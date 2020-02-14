@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1040;&#1085;&#1072;&#1083;&#1086;&#1075; PtrToStructure &#1076;&#1083;&#1103; &#1082;&#1083;&#1072;&#1089;&#1089;&#1086;&#1074;&quot; | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1040;&#1085;&#1072;&#1083;&#1086;&#1075; PtrToStructure &#1076;&#1083;&#1103; &#1082;&#1083;&#1072;&#1089;&#1089;&#1086;&#1074;&quot; | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">Stack Overflow answers</a></i></p>
+<h1>Ответ на "Аналог PtrToStructure для классов"</h1>
+<h2>Answer 1004583</h2>
+<p><a href="https://ru.stackoverflow.com/a/1004583/">Link</a></p>
+<blockquote>
+<blockquote>
+  <p>Создание указателя на класс - невозможно (ошибка CS0208)</p>
+</blockquote>
+<p>Создание указателя на класс невозможно напрямую, так как он управляется сборщиком мусора и может быть перемещен в памяти. Однако, класс можно закрепить с помощью Pinned GCHandle и получить указатель на закрепленный объект - но для этого класс должен состоять только из простых типов и иметь атрибут <code>[StructLayout(LayoutKind.Sequential)]</code> (несмотря на название, его можно применить и к классу).</p>
+<blockquote>
+  <p>А Marshal.PtrToStructure также рассчитан только на структуры</p>
+</blockquote>
+<p>Строго говоря, это не так. Marshal.PtrToStructure работает и c классами, если они удовлетворяют тем же условиям: состоят только из простых типов и имеют атрибут <code>[StructLayout(LayoutKind.Sequential)]</code>.</p>
+<p>Вот пример использования указателей на класс:</p>
+<pre><code>    [StructLayout(LayoutKind.Sequential)]
+    class MyClass
+    {
+        public int A;            
+
+        public override string ToString()
+        {
+            return A.ToString();
+        }
+    }
+
+    static void Main(string[] args)
+    {
+        MyClass my0 = new MyClass { A = 2 };
+        MyClass my1 = new MyClass { A = 3 };                       
+
+        //закрепим объекты в памяти
+        GCHandle h0 = GCHandle.Alloc(my0, GCHandleType.Pinned);
+        GCHandle h1 = GCHandle.Alloc(my1, GCHandleType.Pinned);
+
+        try
+        {
+            //получим адреса объектов
+            IntPtr ptr0 = h0.AddrOfPinnedObject();
+            IntPtr ptr1 = h1.AddrOfPinnedObject();
+
+            //убедимся, что адреса реальные и по ним можно считать данные (первое поле класса)
+            Console.WriteLine("Значение по ptr0: " + Marshal.ReadInt32(ptr0));
+            Console.WriteLine("Значение по ptr1: " + Marshal.ReadInt32(ptr1));
+
+            IntPtr tmp = ptr0;
+            ptr0 = ptr1;
+            ptr1 = tmp;
+
+            my0 = Marshal.PtrToStructure&lt;MyClass&gt;(ptr0);
+            my1 = Marshal.PtrToStructure&lt;MyClass&gt;(ptr1);
+
+            Console.WriteLine("my0.A=" + my0);
+            Console.WriteLine("my1.A=" + my1);
+        }
+        finally
+        {
+            //вернем объекты в управление GC
+            h0.Free();
+            h1.Free();
+        }           
+
+        Console.ReadLine();
+    }
+</code></pre>
+<p>В отличие от принятого ответа, здесь используется указатель на сами данные класса, а не на заголовок объекта. Также при вызове Marshal.PtrToStructure создается новая копия объекта, вместо разыменования указателя на существующий объект. </p>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>

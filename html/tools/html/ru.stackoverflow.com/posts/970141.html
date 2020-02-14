@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1042; &#1095;&#1077;&#1084; &#1088;&#1072;&#1079;&#1085;&#1080;&#1094;&#1072; &#1074; &#1084;&#1072;&#1089;&#1089;&#1080;&#1074;&#1072;&#1093; IEnumerable&lt;T&gt; &#1080; List&lt;T&gt;?&quot; | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1042; &#1095;&#1077;&#1084; &#1088;&#1072;&#1079;&#1085;&#1080;&#1094;&#1072; &#1074; &#1084;&#1072;&#1089;&#1089;&#1080;&#1074;&#1072;&#1093; IEnumerable&lt;T&gt; &#1080; List&lt;T&gt;?&quot; | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">Stack Overflow answers</a></i></p>
+<h1>Ответ на "В чем разница в массивах IEnumerable&lt;T&gt; и List&lt;T&gt;?"</h1>
+<h2>Answer 970141</h2>
+<p><a href="https://ru.stackoverflow.com/a/970141/">Link</a></p>
+<blockquote>
+<blockquote>
+  <p>Здесь, как я понял происходит то, что t2 ссылаться на новый объект IEnumerable с аналогичными значениями</p>
+</blockquote>
+<p>Тип времени выполнения в обоих случаях одинаковый - List. Более того, даже если заменить <code>var ...</code> на <code>IEnumerable&lt;int&gt; ...</code>, ничего не изменится, тип времени выполнения останется тем же, так как метод ToList всегда возвращает объект типа List. (Кроме того, объект просто не может иметь тип IEnumerable, так как экземпляр интерфейса создать нельзя.)</p>
+<p>Чтобы убедиться на практике, выполните код:</p>
+<pre><code>List&lt;int&gt; listValues = new List&lt;int&gt; { 1, 2, 3 };
+var t1 = listValues.ToList();
+Console.WriteLine(t1.GetType());
+
+IEnumerable&lt;int&gt; listValues2 = new List&lt;int&gt; { 1, 2, 3 };
+var t2 = listValues2.ToList();
+Console.WriteLine(t2.GetType());
+
+IEnumerable&lt;int&gt; listValues3 = new List&lt;int&gt; { 1, 2, 3 };
+IEnumerable&lt;int&gt; t3 = listValues3.ToList();
+Console.WriteLine(t3.GetType()); 
+</code></pre>
+<p>Он выведет</p>
+<pre class="lang-none prettyprint-override"><code>System.Collections.Generic.List`1[System.Int32]
+System.Collections.Generic.List`1[System.Int32]
+System.Collections.Generic.List`1[System.Int32]
+</code></pre>
+<hr>
+<p>Чтобы все-таки получить тип времени выполнения, отличный от List, можно реализовать метод-итератор:</p>
+<pre><code>static IEnumerable&lt;int&gt; Foo(List&lt;int&gt; list)
+{
+    for (int i = 0; i &lt; list.Count; i++) yield return list[i];
+}
+</code></pre>
+<p>Тогда</p>
+<pre><code>var t4 = Foo(listValues);
+Console.WriteLine(t4.GetType());
+</code></pre>
+<p>Выведет имя автоматически сгенерированного компилятором типа-итератора (у меня <code>ConsoleApplication1.Program+&lt;Foo&gt;d__0</code>)</p>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>

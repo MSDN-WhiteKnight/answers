@@ -1,0 +1,258 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1086;&#1088;&#1088;&#1077;&#1082;&#1090;&#1080;&#1088;&#1086;&#1074;&#1082;&#1072; &#1082;&#1086;&#1076;&#1072; &#1082;&#1086;&#1085;&#1089;&#1086;&#1083;&#1100;&#1085;&#1086;&#1075;&#1086; &#1082;&#1072;&#1083;&#1100;&#1082;&#1091;&#1083;&#1103;&#1090;&#1086;&#1088;&#1072; &#1085;&#1072; C#&quot; | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1086;&#1088;&#1088;&#1077;&#1082;&#1090;&#1080;&#1088;&#1086;&#1074;&#1082;&#1072; &#1082;&#1086;&#1076;&#1072; &#1082;&#1086;&#1085;&#1089;&#1086;&#1083;&#1100;&#1085;&#1086;&#1075;&#1086; &#1082;&#1072;&#1083;&#1100;&#1082;&#1091;&#1083;&#1103;&#1090;&#1086;&#1088;&#1072; &#1085;&#1072; C#&quot; | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">Stack Overflow answers</a></i></p>
+<h1>Ответ на "Корректировка кода консольного калькулятора на C#"</h1>
+<h2>Answer 985029</h2>
+<p><a href="https://ru.stackoverflow.com/a/985029/">Link</a></p>
+<blockquote>
+<p>В дополнение:</p>
+<pre><code>A = Convert.ToInt32(AT);
+B = Convert.ToInt32(BT);
+</code></pre>
+<p>При использовании методов класса Convert единственный способ обработки неверного ввода - исключения. Генерация исключений является несколько тяжелой операцией, поэтому лучше использовать метод TryParse.</p>
+<pre><code>Console.WriteLine("Числа имеют значение 0, продолжать работу программы нет смысла, завершение");
+</code></pre>
+<p>Такая проверка не имеет смысла, арифметические операции с нолями вполне допустимы (кроме деления). 0+0 должно выдавать 0, а не ошибку.</p>
+<pre><code>char[] NumUs = new char[Longe] { '+', '-', '*', ':' };
+//...
+for (byte i = 0; i &lt; Longe; i++)
+</code></pre>
+<p>Если массив зашит в коде, нет смысла также зашивать в коде его константную длину. Длину массива можно определить программно методом Length, так что при добавлении элементов не придется менять код в двух местах</p>
+<pre><code>Console.WriteLine("Хватит шалить, вводи число от 1 до 4 включительно");
+</code></pre>
+<p>Вы предлагаете пользователю ввести число, а затем преобразуете его в символ. Почему бы сразу не вводить символ? Это намного проще и удобнее.</p>
+<pre><code>Console.WriteLine("Close program? y/n");
+answer = Console.ReadLine();
+</code></pre>
+<p>Так как вы просите пользователя ввести один из символов, оба из которых требуют одиночного нажатия клавиши, можно сделать его ввод чуть более удобным с использованием Console.ReadKey.</p>
+<pre><code>private static void StartProgramm()//полагает начало программы
+{
+    MathGetNumber();
+    MathOperation();
+}
+</code></pre>
+<p>Этот код привносит в программу "повторную входимость": StartProgramm вызывает MathGetNumber, который, в свою очередь, вызывает StartProgramm. Это приводит к тому, что стек вызовов в ходе работы программы будет постепенно расти. Для реализации повторяемости лучше использовать циклы, а не повторно входимые методы.</p>
+<hr>
+<p>Мой вариант улучшения с учетом этих замечаний:</p>
+<pre><code>using System;
+using System.Text;
+
+namespace ConsoleApp1
+{
+    class Program
+    {
+        private static int A;
+        private static int B;
+
+        static void Main(string[] args)
+        {
+            bool success;
+            while (true)
+            {
+                while (true)
+                {
+                    success = MathGetNumber();
+                    if (success) break;
+                }
+
+                while (true)
+                {
+                    success = MathOperation();
+                    if (success) break;
+                }                
+
+                if (Close()) break;                 
+            }
+        }       
+
+        private static bool MathGetNumber()//получаем число
+        {
+            string AT;
+            string BT;
+
+            Console.WriteLine("Первое число");
+            AT = Console.ReadLine();
+            Console.WriteLine("Второе число");
+            BT = Console.ReadLine();
+
+            if (Int32.TryParse(AT, out A) == false || Int32.TryParse(BT, out B) == false)
+            {
+                Console.WriteLine("Не шали, вводи только числа!");
+                return false;
+            }
+
+            for (byte i = 0; i &lt; 4; i++)//это я решил сделать отступ в несколько строк
+            {
+                Console.WriteLine();
+            }
+            return true;
+        }
+
+        private static bool MathOperation()//производим операцию с числом
+        {                       
+
+            char[] NumUs = new char[] { '+', '-', '*', ':' };
+
+            Console.WriteLine("Введите один из знаков операций: ");
+            for (byte i = 0; i &lt; NumUs.Length; i++)
+            {
+                Console.Write(NumUs[i]+" ");                
+            }
+            Console.WriteLine();
+
+            string sign = Console.ReadLine();
+
+            switch (sign)
+            {
+                case "+":
+                    Console.WriteLine("Ваше число = " + (A + B));
+                    break;
+                case "-":
+                    Console.WriteLine("Ваше число = " + (A - B));
+                    break;
+                case "*":
+                    Console.WriteLine("Ваше число = " + (A * B));
+                    break;
+                case ":":
+                    if (B == 0) Console.WriteLine("Делить на ноль нельзя");
+                    else Console.WriteLine("Ваше число = " + (A / B));
+                    break;
+                default:
+                    Console.WriteLine("Не шали, введи один из допустимых знаков операции!");
+                    return false;
+            }
+            return true;
+
+        }                
+
+        private static bool Close()//завершение работы программы
+        {
+            char answer;
+            Console.WriteLine("Close program? y/n");
+
+            while (true)
+            {
+                answer = Console.ReadKey(true).KeyChar;
+
+                if (answer == 'y')
+                {
+                    return true;
+                }
+                else if (answer == 'n')
+                {
+                    return false;
+                }                
+            }            
+        }
+
+    }
+}
+</code></pre>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>

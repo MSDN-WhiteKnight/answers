@@ -11,7 +11,7 @@ namespace StackOverflowAnswers
         static void Main(string[] args)
         {
             HTML.SiteURL = "https://github.com/MSDN-WhiteKnight/answers/";
-            HTML.SiteTitle = "Stack Overflow answers";
+            HTML.SiteTitle = "MSDN.WhiteKnight - Stack Overflow answers";
             HTML.LicenseURL = "https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE";
             HTML.EnableAttribution = false;
 

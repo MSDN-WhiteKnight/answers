@@ -1,0 +1,170 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1063;&#1090;&#1086; &#1090;&#1072;&#1082;&#1086;&#1077; &#1054;&#1087;&#1099;&#1090; &#1088;&#1072;&#1073;&#1086;&#1090;&#1099; &#1074; &#1089;&#1080;&#1089;&#1090;&#1077;&#1084;&#1077; CI/CD&quot; | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1063;&#1090;&#1086; &#1090;&#1072;&#1082;&#1086;&#1077; &#1054;&#1087;&#1099;&#1090; &#1088;&#1072;&#1073;&#1086;&#1090;&#1099; &#1074; &#1089;&#1080;&#1089;&#1090;&#1077;&#1084;&#1077; CI/CD&quot; | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">Stack Overflow answers</a></i></p>
+<h1>Ответ на "Что такое Опыт работы в системе CI/CD"</h1>
+<h2>Answer 1053564</h2>
+<p><a href="https://ru.stackoverflow.com/a/1053564/">Link</a></p>
+<blockquote>
+<p>CI - непрерывная интеграция, упрощенно говоря, это подход к разработке, при котором изменения в исходном коде часто отправляются на сервер и автоматизированно собираются и тестируются. CD (непрерывное развертывание), это аналогично, только помимо сборки код автоматизированно развертывается для конечного использования (например, выкладывается на веб-сервер для веб приложений, или пакуется в установочный пакет целевой ОС для десктопных приложений). Контейнер CI - видимо, просто Docker Container, в котором осуществляются эти действия, если используется <a href="https://docs.microsoft.com/ru-ru/dotnet/architecture/microservices/container-docker-introduction/docker-defined" rel="nofollow noreferrer">Docker</a>. Теория по CI описана по большей части здесь: <a href="https://ru.stackoverflow.com/questions/470453/">Что такое непрерывная интеграция?</a></p>
+<p>В качестве практического примера CI можно привести использование GitHub Actions для автоматизированного построения приложения .NET Core.</p>
+<p>Создадим репозиторий GitHub, и заполним его тестовым проектом C# .NET Core</p>
+<p>Перейдем на вкладку GitHub Actions</p>
+<p><a href="https://i.stack.imgur.com/3d0mc.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/3d0mc.png" alt="GitHub Actions"></a></p>
+<p>Для проекта с кодом на C# система автоматически предлагает создать Workflow .NET Core. Нажмем кнопку "Set up this workflow". Система предложит создать шаблонный файл конфигурации dotnetcore.yml:</p>
+<pre class="lang-none prettyprint-override"><code>name: .NET Core
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.2.108
+    - name: Build with dotnet
+      run: dotnet build --configuration Release
+</code></pre>
+<p>Здесь мы видим два стандартных шага: установка .NET Core SDK нужной версии и запуск сборки с помощью команды dotnet build. Добавим два своих шага: архивацию результатов сборки и запуск получившегося приложения:</p>
+<pre class="lang-none prettyprint-override"><code>name: .NET Core
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.2.108
+    - name: Build with dotnet
+      run: dotnet build CoreTest.sln --configuration Release
+    - name: Archive build results
+      uses: actions/upload-artifact@v1
+      with:
+          name: Output
+          path: NetCoreTest/bin/Release/
+    - name: Run
+      run: |        
+        dotnet NetCoreTest/bin/Release/netcoreapp2.1/NetCoreTest.dll
+</code></pre>
+<p>Зафиксируем результат. Теперь после отправки каждого изменения в репозиторий мы можем автоматически видеть результаты сборки:</p>
+<p><a href="https://i.stack.imgur.com/AQPip.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/AQPip.png" alt="build results"></a></p>
+<p>Эти результаты фигурируют как проверка для Pull request (на вкладке Checks) - можно сделать проверку обязательной, и тогда нельзя будет выполнить слияние изменений, если сборка проходит с ошибкой. Серьезное преимущество в том, что мы всегда можем убедится, что приложение собирается допустим на Linux, даже не имея локальной машины с этой ОС. Под капотом в данном случае не Docker, а виртуальные машины Azure, так что контейнера CI нет (есть виртуальное окружение CI). </p>
+<p>Пример репозитория с настроенным CI: <a href="https://github.com/MSDN-WhiteKnight/CoreTest" rel="nofollow noreferrer">https://github.com/MSDN-WhiteKnight/CoreTest</a></p>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,152 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1072;&#1082; &#1089;&#1086;&#1079;&#1076;&#1072;&#1090;&#1100; DynamicMethod &#1080;&#1079; IL-&#1082;&#1086;&#1076;&#1072;?&quot; | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1072;&#1082; &#1089;&#1086;&#1079;&#1076;&#1072;&#1090;&#1100; DynamicMethod &#1080;&#1079; IL-&#1082;&#1086;&#1076;&#1072;?&quot; | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">Stack Overflow answers</a></i></p>
+<h1>Ответ на "Как создать DynamicMethod из IL-кода?"</h1>
+<h2>Answer 1006815</h2>
+<p><a href="https://ru.stackoverflow.com/a/1006815/">Link</a></p>
+<blockquote>
+<p>Прямая работа с Reflection.Emit обычно используется в особых случаях, когда нужно сгенерировать сложный многострочный метод. Для однострочного метода, который только вызывает другой метод, можно использовать более простое высокоуровневое средство - деревья выражений. При их использовании не нужно задумываться об отдельных инструкциях и корректности IL. Вот пример, также для более простого случая, когда метод call - статический:</p>
+<pre><code>using System;
+using System.Collections;
+using System.Linq.Expressions;
+using System.Reflection;
+
+namespace ConsoleApplication1
+{
+    class Program
+    {
+        public static object call(object[] args)
+        {
+            //...
+        }
+
+        static void Main(string[] args)
+        {
+            ParameterExpression param1 = Expression.Parameter(typeof(string), "v1");
+            ParameterExpression param2 = Expression.Parameter(typeof(int), "v2");
+
+            NewArrayExpression expr_arr = Expression.NewArrayInit(
+                typeof(object),
+                Expression.Convert(param1,typeof(object)),
+                Expression.Convert(param2, typeof(object))
+                );
+
+            MethodCallExpression call_expr = Expression.Call(typeof(Program).GetMethod("call"), expr_arr);
+            UnaryExpression conv_expr = Expression.Convert(call_expr, typeof(int));
+
+            var f_expr = Expression.Lambda&lt;Func&lt;string, int, int&gt;&gt;(conv_expr, param1,param2);
+            Func&lt;string, int, int&gt; f = f_expr.Compile();
+            int res = f("test", 77);
+        }
+    }  
+}
+</code></pre>
+<p>При этом деревья выражений внутри также используют Reflection.Emit и динамические методы. Тип времени выполнения метода f.Method будет <code>System.Reflection.Emit.DynamicMethod+RTDynamicMethod</code>, он также будет создан в специальной изолированной системной сборке и может быть выгружен сборщиком мусора, когда он больше не нужен.</p>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,208 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1072;&#1082; &#1086;&#1087;&#1088;&#1077;&#1076;&#1077;&#1083;&#1080;&#1090;&#1100; &#1092;&#1086;&#1088;&#1084;&#1072;&#1090; &#1092;&#1072;&#1081;&#1083;&#1072; excel?&quot; | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1072;&#1082; &#1086;&#1087;&#1088;&#1077;&#1076;&#1077;&#1083;&#1080;&#1090;&#1100; &#1092;&#1086;&#1088;&#1084;&#1072;&#1090; &#1092;&#1072;&#1081;&#1083;&#1072; excel?&quot; | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">Stack Overflow answers</a></i></p>
+<h1>Ответ на "Как определить формат файла excel?"</h1>
+<h2>Answer 1005851</h2>
+<p><a href="https://ru.stackoverflow.com/a/1005851/">Link</a></p>
+<blockquote>
+<p>Как вариант, в Windows для определения, является ли файл корректным XLS-файлом, можно использовать Structured Storage API. Согласно спецификации, формат XLS - это файл формата Structured Storage, который содержит поток с именем Workbook.</p>
+<p><a href="https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-xls/f67ac5ed-b0a7-4b2c-9b7a-28933eeaac7e" rel="nofollow noreferrer">MS-XLS: Excel Binary File Format Structure, пункт 2.1.2</a>:</p>
+<blockquote>
+  <p>A file of the type specified by this document consists of storages and streams as specified in [MS-CFB]... </p>
+  
+  <p>A workbook MUST contain the workbook stream...</p>
+</blockquote>
+<p>Можно использовать следующий код для проверки на XLS, на основе этого правила:</p>
+<pre><code>using System;
+using System.Collections;
+using System.Runtime.InteropServices;
+
+namespace ConsoleApplication1
+{
+    class Program
+    {
+        [DllImport("ole32.dll")]
+        static extern int StgOpenStorageEx(
+            [MarshalAs(UnmanagedType.LPWStr)] string pwcsName,
+            uint grfMode,
+            uint stgfmt,
+            uint grfAttrs,
+            IntPtr pStgOptions,
+            IntPtr reserved2,
+            [In] ref Guid riid,
+            out IStorage ppObjectOpen);
+
+        const uint STGM_DIRECT = 0;
+        const uint STGM_READ = 0;        
+        const uint STGM_SHARE_EXCLUSIVE = 0x10;        
+        const uint STGFMT_STORAGE = 0;        
+        const uint PID_FIRST_USABLE = 2;
+        const uint STGC_DEFAULT = 0;               
+
+        [Guid("0000000B-0000-0000-C000-000000000046")]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IStorage
+        {
+            void a();
+
+            [PreserveSig]
+            int OpenStream(string pwcsName, 
+                IntPtr reserved1, 
+                uint grfMode, 
+                uint reserved2, 
+                [MarshalAs(UnmanagedType.Interface)] out object ppstm);
+
+            void CreateStorage(string pwcsName, uint grfMode,  uint reserved1, uint reserved2, out IStorage ppstg);            
+            void OpenStorage(string pwcsName, IStorage pstgPriority,  uint grfMode,  IntPtr snbExclude, uint reserved, out IStorage ppstg);            
+            void CopyTo( uint ciidExclude, Guid[] rgiidExclude,  IntPtr snbExclude, IStorage pstgDest);            
+            void MoveElementTo(string pwcsName, IStorage pstgDest, string pwcsNewName, uint grfFlags);            
+            void Commit( uint grfCommitFlags);            
+            void Revert();            
+            void b();            
+            void DestroyElement(string pwcsName);            
+            void RenameElement(string pwcsOldName, string pwcsNewName);            
+            void c();            
+            void SetClass( ref Guid clsid);            
+            void SetStateBits( uint grfStateBits,  uint grfMask);            
+            void d();
+        }
+
+        public static bool IsXLS(string path)
+        {            
+            IStorage pStorage = null;
+            object o = null;
+            int hr;            
+            Guid guidStorage = typeof(IStorage).GUID;            
+
+            try
+            {
+                //открываем файл
+                hr = StgOpenStorageEx(path, STGM_READ | STGM_SHARE_EXCLUSIVE, STGFMT_STORAGE,
+                    0, IntPtr.Zero, IntPtr.Zero, ref guidStorage, out pStorage);
+
+                if (hr != 0) return false; //NOT Structured storage file                 
+
+                //открываем поток
+                hr = pStorage.OpenStream("Workbook", IntPtr.Zero, STGM_DIRECT | STGM_READ | STGM_SHARE_EXCLUSIVE, 0, out o);
+
+                return hr == 0;
+            }
+            finally
+            {
+                //освобождение ресурсов                
+                if (pStorage != null) Marshal.ReleaseComObject(pStorage);
+                if (o != null) Marshal.ReleaseComObject(o);
+            }
+        }       
+    }  
+}
+</code></pre>
+<p>Так как файл XLSX является ZIP-архивом определенной структуры, можно применить для проверки ту же логику, и воспользоваться любой библиотекой для работы с ZIP-архивами (в .NET 4.5+ есть встроенная <a href="https://docs.microsoft.com/en-us/dotnet/api/system.io.compression?view=netcore-2.1" rel="nofollow noreferrer">System.IO.Compression</a>).</p>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>
