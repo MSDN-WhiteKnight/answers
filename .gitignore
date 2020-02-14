@@ -348,3 +348,27 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+####################################################################
+
+# DocFX
+
+###############
+#    folder   #
+###############
+/**/DROP/
+/**/TEMP/
+/**/packages/
+/**/bin/
+/**/obj/
+
+#############
+/html/manifest.json
+*.pdf
+
+# NuGet
+*.dll
+*.nupkg
+
+# Generated files
+/tools/html/*.com/

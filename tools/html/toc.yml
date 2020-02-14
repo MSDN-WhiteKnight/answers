@@ -1,0 +1,4 @@
+- name: "Stackoverflow answers"
+  items:
+  - name: "Stackoverflow на русском"
+    href: ru.stackoverflow.com/posts/
