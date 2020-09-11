@@ -1,0 +1,193 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Answer 1176556 | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Answer 1176556 | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
+<h1>Answer 1176556</h1>
+<h2>Answer 1176556</h2>
+<p><a href="https://ru.stackoverflow.com/a/1176556/">Link</a></p>
+<blockquote>
+<p>Этого в явном виде нет в Entity Framework, и не может быть, так как не любая СУБД поддерживает &quot;составные&quot; параметры на уровне своего протокола. Но SQL Server, например, поддерживает: <a href="https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql/table-valued-parameters" rel="nofollow noreferrer">https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/sql/table-valued-parameters</a></p>
+<p>Пусть у нас есть таблица Users, в которой поле Id целочисленного типа.</p>
+<p>Мы можем вот так создать свой табличный тип:</p>
+<pre><code>CREATE TYPE ListOfIntegersType AS TABLE (i int) 
+</code></pre>
+<p>И выполнить запрос с его использованием так:</p>
+<pre><code>using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Linq;
+using System.Data;
+using Microsoft.Data.SqlClient;
+using Microsoft.Data.SqlClient.Server;
+using Microsoft.EntityFrameworkCore;
+
+namespace ConsoleApp1
+{
+    public class User
+    {
+        public int Id { get; set; }
+        public string DisplayName { get; set; }        
+    }
+
+    public class MyContext : DbContext
+    {
+        public DbSet&lt;User&gt; Users { get; set; }        
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(
+                @&quot;Data source=.\SQLEXPRESS;Initial catalog=Database;Integrated security=True;&quot;);
+        }
+    }
+
+    class Program
+    {
+        static IEnumerable&lt;SqlDataRecord&gt; PrepareSequence(
+            IEnumerable&lt;int&gt; src
+            )
+        {
+            foreach (int item in src)
+            {
+                var ret = new SqlDataRecord(new SqlMetaData(&quot;x&quot;, SqlDbType.Int));
+                ret.SetInt32(0, item);
+                yield return ret;
+            }
+        }
+
+        static void Main(string[] args)
+        {
+            MyContext entities = new MyContext();
+
+            var users = entities.Users.FromSqlRaw(
+                &quot;SELECT * FROM Users WHERE Id IN (SELECT * FROM @tvpID)&quot;,
+                new object[] {
+                    new SqlParameter(&quot;@tvpID&quot;, SqlDbType.Structured)
+                    {
+                        TypeName = &quot;dbo.ListOfIntegersType&quot;,
+                        Value = PrepareSequence(new int[] { 6, 1365})
+                    }
+                });            
+        }
+    }
+}
+</code></pre>
+<p>Выглядит не очень элегантно. Однако, EF для того и создан, что можно не писать вручную SQL, а использовать Linq Expressions с автоматической генерацией запросов. Тогда все это хозяйство можно переписать вот так:</p>
+<pre><code>var users = entities.Users.Where((x) =&gt; new int[] { 1, 2}.Contains(x.Id)); 
+</code></pre>
+<p>Необходимости в параметрах вообще нет, все и так строго типизировано. И все отлично работает! (На SQL Server по крайней мере.) Генерируемый провайдером запрос выглядит так:</p>
+<pre class="lang-none prettyprint-override"><code>SELECT 
+[Extent1].[Id] AS [Id], 
+[Extent1].[DisplayName] AS [DisplayName] 
+FROM (SELECT 
+[Users].[Id] AS [Id], 
+[Users].[DisplayName] AS [DisplayName] 
+FROM [dbo].[Users] AS [Users]) AS [Extent1]
+WHERE [Extent1].[Id] IN (1,2)
+</code></pre>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span><script type="text/javascript">(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(65150713, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/65150713" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>

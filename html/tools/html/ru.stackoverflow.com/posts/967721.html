@@ -76,27 +76,27 @@
 <h1>Windows 10</h1>
 <p>Можно использовать API UWP (<a href="https://docs.microsoft.com/en-us/uwp/api/windows.data.pdf" rel="nofollow noreferrer">Windows.Data.Pdf</a>). Для его использования необходим добавить ссылки на:</p>
 <ul>
-<li>библиотеку метаданных UWP, путь к которой имеет вид <code>C:\Program Files (x86)\Windows Kits\10\UnionMetadata\(версия)\Windows.winmd</code> (для добавления ссылки на нее в диалоговом окне выбора библиотеки необходимо изменить фильтр на "Все файлы");</li>
+<li>библиотеку метаданных UWP, путь к которой имеет вид <code>C:\Program Files (x86)\Windows Kits\10\UnionMetadata\(версия)\Windows.winmd</code> (для добавления ссылки на нее в диалоговом окне выбора библиотеки необходимо изменить фильтр на &quot;Все файлы&quot;);</li>
 <li>сборку System.Runtime.WindowsRuntime (<code>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETCore\v4.5\System.Runtime.WindowsRuntime.dll</code>).</li>
 </ul>
 <p>Тогда код для отображения страницы PDF-документа в WPF будет выглядеть так:</p>
 <p>XAML</p>
 <pre class="lang-xml prettyprint-override"><code>&lt;Window
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
-        x:Class="WpfApp1.MainWindow"
-        Title="MainWindow" Height="400" Width="600" &gt;
-
-    &lt;Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="grid" &gt;
-        &lt;Button Content="Button" HorizontalAlignment="Left" Height="50" Margin="20,20,0,0" 
-                VerticalAlignment="Top" Width="217" Click="Button_Click"/&gt;
-        &lt;Image HorizontalAlignment="Stretch"  Margin="40,100,40,40" VerticalAlignment="Stretch" x:Name="img"/&gt;
-    &lt;/Grid&gt;
-&lt;/Window&gt;
+        xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
+        xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+        xmlns:d=&quot;http://schemas.microsoft.com/expression/blend/2008&quot;
+        xmlns:mc=&quot;http://schemas.openxmlformats.org/markup-compatibility/2006&quot;
+        mc:Ignorable=&quot;d&quot;
+        x:Class=&quot;WpfApp1.MainWindow&quot;
+        Title=&quot;MainWindow&quot; Height=&quot;400&quot; Width=&quot;600&quot; &gt;
+<pre><code>&amp;lt;Grid HorizontalAlignment=&amp;quot;Stretch&amp;quot; VerticalAlignment=&amp;quot;Stretch&amp;quot; x:Name=&amp;quot;grid&amp;quot; &amp;gt;
+    &amp;lt;Button Content=&amp;quot;Button&amp;quot; HorizontalAlignment=&amp;quot;Left&amp;quot; Height=&amp;quot;50&amp;quot; Margin=&amp;quot;20,20,0,0&amp;quot; 
+            VerticalAlignment=&amp;quot;Top&amp;quot; Width=&amp;quot;217&amp;quot; Click=&amp;quot;Button_Click&amp;quot;/&amp;gt;
+    &amp;lt;Image HorizontalAlignment=&amp;quot;Stretch&amp;quot;  Margin=&amp;quot;40,100,40,40&amp;quot; VerticalAlignment=&amp;quot;Stretch&amp;quot; x:Name=&amp;quot;img&amp;quot;/&amp;gt;
+&amp;lt;/Grid&amp;gt;
 </code></pre>
+<p>&lt;/Window&gt;
+</code></pre><p>
 <p>C#</p>
 <pre class="lang-cs prettyprint-override"><code>using System;
 using System.IO;
@@ -108,43 +108,44 @@ using System.Windows.Controls;
 using Windows.Data.Pdf;
 using Windows.Storage;
 using Windows.Storage.Streams;
-
-namespace WpfApp1
+<p>namespace WpfApp1
 {
-    public partial class MainWindow : Window
+public partial class MainWindow : Window
+{
+public MainWindow()
+{
+InitializeComponent();<br>
+}</p>
+<pre><code>    private async void Button_Click(object sender, RoutedEventArgs e)
     {
-        public MainWindow()
+        StorageFile file = await StorageFile.GetFileFromPathAsync(@&amp;quot;C:\files\document.pdf&amp;quot;);
+        PdfDocument pdf = await PdfDocument.LoadFromFileAsync(file);
+        PdfPage page = pdf.GetPage(0);
+        BitmapImage image = new BitmapImage();
+
+        using (var stream = new InMemoryRandomAccessStream())
         {
-            InitializeComponent();            
-        }        
+            await page.RenderToStreamAsync(stream);
 
-        private async void Button_Click(object sender, RoutedEventArgs e)
-        {
-            StorageFile file = await StorageFile.GetFileFromPathAsync(@"C:\files\document.pdf");
-            PdfDocument pdf = await PdfDocument.LoadFromFileAsync(file);
-            PdfPage page = pdf.GetPage(0);
-            BitmapImage image = new BitmapImage();
-
-            using (var stream = new InMemoryRandomAccessStream())
-            {
-                await page.RenderToStreamAsync(stream);
-
-                image.BeginInit();
-                image.CacheOption = BitmapCacheOption.OnLoad;
-                image.StreamSource = stream.AsStream();
-                image.EndInit();
-            }
-            img.Source = image;      
+            image.BeginInit();
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.StreamSource = stream.AsStream();
+            image.EndInit();
         }
-    }    
-}
+        img.Source = image;      
+    }
+}    
 </code></pre>
+<p>}
+</code></pre></p>
 <p>Источник: <a href="https://blogs.u2u.be/lander/post/2018/01/23/Creating-a-PDF-Viewer-in-WPF-using-Windows-10-APIs" rel="nofollow noreferrer">Lander Verhack. Creating a PDF Viewer in WPF using Windows 10 APIs</a></p>
 <h1>Предыдущие версии Windows</h1>
 <p>Использовать какую-либо стороннюю библиотеку, например:</p>
 <ul>
-<li><p><a href="https://cefsharp.github.io" rel="nofollow noreferrer">CefSharp</a> - аналог WebBrowser, который поддерживает также отображение PDF</p></li>
-<li><p><a href="https://www.codeproject.com/Articles/380019/Using-Adobe-Reader-in-a-WPF-app" rel="nofollow noreferrer">ActiveX-элемент Adobe Reader</a></p></li>
+<li><p><a href="https://cefsharp.github.io" rel="nofollow noreferrer">CefSharp</a> - аналог WebBrowser, который поддерживает также отображение PDF</p>
+</li>
+<li><p><a href="https://www.codeproject.com/Articles/380019/Using-Adobe-Reader-in-a-WPF-app" rel="nofollow noreferrer">ActiveX-элемент Adobe Reader</a></p>
+</li>
 </ul>
 </blockquote>
 <hr>
@@ -174,7 +175,7 @@ namespace WpfApp1
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span><script type="text/javascript">(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(65150713, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/65150713" style="position:absolute; left:-9999px;" alt=""></div></noscript>
             
           </div>
         </div>

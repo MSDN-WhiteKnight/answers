@@ -1,0 +1,257 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Answer 1108285 | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Answer 1108285 | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
+<h1>Answer 1108285</h1>
+<h2>Answer 1108285</h2>
+<p><a href="https://ru.stackoverflow.com/a/1108285/">Link</a></p>
+<blockquote>
+<p>Проблема в том, что стандартный шаблон кнопки имеет свою логику в отношении фона кнопки. Ваше значение просто затирается. Как это исправить? Переопределить шаблон и выпилить из него ненужное. Проще всего нажать в дизайнере XAML на свойство Template и выбрать "Преобразовать в локальное значение". Затем в полученной разметке закомментировать что не нужно (конкретно - триггеры для свойств IsMouseOver и IsPressed). Пример переопределенного шаблона для одной кнопки:</p>
+<pre class="lang-xml prettyprint-override"><code>&lt;Window x:Class="WpfTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfTest"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800"&gt;
+    &lt;Window.Resources&gt;
+        &lt;Style x:Key="CenterDataGridColumnsHeaders" TargetType="DataGridColumnHeader"&gt;
+            &lt;Setter Property="HorizontalContentAlignment" Value="Center"/&gt;
+        &lt;/Style&gt;
+        &lt;Style TargetType="Button"&gt;
+            &lt;Style.Triggers&gt;
+                &lt;Trigger Property="IsPressed" Value="True"&gt;
+                    &lt;Setter Property="Effect"&gt;
+                        &lt;Setter.Value&gt;
+                            &lt;DropShadowEffect BlurRadius="50" ShadowDepth="10"/&gt;
+                        &lt;/Setter.Value&gt;
+                    &lt;/Setter&gt;
+                    &lt;Setter Property="Background" Value="Black"/&gt;
+                    &lt;Setter Property="SnapsToDevicePixels" Value="True"/&gt;
+                &lt;/Trigger&gt;
+            &lt;/Style.Triggers&gt;
+        &lt;/Style&gt;
+    &lt;/Window.Resources&gt;
+    &lt;Grid&gt;
+        &lt;Button Content="Button" HorizontalAlignment="Left" Margin="123,102,0,0" VerticalAlignment="Top" Width="75"
+                Foreground="Green"&gt;
+            &lt;Button.Template&gt;
+                &lt;ControlTemplate TargetType="{x:Type ButtonBase}"&gt;
+                    &lt;Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True"&gt;
+                        &lt;ContentPresenter x:Name="contentPresenter" 
+                                          ContentTemplate="{TemplateBinding ContentTemplate}" 
+                                          Content="{TemplateBinding Content}" 
+                                          ContentStringFormat="{TemplateBinding ContentStringFormat}" 
+                                          Focusable="False" 
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                          Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" 
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/&gt;
+                    &lt;/Border&gt;
+                    &lt;ControlTemplate.Triggers&gt;
+                        &lt;Trigger Property="Button.IsDefaulted" Value="True"&gt;
+                            &lt;Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/&gt;
+                        &lt;/Trigger&gt;
+                        &lt;!--&lt;Trigger Property="IsMouseOver" Value="True"&gt;
+                            &lt;Setter Property="Background" TargetName="border" Value="#FFBEE6FD"/&gt;
+                            &lt;Setter Property="BorderBrush" TargetName="border" Value="#FF3C7FB1"/&gt;
+                        &lt;/Trigger&gt;
+                        &lt;Trigger Property="IsPressed" Value="True"&gt;
+                            &lt;Setter Property="Background" TargetName="border" Value="#FFC4E5F6"/&gt;
+                            &lt;Setter Property="BorderBrush" TargetName="border" Value="#FF2C628B"/&gt;
+                        &lt;/Trigger&gt; --&gt;
+                        &lt;Trigger Property="ToggleButton.IsChecked" Value="True"&gt;
+                            &lt;Setter Property="Background" TargetName="border" Value="#FFBCDDEE"/&gt;
+                            &lt;Setter Property="BorderBrush" TargetName="border" Value="#FF245A83"/&gt;
+                        &lt;/Trigger&gt;
+                        &lt;Trigger Property="IsEnabled" Value="False"&gt;
+                            &lt;Setter Property="Background" TargetName="border" Value="#FFF4F4F4"/&gt;
+                            &lt;Setter Property="BorderBrush" TargetName="border" Value="#FFADB2B5"/&gt;
+                            &lt;Setter Property="Foreground" Value="#FF838383"/&gt;
+                        &lt;/Trigger&gt;
+                    &lt;/ControlTemplate.Triggers&gt;
+                &lt;/ControlTemplate&gt;
+            &lt;/Button.Template&gt;
+        &lt;/Button&gt;
+
+    &lt;/Grid&gt;
+&lt;/Window&gt;
+</code></pre>
+<p>Для всех кнопок окна через стиль:</p>
+<pre class="lang-xml prettyprint-override"><code>&lt;Window x:Class="WpfApplication1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"        
+        Title="Window1" Height="350" Width="620.522" &gt;
+    &lt;Window.Resources&gt;
+        &lt;Style x:Key="CenterDataGridColumnsHeaders" TargetType="DataGridColumnHeader"&gt;
+            &lt;Setter Property="HorizontalContentAlignment" Value="Center"/&gt;
+        &lt;/Style&gt;
+        &lt;Style TargetType="Button"&gt;
+            &lt;Style.Triggers&gt;
+                &lt;Trigger Property="IsPressed" Value="True"&gt;
+                    &lt;Setter Property="Effect"&gt;
+                        &lt;Setter.Value&gt;
+                            &lt;DropShadowEffect BlurRadius="50" ShadowDepth="10"/&gt;
+                        &lt;/Setter.Value&gt;
+                    &lt;/Setter&gt;
+                    &lt;Setter Property="Background" Value="Black"/&gt;
+                    &lt;Setter Property="SnapsToDevicePixels" Value="True"/&gt;
+                &lt;/Trigger&gt;
+            &lt;/Style.Triggers&gt;
+            &lt;Setter Property="Template"&gt;
+                &lt;Setter.Value&gt;
+                    &lt;ControlTemplate TargetType="{x:Type ButtonBase}"&gt;
+                        &lt;Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True"&gt;
+                            &lt;ContentPresenter x:Name="contentPresenter" 
+                                          ContentTemplate="{TemplateBinding ContentTemplate}" 
+                                          Content="{TemplateBinding Content}" 
+                                          ContentStringFormat="{TemplateBinding ContentStringFormat}" 
+                                          Focusable="False" 
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                          Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" 
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/&gt;
+                        &lt;/Border&gt;
+                        &lt;ControlTemplate.Triggers&gt;
+                            &lt;Trigger Property="Button.IsDefaulted" Value="True"&gt;
+                                &lt;Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/&gt;
+                            &lt;/Trigger&gt;
+                            &lt;!--&lt;Trigger Property="IsMouseOver" Value="True"&gt;
+                            &lt;Setter Property="Background" TargetName="border" Value="#FFBEE6FD"/&gt;
+                            &lt;Setter Property="BorderBrush" TargetName="border" Value="#FF3C7FB1"/&gt;
+                        &lt;/Trigger&gt;
+                        &lt;Trigger Property="IsPressed" Value="True"&gt;
+                            &lt;Setter Property="Background" TargetName="border" Value="#FFC4E5F6"/&gt;
+                            &lt;Setter Property="BorderBrush" TargetName="border" Value="#FF2C628B"/&gt;
+                        &lt;/Trigger&gt; --&gt;
+                            &lt;Trigger Property="ToggleButton.IsChecked" Value="True"&gt;
+                                &lt;Setter Property="Background" TargetName="border" Value="#FFBCDDEE"/&gt;
+                                &lt;Setter Property="BorderBrush" TargetName="border" Value="#FF245A83"/&gt;
+                            &lt;/Trigger&gt;
+                            &lt;Trigger Property="IsEnabled" Value="False"&gt;
+                                &lt;Setter Property="Background" TargetName="border" Value="#FFF4F4F4"/&gt;
+                                &lt;Setter Property="BorderBrush" TargetName="border" Value="#FFADB2B5"/&gt;
+                                &lt;Setter Property="Foreground" Value="#FF838383"/&gt;
+                            &lt;/Trigger&gt;
+                        &lt;/ControlTemplate.Triggers&gt;
+                    &lt;/ControlTemplate&gt;
+                &lt;/Setter.Value&gt;
+            &lt;/Setter&gt;
+        &lt;/Style&gt;
+    &lt;/Window.Resources&gt;
+    &lt;Grid&gt;
+        &lt;Button Content="Button" HorizontalAlignment="Left" Height="23" Margin="33,10,0,0" 
+                VerticalAlignment="Top" Width="73" Foreground="Green"/&gt;
+        &lt;Button Content="Button2" HorizontalAlignment="Left" Height="22" Margin="33,47,0,0" 
+                VerticalAlignment="Top" Width="73" Foreground="Red"/&gt;
+    &lt;/Grid&gt;
+&lt;/Window&gt;
+</code></pre>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span><script type="text/javascript">(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(65150713, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/65150713" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>

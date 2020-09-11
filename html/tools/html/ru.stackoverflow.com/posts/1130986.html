@@ -1,0 +1,367 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Answer 1130986 | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Answer 1130986 | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
+<h1>Answer 1130986</h1>
+<h2>Answer 1130986</h2>
+<p><a href="https://ru.stackoverflow.com/a/1130986/">Link</a></p>
+<blockquote>
+<p>Вы не сможете полностью избавиться от мерцания при изменении размера из-за <a href="https://stackoverflow.com/q/53000291/8674428">ограничений DWM</a> в новых версиях Windows. Собственно, наиболее известное приложение WPF, Visual Studio, тоже подвержено этой проблеме, по крайней мере по состоянию на VS 2017. Но наилучшего результата, по моим тестам, можно достичь, убрав стандартную рамку сверху с помощью обработки сообщения <a href="https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-nccalcsize" rel="nofollow noreferrer">WM_NCCALCSIZE</a> и реализовав изменение размера через собственный обработчик WM_NCHITTEST:</p>
+<pre class="lang-xml prettyprint-override"><code>&lt;Window x:Class=&quot;WpfTest.MainWindow&quot;
+        xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
+        xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+        Height=&quot;250&quot; Width=&quot;400&quot; FontSize=&quot;14&quot; Loaded=&quot;Window_Loaded&quot; WindowStyle=&quot;SingleBorderWindow&quot;&gt;
+<pre><code>&amp;lt;Grid Background=&amp;quot;Black&amp;quot; x:Name=&amp;quot;grid&amp;quot;&amp;gt;
+
+    &amp;lt;Button Content=&amp;quot;Button1&amp;quot; HorizontalAlignment=&amp;quot;Left&amp;quot; Height=&amp;quot;50&amp;quot; Margin=&amp;quot;64,0,0,0&amp;quot; VerticalAlignment=&amp;quot;Top&amp;quot; 
+           Background=&amp;quot;Green&amp;quot; Width=&amp;quot;150&amp;quot; Click=&amp;quot;Button1_Click&amp;quot; Foreground=&amp;quot;White&amp;quot;/&amp;gt;
+    &amp;lt;Button x:Name=&amp;quot;bMin&amp;quot; Content=&amp;quot;_&amp;quot; HorizontalAlignment=&amp;quot;Right&amp;quot; Height=&amp;quot;40&amp;quot; Margin=&amp;quot;0,0,80,00&amp;quot; VerticalAlignment=&amp;quot;Top&amp;quot; 
+           Background=&amp;quot;LightBlue&amp;quot; Width=&amp;quot;40&amp;quot; Click=&amp;quot;bMin_Click&amp;quot; /&amp;gt;
+    &amp;lt;Button x:Name=&amp;quot;bMax&amp;quot; Content=&amp;quot;□&amp;quot; HorizontalAlignment=&amp;quot;Right&amp;quot; Height=&amp;quot;40&amp;quot; Margin=&amp;quot;0,0,40,00&amp;quot; VerticalAlignment=&amp;quot;Top&amp;quot; 
+           Background=&amp;quot;LightBlue&amp;quot; Width=&amp;quot;40&amp;quot; Click=&amp;quot;bMax_Click&amp;quot; /&amp;gt;
+    &amp;lt;Button Content=&amp;quot;X&amp;quot; HorizontalAlignment=&amp;quot;Right&amp;quot; Height=&amp;quot;40&amp;quot; Margin=&amp;quot;0,0,0,0&amp;quot; VerticalAlignment=&amp;quot;Top&amp;quot; 
+           Background=&amp;quot;Red&amp;quot; Width=&amp;quot;40&amp;quot; Click=&amp;quot;ButtonClose_Click&amp;quot; /&amp;gt;
+    &amp;lt;Label  Content=&amp;quot;Label&amp;quot; HorizontalAlignment=&amp;quot;Left&amp;quot;  Margin=&amp;quot;0,0,0,0&amp;quot; Foreground=&amp;quot;White&amp;quot;
+               VerticalAlignment=&amp;quot;Top&amp;quot; Width=&amp;quot;50&amp;quot; /&amp;gt;
+
+&amp;lt;/Grid&amp;gt;
+</code></pre>
+<p>&lt;/Window&gt;
+</code></pre><p>
+<hr>
+<pre><code>using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Interop;
+using System.Runtime.InteropServices;
+<p>namespace WpfTest
+{
+public partial class MainWindow : Window
+{
+IntPtr Handle;
+int xborder;
+int yborder;</p>
+<pre><code>    [StructLayout(LayoutKind.Sequential)]
+    public struct RECT
+    {
+        public int left, top, right, bottom;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct NCCALCSIZE_PARAMS
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+        public RECT[] rgrc;
+        public IntPtr lppos;
+    }
+
+    [DllImport(&amp;quot;user32.dll&amp;quot;, SetLastError = true)]
+    static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
+
+    [DllImport(&amp;quot;user32.dll&amp;quot;)]
+    static extern bool AdjustWindowRectEx(ref RECT lpRect, uint dwStyle,
+    bool bMenu, uint dwExStyle);
+
+    [DllImport(&amp;quot;dwmapi.dll&amp;quot;)]
+    static extern bool DwmDefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref IntPtr plResult);
+
+    [DllImport(&amp;quot;user32.dll&amp;quot;)]
+    static extern int GetSystemMetrics(uint smIndex);
+
+    static int GET_X_LPARAM(IntPtr lp)
+    {
+        short loword = (short)((ulong)lp &amp;amp; 0xffff);
+        return loword;
+    }
+
+    static int GET_Y_LPARAM(IntPtr lp)
+    {
+        short hiword = (short)((((ulong)lp) &amp;gt;&amp;gt; 16) &amp;amp; 0xffff);
+        return hiword;
+    }
+
+    const uint WM_NCCALCSIZE = 0x0083;
+    const uint WM_NCHITTEST = 0x0084;
+    const uint WM_ACTIVATE = 0x0006;
+    const uint WM_NCACTIVATE = 0x0086;
+    const uint WM_NCPAINT = 0x85;
+
+    const uint WS_OVERLAPPED = 0x00000000;
+    const uint WS_CAPTION = 0x00C00000;
+    const uint WS_SYSMENU = 0x00080000;
+    const uint WS_THICKFRAME = 0x00040000;
+    const uint WS_MINIMIZEBOX = 0x00020000;
+    const uint WS_MAXIMIZEBOX = 0x00010000;
+    const uint WS_OVERLAPPEDWINDOW = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
+          WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+
+    const uint HTTOPLEFT = 13;
+    const uint HTTOPRIGHT = 14;
+    const uint HTTOP = 12;
+    const uint HTCAPTION = 2;
+    const uint HTLEFT = 10;
+    const uint HTNOWHERE = 0;
+    const uint HTRIGHT = 11;
+    const uint HTBOTTOM = 15;
+    const uint HTBOTTOMLEFT = 16;
+    const uint HTBOTTOMRIGHT = 17;
+
+    const uint SM_CXSIZEFRAME = 32;
+    const uint SM_CYSIZEFRAME = 33;
+
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    //обработка координат мыши для неклиентской области
+    IntPtr HitTestNCA(IntPtr hWnd, IntPtr wParam, IntPtr lParam)
+    {
+        // Get the point coordinates for the hit test.
+        var ptMouse = new Point(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+
+        // Get the window rectangle.
+        RECT rcWindow;
+        GetWindowRect(hWnd, out rcWindow);
+
+        // Get the frame rectangle, adjusted for the style without a caption.
+        RECT rcFrame = new RECT();
+        AdjustWindowRectEx(ref rcFrame, WS_OVERLAPPEDWINDOW &amp;amp; ~WS_CAPTION, false, 0);
+
+        // Determine if the hit test is for resizing. Default middle (1,1).
+        ushort uRow = 1;
+        ushort uCol = 1;
+        bool fOnResizeBorder = false;
+
+        // Determine if the point is at the top or bottom of the window.
+        if (ptMouse.Y &amp;gt;= rcWindow.top &amp;amp;&amp;amp; ptMouse.Y &amp;lt; rcWindow.top + yborder)
+        {
+            fOnResizeBorder = (ptMouse.Y &amp;lt; (rcWindow.top - rcFrame.top));
+            uRow = 0;
+        }
+        else if (ptMouse.Y &amp;lt; rcWindow.bottom &amp;amp;&amp;amp; ptMouse.Y &amp;gt;= rcWindow.bottom - yborder)
+        {
+            uRow = 2;
+        }
+
+        // Determine if the point is at the left or right of the window.
+        if (ptMouse.X &amp;gt;= rcWindow.left &amp;amp;&amp;amp; ptMouse.X &amp;lt; rcWindow.left + xborder)
+        {
+            uCol = 0; // left side
+        }
+        else if (ptMouse.X &amp;lt; rcWindow.right &amp;amp;&amp;amp; ptMouse.X &amp;gt;= rcWindow.right - xborder)
+        {
+            uCol = 2; // right side
+        }
+
+        // Hit test (HTTOPLEFT, ... HTBOTTOMRIGHT)
+        IntPtr[,] hitTests = new IntPtr[,]
+        {
+            { (IntPtr)HTTOPLEFT, fOnResizeBorder? (IntPtr)HTTOP : (IntPtr)HTCAPTION, (IntPtr)HTTOPRIGHT },
+            { (IntPtr)HTLEFT,  (IntPtr)HTNOWHERE, (IntPtr)HTRIGHT},
+            { (IntPtr)HTBOTTOMLEFT, (IntPtr)HTBOTTOM, (IntPtr)HTBOTTOMRIGHT },
+        };
+
+        return hitTests[uRow, uCol];
+    }
+
+    //обработчик сообщений для окна
+    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        bool fCallDWP = true;
+        IntPtr lRet = IntPtr.Zero;
+
+        if (msg == WM_NCCALCSIZE)
+        {
+            if (wParam != (IntPtr)0)
+            {
+                //убираем стандартную рамку сверху
+                lRet = IntPtr.Zero;
+
+                NCCALCSIZE_PARAMS pars = (NCCALCSIZE_PARAMS)Marshal.PtrToStructure(lParam, typeof(NCCALCSIZE_PARAMS));
+
+                pars.rgrc[0].top = pars.rgrc[0].top;
+                pars.rgrc[0].left = pars.rgrc[0].left + xborder;
+                pars.rgrc[0].right = pars.rgrc[0].right - xborder * 2;
+                pars.rgrc[0].bottom = pars.rgrc[0].bottom - yborder;
+                
+                Marshal.StructureToPtr(pars, lParam, false);
+
+                handled = true;
+                return lRet;
+            }
+        }
+
+        if (msg == WM_NCACTIVATE)
+        {
+            lRet = (IntPtr)1;
+            handled = true;
+            return lRet;
+        }                        
+
+        fCallDWP = !DwmDefWindowProc(hwnd, msg, wParam, lParam, ref lRet);
+
+        if (msg == WM_NCHITTEST &amp;amp;&amp;amp; lRet == IntPtr.Zero)
+        {
+            //обработка нажатий мыши
+            lRet = HitTestNCA(hwnd, wParam, lParam);
+
+            if (lRet != (IntPtr)HTNOWHERE)
+            {
+                fCallDWP = false;
+            }
+        }
+
+        //если сообщение не обработано, передаем базовой процедуре
+        if (fCallDWP) handled = false;
+        else handled = true;
+
+        return lRet;
+    }
+
+    private void Window_Loaded(object sender, RoutedEventArgs e)
+    {
+        WindowInteropHelper h = new WindowInteropHelper(this);
+        HwndSource source = HwndSource.FromHwnd(h.Handle);
+        Handle = h.Handle;
+        source.AddHook(new HwndSourceHook(WndProc));//регистрируем обработчик сообщений
+        xborder = GetSystemMetrics(SM_CXSIZEFRAME);
+        yborder = GetSystemMetrics(SM_CYSIZEFRAME);
+    }
+
+    private void Button1_Click(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show(&amp;quot;Button 1&amp;quot;);
+    }
+
+    private void bMin_Click(object sender, RoutedEventArgs e)
+    {
+        this.WindowState = WindowState.Minimized;
+    }
+
+    private void bMax_Click(object sender, RoutedEventArgs e)
+    {
+        if (this.WindowState == System.Windows.WindowState.Normal) this.WindowState = System.Windows.WindowState.Maximized;
+        else this.WindowState = System.Windows.WindowState.Normal;
+    }
+
+    private void ButtonClose_Click(object sender, RoutedEventArgs e)
+    {
+        this.Close();
+    }
+}
+</code></pre>
+<p>}
+</code></pre></p>
+<p>Выглядит так:</p>
+<p><a href="https://i.stack.imgur.com/LdUXp.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/LdUXp.png" alt="custom window"></a></p>
+<p>Заточено под Windows 10. В Windows 7 способ тоже работает и дает неплохой результат, но стиль окна должен быть <code>WindowStyle=&quot;None&quot;</code>. При других стилях мерцание противоположного края возвращается. В Windows 10 же при использовании стиля None исчезают анимации свертывания-развертывания, поэтому для разных версий Windows понадобится выставлять разный стиль.</p>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span><script type="text/javascript">(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(65150713, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/65150713" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>

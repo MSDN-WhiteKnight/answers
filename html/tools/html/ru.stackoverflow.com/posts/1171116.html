@@ -1,0 +1,400 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Answer 1171116 | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Answer 1171116 | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
+<h1>Answer 1171116</h1>
+<h2>Answer 1171116</h2>
+<p><a href="https://ru.stackoverflow.com/a/1171116/">Link</a></p>
+<blockquote>
+<p>В WebBrowser, конечно, нет функционала для получения HTTP-запросов. Обычно для этих целей используют специальные программы, веб-отладчики. Но кое-какое решение можно состряпать и самостоятельно. Ключ к решению здесь - управляющий код <a href="https://docs.microsoft.com/en-us/windows/win32/winsock/sio-rcvall" rel="nofollow noreferrer">SIO_RCVALL</a> в WinSock, который позволяет прослушивать через сокет все IP-пакеты на сетевом интерфейсе. Основа решения описана здесь: <a href="https://ru.stackoverflow.com/a/1019378/240512">https://ru.stackoverflow.com/a/1019378/240512</a>, в данном ответе мы добавим, помимо заголовков запросов, прослушивание их содержимого:</p>
+<pre><code>using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Threading;
+using System.Net;
+using System.Net.Sockets;
+using System.Net.NetworkInformation;
+<p>namespace WpfTest
+{
+public partial class MainWindow : Window
+{
+string navigated_host = &quot;&quot;; //последний сайт, на который перешел WebBrowser
+IPAddress target_ip=null; //IP адрес последнего сервера, к которому обратился WebBrowser
+object sync = new object();</p>
+<pre><code>    public MainWindow()
+    {
+        InitializeComponent();
+        webbrowser.Navigating += webbrowser_Navigating;
+
+        var ips = GetIpAddresses();
+
+        foreach (IPAddress ip in ips)
+        {
+            Thread th = new Thread(ThreadProc);
+            th.IsBackground = true;
+            th.Start((object)ip);
+        }
+
+    }
+
+    void TextBoxWriteLine(string s)
+    {
+        this.Dispatcher.Invoke(() =&amp;gt;
+        {
+            textbox.Text += s + Environment.NewLine;
+        });
+    }
+
+    void webbrowser_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
+    {
+        lock (sync)
+        {
+            navigated_host = e.Uri.Host;
+        }
+    }
+
+    //Получает все локальные IP-адреса
+    public static List&amp;lt;IPAddress&amp;gt; GetIpAddresses()
+    {
+        List&amp;lt;IPAddress&amp;gt; res = new List&amp;lt;IPAddress&amp;gt;(10);
+
+        var ifs = NetworkInterface.GetAllNetworkInterfaces();
+
+        foreach (var interf in ifs)
+        {
+            var ipprop = interf.GetIPProperties();
+            if (ipprop == null) continue;
+            var unicast = ipprop.UnicastAddresses;
+            if (unicast == null) continue;
+
+            //находим первый Unicast-адрес
+            foreach (var addr in unicast)
+            {
+                if (addr.Address.AddressFamily != AddressFamily.InterNetwork) continue;
+                res.Add(addr.Address);
+                break;
+            }
+        }
+
+        return res;
+    }
+
+    const byte PROTO_TCP = 6;
+
+    public string ParseIpPacket(byte[] data, IPAddress src_ip)
+    {
+        ushort dummy;
+        byte b;
+
+        MemoryStream ms = new MemoryStream(data);
+        BinaryReader br = new BinaryReader(ms);
+        uint header_len;
+        uint total_len;
+        IPAddress src, dst;
+        string host = &amp;quot;&amp;quot;;
+
+        //parse IP packet header
+        using (ms)
+        using (br)
+        {
+            b = br.ReadByte();
+            byte ver = (byte)((b &amp;amp; (byte)0xF0) &amp;gt;&amp;gt; 4); //IP version
+            if (ver != 4)
+            {
+                TextBoxWriteLine(&amp;quot;Unsupported IP version: &amp;quot; + ver.ToString());
+                return null;
+            }
+
+            byte ihl = (byte)(b &amp;amp; (byte)0x0F);//header length
+            header_len = ihl * 4u;
+
+            b = br.ReadByte();
+
+            //packet length
+            byte[] temp = new byte[2];
+            temp[1] = br.ReadByte();
+            temp[0] = br.ReadByte();
+            total_len = BitConverter.ToUInt16(temp, 0);
+
+            dummy = br.ReadUInt16();
+            dummy = br.ReadUInt16();
+
+            byte ttl = br.ReadByte();
+            byte proto = br.ReadByte();
+
+            dummy = br.ReadUInt16();
+
+            //source IP
+            temp = new byte[4];
+            temp[0] = br.ReadByte();
+            temp[1] = br.ReadByte();
+            temp[2] = br.ReadByte();
+            temp[3] = br.ReadByte();
+            src = new IPAddress(temp);
+
+            //destination IP
+            temp[0] = br.ReadByte();
+            temp[1] = br.ReadByte();
+            temp[2] = br.ReadByte();
+            temp[3] = br.ReadByte();
+            dst = new IPAddress(temp);
+
+            if (proto != PROTO_TCP) return null;
+        }
+
+        //Parse TCP packet
+        uint tcp_size = total_len - header_len;
+        byte[] tcp_data = new byte[tcp_size];
+        Array.Copy(data, header_len, tcp_data, 0, tcp_size);
+
+        ms = new MemoryStream(tcp_data);
+        br = new BinaryReader(ms);
+        byte tcp_header_size;
+        uint http_size;
+
+        using (ms)
+        using (br)
+        {
+            var src_port = br.ReadUInt16();
+            var dst_port = br.ReadUInt16();
+            br.ReadUInt32();
+            br.ReadUInt32();
+            tcp_header_size = (byte)(br.ReadByte() &amp;gt;&amp;gt; 4);
+            tcp_header_size *= 4;
+            http_size = tcp_size - tcp_header_size;
+        }
+
+        byte[] http_data = new byte[http_size];
+        Array.Copy(tcp_data, tcp_header_size, http_data, 0, http_size);
+
+        //Parse HTTP data
+        string res = Encoding.UTF8.GetString(http_data);
+
+        lock (this.sync)
+        {
+            //если IP-адрес соответствует сохраненному адресу сервера, возвращаем содержимое запроса
+            if (dst.Equals(this.target_ip))
+            {
+                return res;
+            }
+        }
+
+        string[] arr = res.Split(&amp;quot;\n\r&amp;quot;.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                    
+        if (arr.Length &amp;gt; 2 &amp;amp;&amp;amp; arr[0].Contains(&amp;quot;HTTP/&amp;quot;))
+        {
+            //найдем поле Host
+            for (int i = 1; i &amp;lt; arr.Length; i++)
+            {
+                if (arr[i].StartsWith(&amp;quot;Host: &amp;quot;))
+                {
+                    host = arr[i].Replace(&amp;quot;Host: &amp;quot;, &amp;quot;&amp;quot;);
+                    break;
+                }
+            }
+
+            if (host == &amp;quot;&amp;quot;)
+            {
+                //пытаемся получить имя узла из обратного DNS
+                try
+                {
+                    host = Dns.GetHostEntry(dst).HostName;
+                }
+                catch (SocketException)
+                {
+                    host = &amp;quot;&amp;quot;;
+                }
+            }
+
+            lock (sync)
+            {
+                if (host == navigated_host)
+                {
+                    //если поле host соответствует сайту, на который перешел веб-браузер, сохраняем IP сервера
+                    this.target_ip = dst;
+
+                    //возвращаем содержимое запроса
+                    return res;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public void ThreadProc(object args)
+    {
+        var mainSocket = new Socket(AddressFamily.InterNetwork, SocketType.Raw,
+                   ProtocolType.IP);
+
+        IPAddress ipaddr = (IPAddress)args;
+
+        //начинаем прослушивание пакетов на интерфейсе...
+        mainSocket.Bind(new IPEndPoint(ipaddr, 0));
+
+        mainSocket.SetSocketOption(SocketOptionLevel.IP,  //Applies only to IP packets
+                       SocketOptionName.HeaderIncluded, //Set the include header
+                       true);                           //option to true
+
+        byte[] byTrue = new byte[4] { 1, 0, 0, 0 };
+        byte[] byOut = new byte[4];
+
+        //Socket.IOControl is analogous to the WSAIoctl method of Winsock 2
+        mainSocket.IOControl(IOControlCode.ReceiveAll,  //SIO_RCVALL of Winsock
+                 byTrue, byOut);
+
+        byte[] buffer = new byte[1024 * 20];
+        int res;
+
+        while (true)
+        {
+            try
+            {
+                res = mainSocket.Receive(buffer);
+
+                var result = ParseIpPacket(buffer, ipaddr);
+
+                if (result != null)
+                {
+                    TextBoxWriteLine(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.GetType() != typeof(System.Threading.Tasks.TaskCanceledException))
+                {
+                    TextBoxWriteLine(ex.ToString());
+                }
+            }
+        }
+    }
+
+    private void Button1_Click(object sender, RoutedEventArgs e)
+    {
+        webbrowser.Navigate(&amp;quot;http://example.com/&amp;quot;);
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        this.Close();
+    }
+}
+</code></pre>
+<p>}
+</code></pre><p>
+<p>Ограничения решения:</p>
+<ul>
+<li>Работает только с IPv4-интерфейсами</li>
+<li>Работает только протоколом HTTP (не HTTPS)</li>
+<li>Для запуска требуются права администратора</li>
+</ul>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span><script type="text/javascript">(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(65150713, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/65150713" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>

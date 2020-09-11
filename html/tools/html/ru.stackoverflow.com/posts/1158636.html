@@ -1,0 +1,148 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Answer 1158636 | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Answer 1158636 | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
+<h1>Answer 1158636</h1>
+<h2>Answer 1158636</h2>
+<p><a href="https://ru.stackoverflow.com/a/1158636/">Link</a></p>
+<blockquote>
+<p>Нет, несколько пространств имен тут ни о чем не говорит, и подключение других сборок тоже. По спецификации CLI понятие &quot;модуль&quot; имеет строго определенное значение - это файл, содержащий исполняемый код (ECMA-335 I.5)</p>
+<blockquote>
+<p>module: A single file containing content that can be executed by the VES.</p>
+</blockquote>
+<p>Но вот понятие &quot;многомодульная сборка&quot; является многозначным. Под этим могут понимать:</p>
+<ol>
+<li>Сборку, состоящую из нескольких физических файлов (такую сборку также называют <a href="https://docs.microsoft.com/en-us/dotnet/framework/app-domains/multifile-assemblies" rel="nofollow noreferrer">многофайловой</a>)</li>
+<li>Сборку, полученную <a href="https://docs.microsoft.com/en-us/cpp/build/reference/netmodule-files-as-linker-input?view=vs-2019" rel="nofollow noreferrer">компоновкой нескольких файлов .netmodule в один физический файл</a></li>
+</ol>
+<p>Многофайловые сборки получают, подавая на вход программы Assembly Linker (al.exe) нескольких файлов .netmodule. В результате получается сборка, которая содержит манифест примерно такого вида:</p>
+<pre><code>.module extern Client.netmodule
+<p>(...)</p>
+<p>.assembly myAssembly
+{
+.hash algorithm 0x00008004
+.ver 0:0:0:0
+}
+.file Client.netmodule
+.hash = (03 DB 59 BE DA B5 E9 DB 7E 0E D3 E5 2E AB 76 2A   // ..Y.....~.....v*
+73 C6 99 82 )                                     // s...
+.file Stringer.netmodule
+.hash = (95 BF 9C ED 5F 64 B5 66 5A D3 2F 7D 6A EF E9 76   // ...._d.fZ./}j..v
+B3 E0 B8 67 )                                     // ...g
+.class extern public myStringer.Stringer
+{
+.file Stringer.netmodule
+.class 0x02000002
+}</p>
+<p>(...)
+</code></pre><p>
+<p>То есть здесь сборка myAssembly.exe сама не содержит кода, а ссылается на два внешних файла модулей, Client.netmodule и Stringer.netmodule. Чтобы ее запустить и выполнить код из файла .netmodule, этот файл должен лежать с ней в одном месте, в противном случае будет ошибка.</p>
+<p>Сборки второго вида получают, подавая на вход обычного компоновщика Visual C++ (link.exe) несколько файлов .netmodule. В результате получается один физический файл, содержащий объединенный код из всех этих модулей. При этом на уровне метаданных не будет никаких признаков, что сборка собиралась из нескольких модулей. Практический смысл тут в том, чтобы сочетать в одной сборке код на разных языках программирования. По слухам, PresentationCore в WPF сделана именно таким образом, из одного модуля на C# и второго - на С++/CLI.</p>
+<p>Если же вы получили сборку с помощью обычной компиляции C# в Visual Studio или командной строке MSBuild, без компоновки, то она не может быть ни многомодульной, ни многофайловой.</p>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span><script type="text/javascript">(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(65150713, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/65150713" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>

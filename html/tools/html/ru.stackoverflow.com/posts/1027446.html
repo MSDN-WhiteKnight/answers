@@ -75,8 +75,10 @@
 <blockquote>
 <p>Анализ кода нужен, чтобы проверять код и выявлять возможные ошибки и нарушения его правильности и соответствия лучшим практикам (например, в плане архитектуры или стиля). В современных версиях студии (2017+) анализаторы можно разделить на две группы:</p>
 <ul>
-<li><p><em>Анализаторы исходного кода.</em> Эти анализаторы работают в режиме реального времени и могут проверять код, даже если он не компилируется. Специально включать их не нужно, они работают всегда, и с меню <strong>Анализ</strong> они не связаны. Обычно их предупреждения отображаются как всплывающие подсказки прямо в редакторе кода, реже - в результатах компиляции.</p></li>
-<li><p><em>Анализаторы скомпилированных сборок.</em> Этот вид анализаторов запускается только после сборки проекта и проверяет бинарники на соответствие определенным правилам (в основном по архитектуре), выводя предупреждения в результаты компиляции. Не работает для .NET Core. Меню <strong>Анализ</strong> управляет именно этими, "старыми" анализаторами. </p></li>
+<li><p><em>Анализаторы исходного кода.</em> Эти анализаторы работают в режиме реального времени и могут проверять код, даже если он не компилируется. Специально включать их не нужно, они работают всегда, и с меню <strong>Анализ</strong> они не связаны. Обычно их предупреждения отображаются как всплывающие подсказки прямо в редакторе кода, реже - в результатах компиляции.</p>
+</li>
+<li><p><em>Анализаторы скомпилированных сборок.</em> Этот вид анализаторов запускается только после сборки проекта и проверяет бинарники на соответствие определенным правилам (в основном по архитектуре), выводя предупреждения в результаты компиляции. Не работает для .NET Core. Меню <strong>Анализ</strong> управляет именно этими, &quot;старыми&quot; анализаторами.</p>
+</li>
 </ul>
 <p>В каких ситуациях использовать анализаторы? Первого вида - видимо всегда, их даже непонятно как отключить (иногда они падают с ошибкой, выводя сообщение в верхней части окна, и анализ перестает работать сам). Второго вида - в зависимости от требований к проекту. Например, имеет смысл их использовать, если вы делаете библиотеку, которой будут пользоваться другие, а если просто программу для себя - скорее всего, нет.</p>
 <h1>Использование анализа исходного кода</h1>
@@ -84,105 +86,101 @@
 <p>Создадим проект C#, и добавим в него такой код:</p>
 <pre><code>using System;
 using System.IO;
-
-namespace NetCoreTest
+<p>namespace NetCoreTest
 {
-    class Program
-    {        
-        public class foo
-        {
+class Program
+{<br>
+public class foo
+{</p>
+<pre><code>    }
 
-        }
-
-        static void Main(string[] args)
-        {            
-            Console.WriteLine("Hello World!");
-            Console.ReadKey();
-        }
+    static void Main(string[] args)
+    {            
+        Console.WriteLine(&amp;quot;Hello World!&amp;quot;);
+        Console.ReadKey();
     }
 }
 </code></pre>
-<p>Студия подчеркнет пунктирной линией класс, названный с маленькой буквы, а также выведет в список ошибок сообщение с кодом IDE1006. (Коды, начинающиеся с IDE, относятся к стилю.) Если навести мышью на пунктир, появляется всплывающая подсказка, в которой можно выбрать предложенный вариант исправления. </p>
-<p>Также неиспользуемую директиву using студия выделила серым цветом. Это предупреждение по умолчанию не отображается в списке ошибок, но оно также имеет код (IDE0005). Аналогично, можно навести мышью и применить исправление, удаляющее неиспользуемую директиву. </p>
+<p>}
+</code></pre><p>
+<p>Студия подчеркнет пунктирной линией класс, названный с маленькой буквы, а также выведет в список ошибок сообщение с кодом IDE1006. (Коды, начинающиеся с IDE, относятся к стилю.) Если навести мышью на пунктир, появляется всплывающая подсказка, в которой можно выбрать предложенный вариант исправления.</p>
+<p>Также неиспользуемую директиву using студия выделила серым цветом. Это предупреждение по умолчанию не отображается в списке ошибок, но оно также имеет код (IDE0005). Аналогично, можно навести мышью и применить исправление, удаляющее неиспользуемую директиву.</p>
 <p><a href="https://i.stack.imgur.com/BfbWm.png" rel="noreferrer"><img src="https://i.stack.imgur.com/BfbWm.png" alt="source analysis"></a></p>
 <p>После исправления:</p>
 <pre><code>using System;
-
-namespace NetCoreTest
+<p>namespace NetCoreTest
 {
-    class Program
-    {        
-        public class Foo
-        {
+class Program
+{<br>
+public class Foo
+{</p>
+<pre><code>    }
 
-        }
-
-        static void Main(string[] args)
-        {            
-            Console.WriteLine("Hello World!");
-            Console.ReadKey();
-        }
+    static void Main(string[] args)
+    {            
+        Console.WriteLine(&amp;quot;Hello World!&amp;quot;);
+        Console.ReadKey();
     }
 }
 </code></pre>
-<p>Можно установить дополнительные анализаторы, которые будут также проверять архитектуру (у них коды предупреждений начинаются с "CA"). Подробнее см. <a href="https://docs.microsoft.com/en-us/visualstudio/code-quality/install-roslyn-analyzers" rel="noreferrer">Install .NET Compiler Platform code analyzers</a>.</p>
+<p>}
+</code></pre></p>
+<p>Можно установить дополнительные анализаторы, которые будут также проверять архитектуру (у них коды предупреждений начинаются с &quot;CA&quot;). Подробнее см. <a href="https://docs.microsoft.com/en-us/visualstudio/code-quality/install-roslyn-analyzers" rel="noreferrer">Install .NET Compiler Platform code analyzers</a>.</p>
 <h1>Использование анализаторов скомпилированных сборок</h1>
 <p>Создадим проект .NET Framework, и добавим в него код:</p>
 <pre><code>using System;
-
-namespace ConsoleApplication1
+<p>namespace ConsoleApplication1
 {
-    public class Program
+public class Program
+{
+public class Foo { }</p>
+<pre><code>    static void Main(string[] argv)
     {
-        public class Foo { }
-
-        static void Main(string[] argv)
-        {
-            Console.WriteLine("Hello world");
-            Console.ReadKey();
-        }  
-    }
+        Console.WriteLine(&amp;quot;Hello world&amp;quot;);
+        Console.ReadKey();
+    }  
 }
 </code></pre>
-<p>Перейдем в свойства проекта, на вкладке <strong>Анализ кода</strong> установим галку "Включить анализ кода в сборке" и выберем набор правил "Базовые нормы и правила разработки Microsoft" (BasicDesignGuidelineRules.ruleset), или аналогичный более строгий. Выполним сборку проекта. Результат:</p>
+<p>}
+</code></pre><p>
+<p>Перейдем в свойства проекта, на вкладке <strong>Анализ кода</strong> установим галку &quot;Включить анализ кода в сборке&quot; и выберем набор правил &quot;Базовые нормы и правила разработки Microsoft&quot; (BasicDesignGuidelineRules.ruleset), или аналогичный более строгий. Выполним сборку проекта. Результат:</p>
 <p><a href="https://i.stack.imgur.com/q1Rvi.png" rel="noreferrer"><img src="https://i.stack.imgur.com/q1Rvi.png" alt="assembly analysis"></a></p>
 <p>Разберем предупреждения:</p>
 <blockquote>
-  <p>CA1014: Microsoft.Design : Пометьте 'ConsoleApp1.exe' как CLSCompliant(true), поскольку он предоставляет типы, видимые извне.</p>
+<p>CA1014: Microsoft.Design : Пометьте 'ConsoleApp1.exe' как CLSCompliant(true), поскольку он предоставляет типы, видимые извне.</p>
 </blockquote>
 <p>Сборка, содержащая открытые типы, должна быть помеченной как соответствующая спецификации CLS. Раз мы пишем не библиотеку, а программу, то открытых типов в ней быть не должно (оставляя пока за скобками удобство модульного тестирования), поэтому исправлять логично не добавлением атрибута, а удалением public с класса Program.</p>
 <blockquote>
-  <p>CA1053: Microsoft.Design : Поскольку тип 'Program' содержит только статические члены, пометьте его как статический, чтобы компилятором не был добавлен общий конструктор по умолчанию.</p>
+<p>CA1053: Microsoft.Design : Поскольку тип 'Program' содержит только статические члены, пометьте его как статический, чтобы компилятором не был добавлен общий конструктор по умолчанию.</p>
 </blockquote>
 <p>Тут все понятно, у класса Program нет членов экземпляра, поэтому он должен быть static.</p>
 <blockquote>
-  <p>CA1801: Microsoft.Usage : Параметр 'argv' в 'Program.Main(string[])' никогда не используется. Удалите этот параметр или используйте его в теле метода.</p>
+<p>CA1801: Microsoft.Usage : Параметр 'argv' в 'Program.Main(string[])' никогда не используется. Удалите этот параметр или используйте его в теле метода.</p>
 </blockquote>
 <p>Это не имеет прямого отношения в архитектуре, среда предупреждает нас о неиспользуемом параметре, который можно удалить для упрощения кода.</p>
 <blockquote>
-  <p>CA1034: Microsoft.Design : Не делайте тип 'Program.Foo' вложенным. Вместо этого измените режим доступа к нему так, чтобы он не был виден извне.</p>
+<p>CA1034: Microsoft.Design : Не делайте тип 'Program.Foo' вложенным. Вместо этого измените режим доступа к нему так, чтобы он не был виден извне.</p>
 </blockquote>
-<p>См. <a href="https://ru.stackoverflow.com/questions/1024325/">Публичные вложенные классы - плохая практика?</a> </p>
+<p>См. <a href="https://ru.stackoverflow.com/questions/1024325/">Публичные вложенные классы - плохая практика?</a></p>
 <hr>
 <p>Исправлять в случае этого типа анализаторов нужно вручную. Получаем такой код после исправления этих предупреждений (он правда выводит новое, о неиспользуемом классе Foo):</p>
 <pre><code>using System;
-
-namespace ConsoleApplication1
+<p>namespace ConsoleApplication1
 {
-    static class Program
+static class Program
+{
+class Foo { }</p>
+<pre><code>    static void Main()
     {
-        class Foo { }
-
-        static void Main()
-        {
-            Console.WriteLine("Hello world");
-            Console.ReadKey();
-        }  
-    }
+        Console.WriteLine(&amp;quot;Hello world&amp;quot;);
+        Console.ReadKey();
+    }  
 }
 </code></pre>
-<p>До сих пор мы не коснулись меню <strong>Анализ</strong>. Зачем оно нужно? Пункт "Выполнить анализ кода", видимо, рассчитан на те типы проектов, где он не выполняется автоматически при сборке. Для C# он бесполезен. "Выполнить анализ кода и подавить активные ошибки" позволяет пометить все текущие ошибки как игнорируемые, в случае, если мы не собираемся их исправлять. "Настроить анализ кода" - это просто другой вариант открыть аналогичную страницу свойств проекта. "Вычислить метрики кода" - рассчитывает какие-то количественные показатели для кода, в том числе на уровне проектов и классов. Практическая ценность сомнительна, но по крайней мере можно быстро посчитать число строк кода.</p>
-<p><a href="https://docs.microsoft.com/en-us/visualstudio/code-quality/code-analysis-for-managed-code-overview" rel="noreferrer">Документация по анализу кода</a> </p>
+<p>}
+</code></pre></p>
+<p>До сих пор мы не коснулись меню <strong>Анализ</strong>. Зачем оно нужно? Пункт &quot;Выполнить анализ кода&quot;, видимо, рассчитан на те типы проектов, где он не выполняется автоматически при сборке. Для C# он бесполезен. &quot;Выполнить анализ кода и подавить активные ошибки&quot; позволяет пометить все текущие ошибки как игнорируемые, в случае, если мы не собираемся их исправлять. &quot;Настроить анализ кода&quot; - это просто другой вариант открыть аналогичную страницу свойств проекта. &quot;Вычислить метрики кода&quot; - рассчитывает какие-то количественные показатели для кода, в том числе на уровне проектов и классов. Практическая ценность сомнительна, но по крайней мере можно быстро посчитать число строк кода.</p>
+<p><a href="https://docs.microsoft.com/en-us/visualstudio/code-quality/code-analysis-for-managed-code-overview" rel="noreferrer">Документация по анализу кода</a></p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>
@@ -211,7 +209,7 @@ namespace ConsoleApplication1
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span><script type="text/javascript">(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(65150713, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/65150713" style="position:absolute; left:-9999px;" alt=""></div></noscript>
             
           </div>
         </div>

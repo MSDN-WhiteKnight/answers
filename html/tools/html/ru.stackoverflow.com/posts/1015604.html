@@ -76,7 +76,7 @@
 <p>Не каждый процессор возвращает в CPUID уникальный серийный номер. Чтобы уникально идентифицировать компьютер, имеет смысл использовать составной аппаратный идентификатор, состоящий из нескольких значений, например:</p>
 <ul>
 <li>CPUID</li>
-<li>SMBIOS System UUID </li>
+<li>SMBIOS System UUID</li>
 <li>Серийный номер системника</li>
 <li>Серийный номер материнской платы</li>
 </ul>
@@ -85,8 +85,7 @@
 <pre class="lang-cpp prettyprint-override"><code>#include &lt;stdio.h&gt;
 #include &lt;Windows.h&gt;
 #include &lt;tchar.h&gt;
-
-// SMBIOS Table Type numbers
+<p>// SMBIOS Table Type numbers
 #define SMB_TABLE_BIOS              0
 #define SMB_TABLE_SYSTEM            1
 #define SMB_TABLE_BASEBOARD         2
@@ -100,222 +99,194 @@
 #define SMB_TABLE_SYS_CFG_OPTIONS   12
 #define SMB_TABLE_MEM_ARRAY         16
 #define SMB_TABLE_MEM_DEVICE        17
-#define SMB_TABLE_END_OF_TABLE      127
-
-// 64bit Word type
-typedef unsigned long long QWORD;
-
-/*
-* Structures
+#define SMB_TABLE_END_OF_TABLE      127</p>
+<p>// 64bit Word type
+typedef unsigned long long QWORD;</p>
+<p>/*</p>
+<ul>
+<li>Structures
 */
 typedef struct _RawSmbiosData
 {
-    BYTE    Used20CallingMethod;
-    BYTE    SMBIOSMajorVersion;
-    BYTE    SMBIOSMinorVersion;
-    BYTE    DmiRevision;
-    DWORD   Length;
-    BYTE    SMBIOSTableData[1];
-} RAW_SMBIOS_DATA, * PRAW_SMBIOS_DATA;
-
-typedef struct _SmbiosStructHeader
+BYTE    Used20CallingMethod;
+BYTE    SMBIOSMajorVersion;
+BYTE    SMBIOSMinorVersion;
+BYTE    DmiRevision;
+DWORD   Length;
+BYTE    SMBIOSTableData[1];
+} RAW_SMBIOS_DATA, * PRAW_SMBIOS_DATA;</li>
+</ul>
+<p>typedef struct _SmbiosStructHeader
 {
-    BYTE Type;
-    BYTE Length;
-    WORD Handle;
-} SMBIOS_STRUCT_HEADER, *PSMBIOS_STRUCT_HEADER;
-
-// Structures
+BYTE Type;
+BYTE Length;
+WORD Handle;
+} SMBIOS_STRUCT_HEADER, *PSMBIOS_STRUCT_HEADER;</p>
+<p>// Structures
 typedef struct _NODE {
-    wchar_t *Name;                      // Name of the node
-    struct _NODE_ATT_LINK *Attributes;  // Array of attributes linked to the node
-    struct _NODE *Parent;               // Parent node
-    struct _NODE_LINK *Children;        // Array of linked child nodes
-    int Flags;                          // Node configuration flags
-} NODE, * PNODE;
-
-typedef struct _NODE_LINK {
-    struct _NODE *LinkedNode;           // Node attached to this node
-} NODE_LINK, * PNODE_LINK;
-
-typedef struct _NODE_ATT {
-    wchar_t *Key;                       // Attribute name
-    wchar_t *Value;                     // Attribute value string (may be null separated multistring if NAFLG_ARRAY is set)
-    int Flags;                          // Attribute configuration flags
-} NODE_ATT, *PNODE_ATT;
-
-typedef struct _NODE_ATT_LINK {
-    struct _NODE_ATT *LinkedAttribute;  // Attribute linked to this node
-} NODE_ATT_LINK, *PNODE_ATT_LINK;
-
-
-/********************************************************************/
-
-PRAW_SMBIOS_DATA GetSmbiosData()
+wchar_t *Name;                      // Name of the node
+struct _NODE_ATT_LINK *Attributes;  // Array of attributes linked to the node
+struct _NODE *Parent;               // Parent node
+struct _NODE_LINK *Children;        // Array of linked child nodes
+int Flags;                          // Node configuration flags
+} NODE, * PNODE;</p>
+<p>typedef struct _NODE_LINK {
+struct _NODE *LinkedNode;           // Node attached to this node
+} NODE_LINK, * PNODE_LINK;</p>
+<p>typedef struct _NODE_ATT {
+wchar_t *Key;                       // Attribute name
+wchar_t *Value;                     // Attribute value string (may be null separated multistring if NAFLG_ARRAY is set)
+int Flags;                          // Attribute configuration flags
+} NODE_ATT, *PNODE_ATT;</p>
+<p>typedef struct _NODE_ATT_LINK {
+struct _NODE_ATT *LinkedAttribute;  // Attribute linked to this node
+} NODE_ATT_LINK, *PNODE_ATT_LINK;</p>
+<p>/********************************************************************/</p>
+<p>PRAW_SMBIOS_DATA GetSmbiosData()
 {
-    DWORD bufferSize = 0;
+DWORD bufferSize = 0;</p>
+<pre><code>PRAW_SMBIOS_DATA smbios = NULL;
 
-    PRAW_SMBIOS_DATA smbios = NULL;
-
-    // Get required buffer size
-    bufferSize = GetSystemFirmwareTable('RSMB', 0, NULL, 0);
-    if (bufferSize) {
-        smbios = (PRAW_SMBIOS_DATA)LocalAlloc(LPTR, bufferSize);
-        bufferSize = GetSystemFirmwareTable('RSMB', 0, (PVOID)smbios, bufferSize);
-    }
-
-    return smbios;
+// Get required buffer size
+bufferSize = GetSystemFirmwareTable('RSMB', 0, NULL, 0);
+if (bufferSize) {
+    smbios = (PRAW_SMBIOS_DATA)LocalAlloc(LPTR, bufferSize);
+    bufferSize = GetSystemFirmwareTable('RSMB', 0, (PVOID)smbios, bufferSize);
 }
 
-PSMBIOS_STRUCT_HEADER GetNextStructure(PRAW_SMBIOS_DATA smbios,PSMBIOS_STRUCT_HEADER previous)
+return smbios;
+</code></pre>
+<p>}</p>
+<p>PSMBIOS_STRUCT_HEADER GetNextStructure(PRAW_SMBIOS_DATA smbios,PSMBIOS_STRUCT_HEADER previous)
 {
-    PSMBIOS_STRUCT_HEADER next = NULL;
-    PBYTE c = NULL;
-
-
-    // Return NULL is no data found
-    if (NULL == smbios)
-        return NULL;
-
-    // Return first table if previous was NULL
-    if (NULL == previous)
-        return (PSMBIOS_STRUCT_HEADER)(&amp;smbios-&gt;SMBIOSTableData[0]);
-
-    // Move to the end of the formatted structure
-    c = ((PBYTE)previous) + previous-&gt;Length;
-
-    // Search for the end of the unformatted structure (\0\0)
-    while (true) {
-        if ('\0' == *c &amp;&amp; '\0' == *(c + 1)) {
-            /* Make sure next table is not beyond end of SMBIOS data
-             * (Thankyou Microsoft for ommitting the structure count
-             * in GetSystemFirmwareTable
-             */
-            if ((c + 2) &lt; ((PBYTE)smbios-&gt;SMBIOSTableData + smbios-&gt;Length))
-                return (PSMBIOS_STRUCT_HEADER)(c + 2);
-            else
-                return NULL; // We reached the end
-        }
-
-        c++;
-    }
-
+PSMBIOS_STRUCT_HEADER next = NULL;
+PBYTE c = NULL;</p>
+<pre><code>// Return NULL is no data found
+if (NULL == smbios)
     return NULL;
-}
 
-PSMBIOS_STRUCT_HEADER GetNextStructureOfType(PRAW_SMBIOS_DATA smbios,PSMBIOS_STRUCT_HEADER previous, DWORD type)
-{
-    PSMBIOS_STRUCT_HEADER next = previous;
-    while (NULL != (next = GetNextStructure(smbios,next))) {
-        if (type == next-&gt;Type)
-            return next;
+// Return first table if previous was NULL
+if (NULL == previous)
+    return (PSMBIOS_STRUCT_HEADER)(&amp;amp;smbios-&amp;gt;SMBIOSTableData[0]);
+
+// Move to the end of the formatted structure
+c = ((PBYTE)previous) + previous-&amp;gt;Length;
+
+// Search for the end of the unformatted structure (\0\0)
+while (true) {
+    if ('\0' == *c &amp;amp;&amp;amp; '\0' == *(c + 1)) {
+        /* Make sure next table is not beyond end of SMBIOS data
+         * (Thankyou Microsoft for ommitting the structure count
+         * in GetSystemFirmwareTable
+         */
+        if ((c + 2) &amp;lt; ((PBYTE)smbios-&amp;gt;SMBIOSTableData + smbios-&amp;gt;Length))
+            return (PSMBIOS_STRUCT_HEADER)(c + 2);
+        else
+            return NULL; // We reached the end
     }
 
-    return NULL;
+    c++;
 }
 
-PSMBIOS_STRUCT_HEADER GetStructureByHandle(PRAW_SMBIOS_DATA smbios,WORD handle)
+return NULL;
+</code></pre>
+<p>}</p>
+<p>PSMBIOS_STRUCT_HEADER GetNextStructureOfType(PRAW_SMBIOS_DATA smbios,PSMBIOS_STRUCT_HEADER previous, DWORD type)
 {
-    PSMBIOS_STRUCT_HEADER header = NULL;
-
-    while (NULL != (header = GetNextStructure(smbios,header)))
-        if (handle == header-&gt;Handle)
-            return header;
-
-    return NULL;
-}
-
-LPTSTR GetSmbiosString(PSMBIOS_STRUCT_HEADER table, BYTE index)
+PSMBIOS_STRUCT_HEADER next = previous;
+while (NULL != (next = GetNextStructure(smbios,next))) {
+if (type == next-&gt;Type)
+return next;
+}</p>
+<pre><code>return NULL;
+</code></pre>
+<p>}</p>
+<p>PSMBIOS_STRUCT_HEADER GetStructureByHandle(PRAW_SMBIOS_DATA smbios,WORD handle)
 {
-    DWORD i = 0;
-    DWORD len = 0;
-    LPTSTR unicode = _wcsdup(_T(""));
+PSMBIOS_STRUCT_HEADER header = NULL;</p>
+<pre><code>while (NULL != (header = GetNextStructure(smbios,header)))
+    if (handle == header-&amp;gt;Handle)
+        return header;
 
-    if (0 == index)
-        return unicode;
+return NULL;
+</code></pre>
+<p>}</p>
+<p>void GetSmbiosString(PSMBIOS_STRUCT_HEADER table, BYTE index, LPWSTR output, int cchOutput)
+{
+DWORD i = 0;
+DWORD len = 0;
+wcscpy(output,L&quot;&quot;);</p>
+<pre><code>if (0 == index) return;
 
-    char *c = NULL;
+char *c = NULL;
 
-    for (i = 1, c = (char *)table + table-&gt;Length; '\0' != *c; c += strlen(c) + 1, i++) {
-        if (i == index) {
-            LocalFree(unicode);
-
-            len = MultiByteToWideChar(CP_UTF8, 0, c, -1, NULL, 0);
-            unicode = (LPTSTR)LocalAlloc(LPTR, sizeof(WCHAR)* len);
-
-            MultiByteToWideChar(CP_UTF8, 0, c, -1, unicode, len);
-            break;
-        }
+for (i = 1, c = (char *)table + table-&amp;gt;Length; '\0' != *c; c += strlen(c) + 1, i++) {
+    if (i == index) {
+        len = MultiByteToWideChar(CP_UTF8, 0, c, -1, output,cchOutput);
+        break;
     }
-
-    return unicode;
-}
-
-//вывод значения числового параметра таблицы SMBIOS по указанному смещению
-void PrintBiosValue(PRAW_SMBIOS_DATA smbios,DWORD type,DWORD offset, DWORD size)
-{
-    PSMBIOS_STRUCT_HEADER head; 
-    head=NULL;
-    PBYTE cursor = NULL; 
-
-    head = GetNextStructureOfType(smbios,head, type);
-    if (NULL == head){ printf("PrintBiosValue Error!\n");return;}
-
-    cursor=((PBYTE)head+offset);
-
-    //value           
-    for(int i=0;i&lt;size;i++) {
-        printf("%02x",(unsigned int) *cursor);     
-        cursor++;
-    }
-    printf("\n");
-}
-
-//вывод значения строкового параметра таблицы SMBIOS по указанному смещению
-void PrintBiosString(PRAW_SMBIOS_DATA smbios,DWORD type,DWORD offset)
-{
-    PSMBIOS_STRUCT_HEADER head; 
-    head=NULL;
-    PBYTE cursor = NULL;
-
-    LPTSTR unicode = NULL;      
-
-    head = GetNextStructureOfType(smbios,head, type);
-    if (NULL == head){printf("PrintString Error!\n");return;}
-    cursor=((PBYTE)head+offset);
-    BYTE val=*cursor;
-
-    unicode = GetSmbiosString((head), *cursor);
-    //  value           
-    wprintf(unicode);
-    printf("\n");      
-    LocalFree(unicode); 
-}
-
-int main(){
-
-    PRAW_SMBIOS_DATA data = GetSmbiosData();
-
-    if(data==NULL){
-        printf("Can't get SMBIOS data!"); 
-        return 1;
-    }   
-
-    printf("System UUID: ");
-    PrintBiosValue(data,SMB_TABLE_SYSTEM,8, 16); 
-
-    printf("Chassis serial: ");
-    PrintBiosString(data,SMB_TABLE_CHASSIS,7);
-
-    printf("Motherboard serial: ");
-    PrintBiosString(data,SMB_TABLE_BASEBOARD,7);        
-
-    printf("CPUID: ");
-    PrintBiosValue(data,SMB_TABLE_PROCESSOR,8, 8);  //Таблица SMBIOS содержит только 2 DWORD-значения CPUID из 4, но этого обычно достаточно
-
-    getchar();
 }
 </code></pre>
+<p>}</p>
+<p>//вывод значения числового параметра таблицы SMBIOS по указанному смещению
+void PrintBiosValue(PRAW_SMBIOS_DATA smbios,DWORD type,DWORD offset, DWORD size)
+{
+PSMBIOS_STRUCT_HEADER head=NULL;
+PBYTE cursor = NULL;</p>
+<pre><code>head = GetNextStructureOfType(smbios,head, type);
+if (NULL == head){ printf(&amp;quot;PrintBiosValue Error!\n&amp;quot;);return;}
+
+cursor=((PBYTE)head+offset);
+
+//value           
+for(int i=0;i&amp;lt;size;i++) {
+    printf(&amp;quot;%02x&amp;quot;,(unsigned int) *cursor);     
+    cursor++;
+}
+printf(&amp;quot;\n&amp;quot;);
+</code></pre>
+<p>}</p>
+<p>//вывод значения строкового параметра таблицы SMBIOS по указанному смещению
+void PrintBiosString(PRAW_SMBIOS_DATA smbios,DWORD type,DWORD offset)
+{
+PSMBIOS_STRUCT_HEADER head;
+head=NULL;
+PBYTE cursor = NULL;
+WCHAR buf[1024];</p>
+<pre><code>head = GetNextStructureOfType(smbios,head, type);
+if (NULL == head){printf(&amp;quot;PrintString Error!\n&amp;quot;);return;}
+cursor=((PBYTE)head+offset);
+BYTE val=*cursor;
+    
+GetSmbiosString((head), *cursor,buf,1024);
+//  value           
+wprintf(L&amp;quot;%s\n&amp;quot;,buf);
+</code></pre>
+<p>}</p>
+<p>int main(){</p>
+<pre><code>PRAW_SMBIOS_DATA data = GetSmbiosData();
+
+if(data==NULL){
+    printf(&amp;quot;Can't get SMBIOS data!&amp;quot;); 
+    return 1;
+}
+
+printf(&amp;quot;System UUID: &amp;quot;);
+PrintBiosValue(data,SMB_TABLE_SYSTEM,8, 16);
+
+printf(&amp;quot;Chassis serial: &amp;quot;);
+PrintBiosString(data,SMB_TABLE_CHASSIS,7);
+
+printf(&amp;quot;Motherboard serial: &amp;quot;);
+PrintBiosString(data,SMB_TABLE_BASEBOARD,7);
+
+printf(&amp;quot;CPUID: &amp;quot;);
+PrintBiosValue(data,SMB_TABLE_PROCESSOR,8, 8);  //Таблица SMBIOS содержит только 2 DWORD-значения CPUID из 4, но этого обычно достаточно
+
+getchar();
+</code></pre>
+<p>}
+</code></pre><p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>
@@ -344,7 +315,7 @@ int main(){
             <span class="pull-right">
               <a href="#top">Back to top</a>
             </span>
-            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span><script type="text/javascript">(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(65150713, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/65150713" style="position:absolute; left:-9999px;" alt=""></div></noscript>
             
           </div>
         </div>

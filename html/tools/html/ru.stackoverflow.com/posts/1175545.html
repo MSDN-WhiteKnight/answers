@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Answer 1175545 | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Answer 1175545 | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
+<h1>Answer 1175545</h1>
+<h2>Answer 1175545</h2>
+<p><a href="https://ru.stackoverflow.com/a/1175545/">Link</a></p>
+<blockquote>
+<p>Папка является файлом, в том смысле, что она тоже является блоком информации, к которому можно получить доступ по его имени в файловой системе; и некоторые функции для работы с файлами могут оперировать и папками. Это справедливо практически для всех современных ОС. В структуре NTFS папка также представлена файлом, только, в отличие от обычного файла, она как правило не имеет атрибута $DATA, но имеет атрибут <a href="http://ftp.kolibrios.org/users/Asper/docs/NTFS/ntfsdoc.html#attribute_index_root" rel="noreferrer">$INDEX_ROOT</a>.</p>
+<p>Как работает функция _open в Microsoft CRT можно прочитать <a href="https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/open-wopen?view=vs-2019" rel="noreferrer">здесь</a>. Открыть папку с ее помощью в Windows вы не сможете, потому что она не позволяет задать дополнительные флаги и поэтому с ее помощью можно открыть только обычные файлы. Открыть папку можно с помощью функции <a href="https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilea#directories" rel="noreferrer">CreateFile</a>, передавая флаг FILE_FLAG_BACKUP_SEMANTICS. Но напрямую читать байты из папки, как из файла, нельзя: список функций, которые работают с папками, приведен <a href="https://docs.microsoft.com/en-us/windows/win32/fileio/obtaining-a-handle-to-a-directory" rel="noreferrer">здесь</a>. Например, так можно получить время создания папки:</p>
+<pre><code>#define _CRT_SECURE_NO_WARNINGS
+#include &lt;stdio.h&gt;
+#include &lt;Windows.h&gt;
+<p>int main() {</p>
+<pre><code>HANDLE h = CreateFileW(L&amp;quot;c:\\Test\\&amp;quot;,
+    GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL
+);
+
+BY_HANDLE_FILE_INFORMATION info;
+SYSTEMTIME st;
+SYSTEMTIME stLocal;
+
+if (GetFileInformationByHandle(h, &amp;amp;info) == FALSE) {
+    printf(&amp;quot;GetFileInformationByHandle Error\n&amp;quot;);
+}
+else {
+    FileTimeToSystemTime(&amp;amp;info.ftCreationTime, &amp;amp;st);
+    SystemTimeToTzSpecificLocalTime(NULL, &amp;amp;st, &amp;amp;stLocal);
+    printf(
+        &amp;quot;Creation Time: %02u.%02u.%u  %02u:%02u\n&amp;quot;, 
+        (UINT)stLocal.wDay, (UINT)stLocal.wMonth, 
+        (UINT)stLocal.wYear, (UINT)stLocal.wHour, 
+        (UINT)stLocal.wMinute
+    );
+}
+
+getchar();
+</code></pre>
+<p>}
+</code></pre><p>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span><script type="text/javascript">(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(65150713, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/65150713" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>

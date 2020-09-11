@@ -1,0 +1,266 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Answer 1131533 | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Answer 1131533 | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
+<h1>Answer 1131533</h1>
+<h2>Answer 1131533</h2>
+<p><a href="https://ru.stackoverflow.com/a/1131533/">Link</a></p>
+<blockquote>
+<blockquote>
+  <p>Есть ли языки, которые не могут без него жить?</p>
+</blockquote>
+<p>Языкам, по существу, до лампочки этот аттрибут. Языкам требуется API, который они переваривают, а атрибут CLSCompliant они могут использовать, чтобы вывести предупреждение во время компиляции при попытке использовать неподдерживаемый API. А могут и не использовать. Реальность находится ближе ко второму варианту. Чтобы проиллюстировать это, создадим экспериментальную заготовку для взаимодействия "низкоуровневого" С# и высокоуровневого JScript.NET:</p>
+<pre class="lang-cs prettyprint-override"><code>using System;
+using System.Collections.Generic;
+using Microsoft.JScript;
+using System.CodeDom.Compiler;
+using System.Text;
+
+namespace ConsoleApp1
+{
+    class Program
+    {
+        static object JsExecute(
+            string script, 
+            string[] refs,
+            string func, 
+            params object[] args)
+        {
+            var jsc = new JScriptCodeProvider();
+            var parameters = new CompilerParameters( refs, "test.dll", true);
+            parameters.GenerateExecutable = false;
+
+            CompilerResults results = jsc.CompileAssemblyFromFile(parameters, new string[] { script });
+
+            if (results.Errors.Count &gt; 0)
+            {
+                Console.WriteLine("Errors: ");
+
+                foreach (var err in results.Errors)
+                {
+                    Console.WriteLine(err.ToString());
+                }
+
+                return null;
+            }            
+
+            var ass = results.CompiledAssembly;
+            var c = ass.GetType("C");
+            var f = c.GetMethod(func);
+            return f.Invoke(null, args);
+        }
+    }
+}
+</code></pre>
+<p>Чтобы это заработало, нужно добавить ссылку на Microsoft.JScript (и проект должен быть .NET Framework - в .NET Core нет нужных типов для интеграции с JS). Собственно, код берет скрипт из файла, компилирует и запускает отражением. Обращаю внимание, что <code>results.Errors</code> помимо ошибок включает также предупреждения, так что мы увидим все, что выдает компилятор (jsc). Теперь с его помощью мы можем прогнать интересные API через JS и посмотреть, как он себя поведет.</p>
+<h1>Эксперимент 1 - UInt32</h1>
+<p>Начнем с простого - попробуем скормить JS "некомплиантый" UInt32:</p>
+<p>JS:</p>
+<pre class="lang-js prettyprint-override"><code>class C {
+
+    static function calc_sum(x, y) {
+
+        return x + y;
+    }
+}
+</code></pre>
+<hr>
+<p>C#:</p>
+<pre><code>static void Main(string[] args)
+{
+    object res = JsExecute(
+        "test.js",
+        new[] { "mscorlib.dll", "System.Core.dll" },
+        "calc_sum",
+        new object[] { (uint)1, (uint)2 });
+    Console.WriteLine(res);
+    Console.Read();
+}
+
+/* Вывод:
+3
+*/
+</code></pre>
+<p>Как видно, все отработало без ошибок. На самом деле, это ничего толком не доказывает, так как JScript.NET, в отличие от браузерного эквивалента, поддерживает uint нативно (<a href="https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2010/ddacxdt5%28v%3dvs.100%29" rel="nofollow noreferrer">https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2010/ddacxdt5%28v%3dvs.100%29</a>). Но по крайней мере наш экспериментальный код работает.</p>
+<h1>Эксперимент 2 - Microsoft.Extensions.Configuration</h1>
+<p>Рассмотрим упомянутую Microsoft.Extensions.Configuration. К счастью, она совместима с новыми версиями .NET Framework. Для проверки напишем такой код на JS, который создает ConfigurationBuilder, устанавливает значение в словаре Properties и пытается считать его обратно:</p>
+<pre class="lang-js prettyprint-override"><code>import Microsoft.Extensions.Configuration;
+
+class C {
+
+    static function test() {
+        var builder = new ConfigurationBuilder();
+        builder.Properties['key'] = 'Value';
+        return builder.Properties['key'];
+    }
+}
+</code></pre>
+<hr>
+<p>C#:</p>
+<pre><code>static void Main(string[] args)
+{
+    object res = JsExecute(
+        "test.js",
+        new[] { "mscorlib.dll", "System.Core.dll", "Microsoft.Extensions.Configuration.dll" },
+        "test",
+        new object[] { });
+    Console.WriteLine(res);
+
+    Console.Read();
+}
+
+/* Вывод:
+Value
+*/
+</code></pre>
+<p>Опять же, все работает прекрасно. Ну, тоже нет ничего удивительно - все типы ложаться на систему типов JS.</p>
+<h1>Эксперимент 3 - Указатели</h1>
+<p>Теперь возьмем то, что JS действительно не поддерживает - указатели. Само собой, напрямую указатель мы даже передать не можем, но есть API типа <a href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.pointer?view=netframework-4.5" rel="nofollow noreferrer">Pointer</a>.Box/Unbox, IntPtr которые позволяют заворачивать указатели для отражения. И они, как вы можете догадаться, CLSCompliant(false). Напишем код, который передает указатель в JS, а в коде на JS попытаемся поработать с ним доступными в нем средствами:</p>
+<p>JS:</p>
+<pre class="lang-js prettyprint-override"><code>import System;
+import System.Reflection;
+import System.Runtime.InteropServices;
+
+class C {
+
+    static function write_value(p) {
+        var ptr = new IntPtr(Pointer.Unbox(p));
+        Marshal.WriteInt32(ptr, 1);
+    }
+
+}
+</code></pre>
+<hr>
+<p>C#</p>
+<pre><code>unsafe static void Main(string[] args)
+{
+    int x = 0;
+
+    Console.WriteLine("x before: "+x.ToString());
+
+    object res = JsExecute(
+        "test.js",
+        new[] { "mscorlib.dll", "System.Core.dll", "System.Runtime.dll" },
+        "write_value",
+        new object[] { Pointer.Box(&amp;x, typeof(int*))});
+
+    Console.WriteLine("x  after: " + x.ToString());
+
+    Console.Read();
+}
+
+/* Вывод:
+x before: 0
+x  after: 1
+*/
+</code></pre>
+<p>Как видим, не только нет никаких предупреждений на использование 2 методов с CLSCompliant(false), но и код успешно смог установить значение переменной по указателю. Разгадка в том, что под капотом все работает на отражении, и JS нигде не встречает необходимость создать непосредственно переменную-указатель. Это не значит, что любые API на указателях можно использовать таким образом. Если API принимает не void*, а допустим byte* - уже непонятно, как его преобразовать.</p>
+<hr>
+<p>Словом, значение CLSCompliantAttribute в современном мире .NET не так уж велико. Он нужен больше чтобы заткнуть сам компилятор C# и отдельные анализаторы FxCop, которые ругаются на его отсутствие, чем для реальной интеграции языков. Некоторые решают игнорировать предупреждение и не ставить атрибут, чтобы сэкономить на размере бинарника. Но если просто удалить атрибут, сломается код, который от него зависит, что и приводит к ситуации "не нужен даже создателям, но не удалить".</p>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span><script type="text/javascript">(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(65150713, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/65150713" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>

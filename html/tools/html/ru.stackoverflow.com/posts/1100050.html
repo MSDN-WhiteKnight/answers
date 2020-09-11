@@ -1,0 +1,229 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Answer 1100050 | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Answer 1100050 | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
+<h1>Answer 1100050</h1>
+<h2>Answer 1100050</h2>
+<p><a href="https://ru.stackoverflow.com/a/1100050/">Link</a></p>
+<blockquote>
+<p>Функции SQLCLR могут быть представлены либо одной скомпилированной DLL, либо DLL с исходниками, если ее залили таким образом (что стандартный шаблон проекта и делает, насколько я знаю). Перечень функций можно получить запросом</p>
+<pre><code>select * from sys.assembly_modules
+</code></pre>
+<p>Который вернет что-то такое:</p>
+<pre class="lang-none prettyprint-override"><code>object_id   assembly_id     assembly_class          assembly_method ...
+1573580644  65551           UserDefinedFunctions    Func1           ...
+1589580701  65551           UserDefinedFunctions    Func2           ...
+</code></pre>
+<p><strong>assembly_id</strong> указывает на сборку, в которой лежит код функции. Сборки можно получить запросом к системной таблице <a href="https://docs.microsoft.com/ru-ru/sql/relational-databases/system-catalog-views/sys-assemblies-transact-sql?view=sql-server-2017" rel="nofollow noreferrer">sys.assemblies</a>. Файлы, соответствующие сборкам, хранятся в <a href="https://docs.microsoft.com/ru-ru/sql/relational-databases/system-catalog-views/sys-assembly-files-transact-sql?view=sql-server-2017" rel="nofollow noreferrer">sys.assembly_files</a>.</p>
+<p>Извлечь С# код из скомпилированной сборки можно с помощью библиотеки <a href="https://www.nuget.org/packages/ICSharpCode.Decompiler" rel="nofollow noreferrer">ICSharpCode.Decompiler</a>.</p>
+<p>Пример запроса для вывода списка файлов:</p>
+<pre class="lang-sql prettyprint-override"><code>SELECT assemblies.name, 
+ assemblies.assembly_id, 
+ assembly_files.name as "filename"
+FROM sys.assemblies
+INNER JOIN sys.assembly_files  ON assemblies.assembly_id = assembly_files.assembly_id 
+</code></pre>
+<p>Пример вывода кода всех файлов указанной сборки на C#:</p>
+<pre class="lang-cs prettyprint-override"><code>using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Text;
+using ICSharpCode.Decompiler;
+using ICSharpCode.Decompiler.CSharp;
+
+class SqlClrAssFile
+{
+    public string Name { get; set; }
+    public byte[] Data { get; set; }
+}
+
+class Program
+{
+
+    public static IEnumerable&lt;SqlClrAssFile&gt; GetAssemblyFiles(string assname)
+    {
+        SqlConnectionStringBuilder build = new SqlConnectionStringBuilder();
+        build.DataSource = "SERVER";
+        build.InitialCatalog = "mydb";
+
+        SqlConnection conn = new SqlConnection(build.ConnectionString);
+        List&lt;SqlClrAssFile&gt; files = new List&lt;SqlClrAssFile&gt;();
+
+        using (conn)
+        {
+            conn.Open();
+            SqlCommand cmd = new SqlCommand(
+                "SELECT assembly_files.name as filename,content FROM sys.assemblies "+
+                " INNER JOIN sys.assembly_files ON assemblies.assembly_id = assembly_files.assembly_id " +
+                " WHERE assemblies.name=@name", conn);
+            cmd.Parameters.AddWithValue("name", assname);
+            SqlDataReader rd = cmd.ExecuteReader();
+
+            using (rd)
+            {
+                while (true)
+                {
+                    if (rd.Read() == false) break;
+                    SqlClrAssFile file = new SqlClrAssFile();
+                    file.Name = (string)rd["filename"];
+                    file.Data = (byte[])rd["content"];
+                    files.Add(file);
+                }
+
+                return files;
+            }
+        }        
+    }
+
+    static void Main(string[] args)
+    {
+        IEnumerable&lt;SqlClrAssFile&gt; files = GetAssemblyFiles("MyClrAssembly");
+
+        foreach (var x in files)
+        {
+            Console.WriteLine("*****"+x.Name+ "*****");
+            string ext = Path.GetExtension(x.Name);
+
+            if (ext == ".cs")
+            {
+                //показать файл исходников
+                Console.WriteLine(Encoding.UTF8.GetString(x.Data));
+            }
+            else if (ext == ".dll" || ext == "")
+            {
+                try
+                {
+                    //показать декомпилированную DLL
+                    string name = Path.GetFileName(x.Name);
+                    File.WriteAllBytes(name, x.Data);
+                    CSharpDecompiler decompiler = new CSharpDecompiler(name, new DecompilerSettings());
+
+                    Console.WriteLine("[Decompiled]");
+                    Console.WriteLine(decompiler.DecompileWholeModuleAsString());                    
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+            }
+            else
+            {
+                Console.WriteLine("[Unknown file: {0} bytes]",x.Data.Length);
+            }
+        }
+
+        Console.ReadKey();
+    }
+}
+
+</code></pre>
+<p>Здесь мы просто преобразуем байты в текст для .cs файлов, а для DLL выгружаем в файл и декомпилируем. </p>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span><script type="text/javascript">(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(65150713, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/65150713" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>
