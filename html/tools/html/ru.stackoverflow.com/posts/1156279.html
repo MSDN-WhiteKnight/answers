@@ -76,24 +76,27 @@
 <p>Вы не учитываете маленькую деталь. Settings API - это очень топорная вещь, рассчитанная на стандартный сценарий &quot;конфигурировать набор свойств, заданный на этапе разработки&quot;. Если вы просто так добавляете что-то на лету в файл user.config, оно не будет волшебным образом считываться, так как программа тупо не знает о существовании этого нового свойства. Это значит, что свойство нужно создавать <strong>всегда</strong>, даже когда оно уже есть в файле. И делать это аккуратно, копируя существующее эталонное свойство и меняя в нем что нужно, а не заполнять все с нуля и гадать, хватит или не хватит. То есть код _setFormSize должен выглядеть как-то так:</p>
 <pre><code>Type t = GetType();
 string propName = t.Name+&quot;_FormSize&quot;;
-<p>var baseProp = Properties.Settings.Default.Properties[&quot;FormSizeBase&quot;];
+
+var baseProp = Properties.Settings.Default.Properties[&quot;FormSizeBase&quot;];
 var prop = new SettingsProperty(baseProp)
 {
-Name = propName
-};</p>
-<p>Properties.Settings.Default.Properties.Add(prop);
+    Name = propName
+};
+
+Properties.Settings.Default.Properties.Add(prop);
 Properties.Settings.Default.Reload();
-Size formSize = (Size)Properties.Settings.Default[propName];</p>
-<p>if (formSize.Width &gt; 0 &amp;&amp; formSize.Height &gt; 0)
+Size formSize = (Size)Properties.Settings.Default[propName];
+
+if (formSize.Width &gt; 0 &amp;&amp; formSize.Height &gt; 0)
 {
-Size = formSize;
+    Size = formSize;
 }
 else
 {
-Properties.Settings.Default[propName] = Size;
-Properties.Settings.Default.Save();
+    Properties.Settings.Default[propName] = Size;
+    Properties.Settings.Default.Save();
 }
-</code></pre><p>
+</code></pre>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

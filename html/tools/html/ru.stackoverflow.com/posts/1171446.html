@@ -93,34 +93,36 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Reflection;
-<p>public class Person
-{
-public string Name;
-public string Location;
-}</p>
-<p>class Program
-{
-static bool AreMethodsEqual(MethodBase left, MethodBase right)
-{
-MethodBody m1 = left.GetMethodBody();
-MethodBody m2 = right.GetMethodBody();
-byte[] il1 = m1.GetILAsByteArray();
-byte[] il2 = m2.GetILAsByteArray();
-return il1.SequenceEqual(il2);
-}</p>
-<pre><code>static void Main(string[] args)
-{
-    Func&amp;lt;Person, string&amp;gt; func = s =&amp;gt; s.Name;
-    Func&amp;lt;Person, string&amp;gt; predicate = x =&amp;gt; x.Name;
-    
-    Console.WriteLine(&amp;quot;Результат сравнения делегатов: &amp;quot;+func.Equals(predicate));
-    Console.WriteLine(&amp;quot;Результат сравнения методов:   &amp;quot;+AreMethodsEqual(func.Method, predicate.Method));
 
-    Console.ReadKey();
+public class Person
+{
+    public string Name;
+    public string Location;
+}
+
+class Program
+{
+    static bool AreMethodsEqual(MethodBase left, MethodBase right)
+    {
+        MethodBody m1 = left.GetMethodBody();
+        MethodBody m2 = right.GetMethodBody();
+        byte[] il1 = m1.GetILAsByteArray();
+        byte[] il2 = m2.GetILAsByteArray();
+        return il1.SequenceEqual(il2);
+    }
+
+    static void Main(string[] args)
+    {
+        Func&lt;Person, string&gt; func = s =&gt; s.Name;
+        Func&lt;Person, string&gt; predicate = x =&gt; x.Name;
+        
+        Console.WriteLine(&quot;Результат сравнения делегатов: &quot;+func.Equals(predicate));
+        Console.WriteLine(&quot;Результат сравнения методов:   &quot;+AreMethodsEqual(func.Method, predicate.Method));
+
+        Console.ReadKey();
+    }
 }
 </code></pre>
-<p>}
-</code></pre><p>
 <p>Но этот способ работает только для предикатов, полученных из лямбда-выражений, заданных на этапе разработки. Если оно генерируется динамически на основе LINQ Expression, AreMethodsEqual не сработает, так как GetMethodBody выдаст исключение.</p>
 </blockquote>
 <hr>

@@ -81,25 +81,27 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-<p>//...</p>
-<p>protected void Button1_Click(object sender, EventArgs e)
-{
-StringBuilder sb =new StringBuilder();
-StringWriter wr =new StringWriter(sb);</p>
-<pre><code>Page page = new Page();
-HtmlHead head = new HtmlHead();
-head.Title = &amp;quot;Title&amp;quot;;
-page.Controls.Add(head);
-HtmlForm f = new HtmlForm();
-page.Controls.Add(f);
-f.Controls.Add(this.divContent);
-HttpContext.Current.Server.Execute(page, wr, true);
-wr.Flush();
 
-string html = sb.ToString();
+//...
+
+protected void Button1_Click(object sender, EventArgs e)
+{
+    StringBuilder sb =new StringBuilder();
+    StringWriter wr =new StringWriter(sb);
+
+    Page page = new Page();
+    HtmlHead head = new HtmlHead();
+    head.Title = &quot;Title&quot;;
+    page.Controls.Add(head);
+    HtmlForm f = new HtmlForm();
+    page.Controls.Add(f);
+    f.Controls.Add(this.divContent);
+    HttpContext.Current.Server.Execute(page, wr, true);
+    wr.Flush();
+
+    string html = sb.ToString();
+}
 </code></pre>
-<p>}
-</code></pre><p>
 <p>Затем полученную строку можно отправить в Response (собственно, можно сразу писать в Response.OutputStream вместо StringBuilder). Чтобы заставить браузер скачать файл вместо отображения, можно либо выставить Content-Type в <code>application/octet-stream</code>, либо добавить <code>Content-Disposition: attachment</code>.</p>
 <p>Если же нужно просто заставить браузер скачать текущую страницу как есть, можно поступить проще:</p>
 <pre><code>Response.AddHeader(&quot;Content-Disposition&quot;, &quot;attachment; filename=form.html&quot;);

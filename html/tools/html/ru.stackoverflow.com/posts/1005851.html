@@ -83,86 +83,87 @@
 <pre><code>using System;
 using System.Collections;
 using System.Runtime.InteropServices;
-<p>namespace ConsoleApplication1
-{
-class Program
-{
-[DllImport(&quot;ole32.dll&quot;)]
-static extern int StgOpenStorageEx(
-[MarshalAs(UnmanagedType.LPWStr)] string pwcsName,
-uint grfMode,
-uint stgfmt,
-uint grfAttrs,
-IntPtr pStgOptions,
-IntPtr reserved2,
-[In] ref Guid riid,
-out IStorage ppObjectOpen);</p>
-<pre><code>    const uint STGM_DIRECT = 0;
-    const uint STGM_READ = 0;        
-    const uint STGM_SHARE_EXCLUSIVE = 0x10;        
-    const uint STGFMT_STORAGE = 0;        
-    const uint PID_FIRST_USABLE = 2;
-    const uint STGC_DEFAULT = 0;               
 
-    [Guid(&amp;quot;0000000B-0000-0000-C000-000000000046&amp;quot;)]
-    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IStorage
+namespace ConsoleApplication1
+{
+    class Program
     {
-        void a();
-        
-        [PreserveSig]
-        int OpenStream(string pwcsName, 
-            IntPtr reserved1, 
-            uint grfMode, 
-            uint reserved2, 
-            [MarshalAs(UnmanagedType.Interface)] out object ppstm);
-        
-        void CreateStorage(string pwcsName, uint grfMode,  uint reserved1, uint reserved2, out IStorage ppstg);            
-        void OpenStorage(string pwcsName, IStorage pstgPriority,  uint grfMode,  IntPtr snbExclude, uint reserved, out IStorage ppstg);            
-        void CopyTo( uint ciidExclude, Guid[] rgiidExclude,  IntPtr snbExclude, IStorage pstgDest);            
-        void MoveElementTo(string pwcsName, IStorage pstgDest, string pwcsNewName, uint grfFlags);            
-        void Commit( uint grfCommitFlags);            
-        void Revert();            
-        void b();            
-        void DestroyElement(string pwcsName);            
-        void RenameElement(string pwcsOldName, string pwcsNewName);            
-        void c();            
-        void SetClass( ref Guid clsid);            
-        void SetStateBits( uint grfStateBits,  uint grfMask);            
-        void d();
-    }
+        [DllImport(&quot;ole32.dll&quot;)]
+        static extern int StgOpenStorageEx(
+            [MarshalAs(UnmanagedType.LPWStr)] string pwcsName,
+            uint grfMode,
+            uint stgfmt,
+            uint grfAttrs,
+            IntPtr pStgOptions,
+            IntPtr reserved2,
+            [In] ref Guid riid,
+            out IStorage ppObjectOpen);
 
-    public static bool IsXLS(string path)
-    {            
-        IStorage pStorage = null;
-        object o = null;
-        int hr;            
-        Guid guidStorage = typeof(IStorage).GUID;            
+        const uint STGM_DIRECT = 0;
+        const uint STGM_READ = 0;        
+        const uint STGM_SHARE_EXCLUSIVE = 0x10;        
+        const uint STGFMT_STORAGE = 0;        
+        const uint PID_FIRST_USABLE = 2;
+        const uint STGC_DEFAULT = 0;               
 
-        try
+        [Guid(&quot;0000000B-0000-0000-C000-000000000046&quot;)]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IStorage
         {
-            //открываем файл
-            hr = StgOpenStorageEx(path, STGM_READ | STGM_SHARE_EXCLUSIVE, STGFMT_STORAGE,
-                0, IntPtr.Zero, IntPtr.Zero, ref guidStorage, out pStorage);
+            void a();
+            
+            [PreserveSig]
+            int OpenStream(string pwcsName, 
+                IntPtr reserved1, 
+                uint grfMode, 
+                uint reserved2, 
+                [MarshalAs(UnmanagedType.Interface)] out object ppstm);
+            
+            void CreateStorage(string pwcsName, uint grfMode,  uint reserved1, uint reserved2, out IStorage ppstg);            
+            void OpenStorage(string pwcsName, IStorage pstgPriority,  uint grfMode,  IntPtr snbExclude, uint reserved, out IStorage ppstg);            
+            void CopyTo( uint ciidExclude, Guid[] rgiidExclude,  IntPtr snbExclude, IStorage pstgDest);            
+            void MoveElementTo(string pwcsName, IStorage pstgDest, string pwcsNewName, uint grfFlags);            
+            void Commit( uint grfCommitFlags);            
+            void Revert();            
+            void b();            
+            void DestroyElement(string pwcsName);            
+            void RenameElement(string pwcsOldName, string pwcsNewName);            
+            void c();            
+            void SetClass( ref Guid clsid);            
+            void SetStateBits( uint grfStateBits,  uint grfMask);            
+            void d();
+        }
 
-            if (hr != 0) return false; //NOT Structured storage file                 
-                   
-            //открываем поток
-            hr = pStorage.OpenStream(&amp;quot;Workbook&amp;quot;, IntPtr.Zero, STGM_DIRECT | STGM_READ | STGM_SHARE_EXCLUSIVE, 0, out o);
-                                        
-            return hr == 0;
-        }
-        finally
-        {
-            //освобождение ресурсов                
-            if (pStorage != null) Marshal.ReleaseComObject(pStorage);
-            if (o != null) Marshal.ReleaseComObject(o);
-        }
-    }       
-}  
+        public static bool IsXLS(string path)
+        {            
+            IStorage pStorage = null;
+            object o = null;
+            int hr;            
+            Guid guidStorage = typeof(IStorage).GUID;            
+
+            try
+            {
+                //открываем файл
+                hr = StgOpenStorageEx(path, STGM_READ | STGM_SHARE_EXCLUSIVE, STGFMT_STORAGE,
+                    0, IntPtr.Zero, IntPtr.Zero, ref guidStorage, out pStorage);
+
+                if (hr != 0) return false; //NOT Structured storage file                 
+                       
+                //открываем поток
+                hr = pStorage.OpenStream(&quot;Workbook&quot;, IntPtr.Zero, STGM_DIRECT | STGM_READ | STGM_SHARE_EXCLUSIVE, 0, out o);
+                                            
+                return hr == 0;
+            }
+            finally
+            {
+                //освобождение ресурсов                
+                if (pStorage != null) Marshal.ReleaseComObject(pStorage);
+                if (o != null) Marshal.ReleaseComObject(o);
+            }
+        }       
+    }  
+}
 </code></pre>
-<p>}
-</code></pre><p>
 <p>Так как файл XLSX является ZIP-архивом определенной структуры, можно применить для проверки ту же логику, и воспользоваться любой библиотекой для работы с ZIP-архивами (в .NET 4.5+ есть встроенная <a href="https://docs.microsoft.com/en-us/dotnet/api/system.io.compression?view=netcore-2.1" rel="nofollow noreferrer">System.IO.Compression</a>).</p>
 </blockquote>
 <hr>

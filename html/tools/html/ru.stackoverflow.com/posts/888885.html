@@ -85,32 +85,34 @@
 </code></pre>
 <p>И заменим его на следующий код:</p>
 <pre><code>  &lt;Import Project=&quot;$(MSBuildToolsPath)\Microsoft.Common.targets&quot; /&gt;
-<p>&lt;Target Name=&quot;CreateManifestResourceNames&quot; /&gt;</p>
-<p>&lt;Target Name=&quot;CoreCompile&quot; Inputs=&quot;$(MSBuildAllProjects);@(Compile);&quot; Outputs=&quot;@(IntermediateAssembly);&quot;&gt;
-&lt;GetFrameworkPath&gt;
-&lt;Output TaskParameter=&quot;Path&quot; PropertyName=&quot;FrameworkPath&quot; /&gt;
-&lt;/GetFrameworkPath&gt;</p>
-<pre><code>&amp;lt;PropertyGroup&amp;gt;
-  &amp;lt;IlAsmCommand&amp;gt;&amp;amp;quot;$(FrameworkPath)\Ilasm.exe&amp;amp;quot; /NOLOGO /DLL /OUTPUT:&amp;amp;quot;@(IntermediateAssembly)&amp;amp;quot; &amp;lt;/IlAsmCommand&amp;gt;
-&amp;lt;/PropertyGroup&amp;gt;
 
-&amp;lt;PropertyGroup Condition=&amp;quot; '$(Configuration)' == 'Debug' &amp;quot; &amp;gt;
-  &amp;lt;IlAsmCommand&amp;gt;$(IlAsmCommand) /DEBUG &amp;lt;/IlAsmCommand&amp;gt;
-&amp;lt;/PropertyGroup&amp;gt;
+  &lt;Target Name=&quot;CreateManifestResourceNames&quot; /&gt;
 
-&amp;lt;PropertyGroup Condition=&amp;quot; '$(Configuration)' == 'Release' &amp;quot; &amp;gt;&amp;lt;IlAsmCommand&amp;gt;$(IlAsmCommand) /OPTIMIZE &amp;lt;/IlAsmCommand&amp;gt;&amp;lt;/PropertyGroup&amp;gt;
+  &lt;Target Name=&quot;CoreCompile&quot; Inputs=&quot;$(MSBuildAllProjects);@(Compile);&quot; Outputs=&quot;@(IntermediateAssembly);&quot;&gt;
+    &lt;GetFrameworkPath&gt;
+      &lt;Output TaskParameter=&quot;Path&quot; PropertyName=&quot;FrameworkPath&quot; /&gt;
+    &lt;/GetFrameworkPath&gt;
 
-&amp;lt;PropertyGroup Condition=&amp;quot; '$(AssemblyOriginatorKeyFile)' != '' &amp;quot; &amp;gt;
-  &amp;lt;IlAsmCommand&amp;gt;$(IlAsmCommand) /KEY:&amp;amp;quot;$(AssemblyOriginatorKeyFile)&amp;amp;quot; &amp;lt;/IlAsmCommand&amp;gt;
-&amp;lt;/PropertyGroup&amp;gt;
+    &lt;PropertyGroup&gt;
+      &lt;IlAsmCommand&gt;&amp;quot;$(FrameworkPath)\Ilasm.exe&amp;quot; /NOLOGO /DLL /OUTPUT:&amp;quot;@(IntermediateAssembly)&amp;quot; &lt;/IlAsmCommand&gt;
+    &lt;/PropertyGroup&gt;
 
-&amp;lt;Exec Command=&amp;quot;$(IlAsmCommand) @(Compile-&amp;gt;'&amp;amp;quot;%(FullPath)&amp;amp;quot;', ' ')&amp;quot; 
-      Outputs=&amp;quot;@(IntermediateAssembly)&amp;quot; /&amp;gt;
+    &lt;PropertyGroup Condition=&quot; '$(Configuration)' == 'Debug' &quot; &gt;
+      &lt;IlAsmCommand&gt;$(IlAsmCommand) /DEBUG &lt;/IlAsmCommand&gt;
+    &lt;/PropertyGroup&gt;
 
-&amp;lt;CallTarget Targets=&amp;quot;$(TargetsTriggeredByCompilation)&amp;quot; Condition=&amp;quot;'$(TargetsTriggeredByCompilation)' != ''&amp;quot; /&amp;gt;
+    &lt;PropertyGroup Condition=&quot; '$(Configuration)' == 'Release' &quot; &gt;&lt;IlAsmCommand&gt;$(IlAsmCommand) /OPTIMIZE &lt;/IlAsmCommand&gt;&lt;/PropertyGroup&gt;
+
+    &lt;PropertyGroup Condition=&quot; '$(AssemblyOriginatorKeyFile)' != '' &quot; &gt;
+      &lt;IlAsmCommand&gt;$(IlAsmCommand) /KEY:&amp;quot;$(AssemblyOriginatorKeyFile)&amp;quot; &lt;/IlAsmCommand&gt;
+    &lt;/PropertyGroup&gt;
+
+    &lt;Exec Command=&quot;$(IlAsmCommand) @(Compile-&gt;'&amp;quot;%(FullPath)&amp;quot;', ' ')&quot; 
+          Outputs=&quot;@(IntermediateAssembly)&quot; /&gt;
+
+    &lt;CallTarget Targets=&quot;$(TargetsTriggeredByCompilation)&quot; Condition=&quot;'$(TargetsTriggeredByCompilation)' != ''&quot; /&gt;
+  &lt;/Target&gt;
 </code></pre>
-<p>&lt;/Target&gt;
-</code></pre><p>
 <p>Снова загрузим проект (в том же контекстном меню выберем пункт &quot;Перезагрузить проект&quot;).</p>
 <p>Заменим AssemblyInfo.cs на AssemblyInfo.il:</p>
 <pre><code>.assembly CilProject { }

@@ -85,57 +85,60 @@
 #include &lt;psapi.h&gt;
 #include &quot;pdh.h&quot;
 #pragma comment( lib, &quot;Pdh.lib&quot; )
-<p>long GetPrivateWorkingSet(const wchar_t* process) {</p>
-<pre><code>PDH_HQUERY query;
-PDH_HCOUNTER counter;
-PDH_FMT_COUNTERVALUE counterVal;
-const wchar_t* name = L&amp;quot;\\Process(%s)\\Working Set - Private&amp;quot;;
-wchar_t buf[1024]=L&amp;quot;&amp;quot;;
-swprintf_s(buf, 1024, name, process);
 
-PdhOpenQuery(NULL, NULL, &amp;amp;query);
-PDH_STATUS res = PdhAddEnglishCounter(query, buf, NULL, &amp;amp;counter);
-res = PdhCollectQueryData(query);       
-PdhGetFormattedCounterValue(counter, PDH_FMT_LONG, NULL, &amp;amp;counterVal);
-long ret = counterVal.longValue;
-PdhCloseQuery(query);
+long GetPrivateWorkingSet(const wchar_t* process) {
 
-return ret;
-</code></pre>
-<p>}</p>
-<p>void PrintMemory() {</p>
-<pre><code>PROCESS_MEMORY_COUNTERS_EX pmc;
-GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&amp;amp;pmc, sizeof(pmc));
-printf(&amp;quot;Private committed memory: %u B\nWorking set: %u B\n&amp;quot;, (UINT)pmc.PrivateUsage, (UINT)pmc.WorkingSetSize);
+    PDH_HQUERY query;
+    PDH_HCOUNTER counter;
+    PDH_FMT_COUNTERVALUE counterVal;
+    const wchar_t* name = L&quot;\\Process(%s)\\Working Set - Private&quot;;
+    wchar_t buf[1024]=L&quot;&quot;;
+    swprintf_s(buf, 1024, name, process);
 
-printf(&amp;quot;Private working set: %u B\n&amp;quot;, (UINT)GetPrivateWorkingSet(L&amp;quot;Program&amp;quot;));
+    PdhOpenQuery(NULL, NULL, &amp;query);
+    PDH_STATUS res = PdhAddEnglishCounter(query, buf, NULL, &amp;counter);
+    res = PdhCollectQueryData(query);       
+    PdhGetFormattedCounterValue(counter, PDH_FMT_LONG, NULL, &amp;counterVal);
+    long ret = counterVal.longValue;
+    PdhCloseQuery(query);
 
-HANDLE heaps[20];
-HEAP_SUMMARY hs;
-
-DWORD cHeaps = GetProcessHeaps(20, heaps);
-
-for (DWORD i = 0; i &amp;lt; cHeaps; i++) {
-    memset(&amp;amp;hs, 0, sizeof(hs));
-    hs.cb = sizeof(hs);
-    if (HeapSummary(heaps[i], 0, &amp;amp;hs) == FALSE) printf(&amp;quot;HeapSummary failed&amp;quot;);
-    printf(&amp;quot;Heap #%u size: %u B\n&amp;quot;, (UINT)i, (UINT)hs.cbAllocated);
+    return ret;
 }
-printf(&amp;quot;\n&amp;quot;);
-</code></pre>
-<p>}</p>
-<p>int main()
-{
-//первый запуск нужен для прогрева, т.е чтобы инициализировать внутренние структуры API
-//(так как API счетчиков производительности сам выделяет память при первом запуске)
-PrintMemory();</p>
-<pre><code>//второй запуск, соответственно, дает достоверные значения
-PrintMemory();
 
-getchar();
+void PrintMemory() {
+    
+    PROCESS_MEMORY_COUNTERS_EX pmc;
+    GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&amp;pmc, sizeof(pmc));
+    printf(&quot;Private committed memory: %u B\nWorking set: %u B\n&quot;, (UINT)pmc.PrivateUsage, (UINT)pmc.WorkingSetSize);
+
+    printf(&quot;Private working set: %u B\n&quot;, (UINT)GetPrivateWorkingSet(L&quot;Program&quot;));
+
+    HANDLE heaps[20];
+    HEAP_SUMMARY hs;
+
+    DWORD cHeaps = GetProcessHeaps(20, heaps);
+
+    for (DWORD i = 0; i &lt; cHeaps; i++) {
+        memset(&amp;hs, 0, sizeof(hs));
+        hs.cb = sizeof(hs);
+        if (HeapSummary(heaps[i], 0, &amp;hs) == FALSE) printf(&quot;HeapSummary failed&quot;);
+        printf(&quot;Heap #%u size: %u B\n&quot;, (UINT)i, (UINT)hs.cbAllocated);
+    }
+    printf(&quot;\n&quot;);
+}
+
+int main()
+{
+    //первый запуск нужен для прогрева, т.е чтобы инициализировать внутренние структуры API
+    //(так как API счетчиков производительности сам выделяет память при первом запуске)
+    PrintMemory();
+
+    //второй запуск, соответственно, дает достоверные значения
+    PrintMemory();
+
+    getchar();
+}
 </code></pre>
-<p>}
-</code></pre><p>
 <p>Показатели, которые я здесь использую:</p>
 <p><strong>Private committed memory</strong> (Частная выделенная память) - объем виртуальной памяти процесса в состоянии MEM_COMMIT, принадлежащей исключительно этому процессу. Состояние MEM_COMMIT значит, что под данную память выделено место в файле подкачки, а в физической памяти оно может быть либо выделено, либо нет. Из данного значения исключена память, которая является разделяемой между разными процессами - отображенные на память файлы и загруженные DLL, отсюда &quot;private&quot;. Звучит сложно, но по сути это и есть главный показатель, сколько процесс &quot;жрет&quot; памяти.</p>
 <p><strong>Working set</strong> (Рабочий набор) - общий объем физической памяти, выделенной процессу, в том числе разделяемой между несколькими процессами.</p>

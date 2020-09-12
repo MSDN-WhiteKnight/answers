@@ -103,225 +103,226 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Runtime.InteropServices;
-<p>namespace WpfTest
+
+namespace WpfTest
 {
-public partial class MainWindow : Window
-{
-IntPtr Handle;
-int xborder;
-int yborder;</p>
-<pre><code>    [StructLayout(LayoutKind.Sequential)]
-    public struct RECT
+    public partial class MainWindow : Window
     {
-        public int left, top, right, bottom;
-    }
+        IntPtr Handle;
+        int xborder;
+        int yborder;
 
-    [StructLayout(LayoutKind.Sequential)]
-    struct NCCALCSIZE_PARAMS
-    {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
-        public RECT[] rgrc;
-        public IntPtr lppos;
-    }
-
-    [DllImport(&amp;quot;user32.dll&amp;quot;, SetLastError = true)]
-    static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
-
-    [DllImport(&amp;quot;user32.dll&amp;quot;)]
-    static extern bool AdjustWindowRectEx(ref RECT lpRect, uint dwStyle,
-    bool bMenu, uint dwExStyle);
-
-    [DllImport(&amp;quot;dwmapi.dll&amp;quot;)]
-    static extern bool DwmDefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref IntPtr plResult);
-
-    [DllImport(&amp;quot;user32.dll&amp;quot;)]
-    static extern int GetSystemMetrics(uint smIndex);
-
-    static int GET_X_LPARAM(IntPtr lp)
-    {
-        short loword = (short)((ulong)lp &amp;amp; 0xffff);
-        return loword;
-    }
-
-    static int GET_Y_LPARAM(IntPtr lp)
-    {
-        short hiword = (short)((((ulong)lp) &amp;gt;&amp;gt; 16) &amp;amp; 0xffff);
-        return hiword;
-    }
-
-    const uint WM_NCCALCSIZE = 0x0083;
-    const uint WM_NCHITTEST = 0x0084;
-    const uint WM_ACTIVATE = 0x0006;
-    const uint WM_NCACTIVATE = 0x0086;
-    const uint WM_NCPAINT = 0x85;
-
-    const uint WS_OVERLAPPED = 0x00000000;
-    const uint WS_CAPTION = 0x00C00000;
-    const uint WS_SYSMENU = 0x00080000;
-    const uint WS_THICKFRAME = 0x00040000;
-    const uint WS_MINIMIZEBOX = 0x00020000;
-    const uint WS_MAXIMIZEBOX = 0x00010000;
-    const uint WS_OVERLAPPEDWINDOW = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
-          WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
-
-    const uint HTTOPLEFT = 13;
-    const uint HTTOPRIGHT = 14;
-    const uint HTTOP = 12;
-    const uint HTCAPTION = 2;
-    const uint HTLEFT = 10;
-    const uint HTNOWHERE = 0;
-    const uint HTRIGHT = 11;
-    const uint HTBOTTOM = 15;
-    const uint HTBOTTOMLEFT = 16;
-    const uint HTBOTTOMRIGHT = 17;
-
-    const uint SM_CXSIZEFRAME = 32;
-    const uint SM_CYSIZEFRAME = 33;
-
-    public MainWindow()
-    {
-        InitializeComponent();
-    }
-
-    //обработка координат мыши для неклиентской области
-    IntPtr HitTestNCA(IntPtr hWnd, IntPtr wParam, IntPtr lParam)
-    {
-        // Get the point coordinates for the hit test.
-        var ptMouse = new Point(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
-
-        // Get the window rectangle.
-        RECT rcWindow;
-        GetWindowRect(hWnd, out rcWindow);
-
-        // Get the frame rectangle, adjusted for the style without a caption.
-        RECT rcFrame = new RECT();
-        AdjustWindowRectEx(ref rcFrame, WS_OVERLAPPEDWINDOW &amp;amp; ~WS_CAPTION, false, 0);
-
-        // Determine if the hit test is for resizing. Default middle (1,1).
-        ushort uRow = 1;
-        ushort uCol = 1;
-        bool fOnResizeBorder = false;
-
-        // Determine if the point is at the top or bottom of the window.
-        if (ptMouse.Y &amp;gt;= rcWindow.top &amp;amp;&amp;amp; ptMouse.Y &amp;lt; rcWindow.top + yborder)
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT
         {
-            fOnResizeBorder = (ptMouse.Y &amp;lt; (rcWindow.top - rcFrame.top));
-            uRow = 0;
-        }
-        else if (ptMouse.Y &amp;lt; rcWindow.bottom &amp;amp;&amp;amp; ptMouse.Y &amp;gt;= rcWindow.bottom - yborder)
-        {
-            uRow = 2;
+            public int left, top, right, bottom;
         }
 
-        // Determine if the point is at the left or right of the window.
-        if (ptMouse.X &amp;gt;= rcWindow.left &amp;amp;&amp;amp; ptMouse.X &amp;lt; rcWindow.left + xborder)
+        [StructLayout(LayoutKind.Sequential)]
+        struct NCCALCSIZE_PARAMS
         {
-            uCol = 0; // left side
-        }
-        else if (ptMouse.X &amp;lt; rcWindow.right &amp;amp;&amp;amp; ptMouse.X &amp;gt;= rcWindow.right - xborder)
-        {
-            uCol = 2; // right side
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+            public RECT[] rgrc;
+            public IntPtr lppos;
         }
 
-        // Hit test (HTTOPLEFT, ... HTBOTTOMRIGHT)
-        IntPtr[,] hitTests = new IntPtr[,]
+        [DllImport(&quot;user32.dll&quot;, SetLastError = true)]
+        static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
+
+        [DllImport(&quot;user32.dll&quot;)]
+        static extern bool AdjustWindowRectEx(ref RECT lpRect, uint dwStyle,
+        bool bMenu, uint dwExStyle);
+
+        [DllImport(&quot;dwmapi.dll&quot;)]
+        static extern bool DwmDefWindowProc(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam, ref IntPtr plResult);
+
+        [DllImport(&quot;user32.dll&quot;)]
+        static extern int GetSystemMetrics(uint smIndex);
+
+        static int GET_X_LPARAM(IntPtr lp)
         {
-            { (IntPtr)HTTOPLEFT, fOnResizeBorder? (IntPtr)HTTOP : (IntPtr)HTCAPTION, (IntPtr)HTTOPRIGHT },
-            { (IntPtr)HTLEFT,  (IntPtr)HTNOWHERE, (IntPtr)HTRIGHT},
-            { (IntPtr)HTBOTTOMLEFT, (IntPtr)HTBOTTOM, (IntPtr)HTBOTTOMRIGHT },
-        };
+            short loword = (short)((ulong)lp &amp; 0xffff);
+            return loword;
+        }
 
-        return hitTests[uRow, uCol];
-    }
-
-    //обработчик сообщений для окна
-    private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-    {
-        bool fCallDWP = true;
-        IntPtr lRet = IntPtr.Zero;
-
-        if (msg == WM_NCCALCSIZE)
+        static int GET_Y_LPARAM(IntPtr lp)
         {
-            if (wParam != (IntPtr)0)
+            short hiword = (short)((((ulong)lp) &gt;&gt; 16) &amp; 0xffff);
+            return hiword;
+        }
+
+        const uint WM_NCCALCSIZE = 0x0083;
+        const uint WM_NCHITTEST = 0x0084;
+        const uint WM_ACTIVATE = 0x0006;
+        const uint WM_NCACTIVATE = 0x0086;
+        const uint WM_NCPAINT = 0x85;
+
+        const uint WS_OVERLAPPED = 0x00000000;
+        const uint WS_CAPTION = 0x00C00000;
+        const uint WS_SYSMENU = 0x00080000;
+        const uint WS_THICKFRAME = 0x00040000;
+        const uint WS_MINIMIZEBOX = 0x00020000;
+        const uint WS_MAXIMIZEBOX = 0x00010000;
+        const uint WS_OVERLAPPEDWINDOW = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU |
+              WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+
+        const uint HTTOPLEFT = 13;
+        const uint HTTOPRIGHT = 14;
+        const uint HTTOP = 12;
+        const uint HTCAPTION = 2;
+        const uint HTLEFT = 10;
+        const uint HTNOWHERE = 0;
+        const uint HTRIGHT = 11;
+        const uint HTBOTTOM = 15;
+        const uint HTBOTTOMLEFT = 16;
+        const uint HTBOTTOMRIGHT = 17;
+
+        const uint SM_CXSIZEFRAME = 32;
+        const uint SM_CYSIZEFRAME = 33;
+
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+        //обработка координат мыши для неклиентской области
+        IntPtr HitTestNCA(IntPtr hWnd, IntPtr wParam, IntPtr lParam)
+        {
+            // Get the point coordinates for the hit test.
+            var ptMouse = new Point(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+
+            // Get the window rectangle.
+            RECT rcWindow;
+            GetWindowRect(hWnd, out rcWindow);
+
+            // Get the frame rectangle, adjusted for the style without a caption.
+            RECT rcFrame = new RECT();
+            AdjustWindowRectEx(ref rcFrame, WS_OVERLAPPEDWINDOW &amp; ~WS_CAPTION, false, 0);
+
+            // Determine if the hit test is for resizing. Default middle (1,1).
+            ushort uRow = 1;
+            ushort uCol = 1;
+            bool fOnResizeBorder = false;
+
+            // Determine if the point is at the top or bottom of the window.
+            if (ptMouse.Y &gt;= rcWindow.top &amp;&amp; ptMouse.Y &lt; rcWindow.top + yborder)
             {
-                //убираем стандартную рамку сверху
-                lRet = IntPtr.Zero;
+                fOnResizeBorder = (ptMouse.Y &lt; (rcWindow.top - rcFrame.top));
+                uRow = 0;
+            }
+            else if (ptMouse.Y &lt; rcWindow.bottom &amp;&amp; ptMouse.Y &gt;= rcWindow.bottom - yborder)
+            {
+                uRow = 2;
+            }
 
-                NCCALCSIZE_PARAMS pars = (NCCALCSIZE_PARAMS)Marshal.PtrToStructure(lParam, typeof(NCCALCSIZE_PARAMS));
+            // Determine if the point is at the left or right of the window.
+            if (ptMouse.X &gt;= rcWindow.left &amp;&amp; ptMouse.X &lt; rcWindow.left + xborder)
+            {
+                uCol = 0; // left side
+            }
+            else if (ptMouse.X &lt; rcWindow.right &amp;&amp; ptMouse.X &gt;= rcWindow.right - xborder)
+            {
+                uCol = 2; // right side
+            }
 
-                pars.rgrc[0].top = pars.rgrc[0].top;
-                pars.rgrc[0].left = pars.rgrc[0].left + xborder;
-                pars.rgrc[0].right = pars.rgrc[0].right - xborder * 2;
-                pars.rgrc[0].bottom = pars.rgrc[0].bottom - yborder;
-                
-                Marshal.StructureToPtr(pars, lParam, false);
+            // Hit test (HTTOPLEFT, ... HTBOTTOMRIGHT)
+            IntPtr[,] hitTests = new IntPtr[,]
+            {
+                { (IntPtr)HTTOPLEFT, fOnResizeBorder? (IntPtr)HTTOP : (IntPtr)HTCAPTION, (IntPtr)HTTOPRIGHT },
+                { (IntPtr)HTLEFT,  (IntPtr)HTNOWHERE, (IntPtr)HTRIGHT},
+                { (IntPtr)HTBOTTOMLEFT, (IntPtr)HTBOTTOM, (IntPtr)HTBOTTOMRIGHT },
+            };
 
+            return hitTests[uRow, uCol];
+        }
+
+        //обработчик сообщений для окна
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            bool fCallDWP = true;
+            IntPtr lRet = IntPtr.Zero;
+
+            if (msg == WM_NCCALCSIZE)
+            {
+                if (wParam != (IntPtr)0)
+                {
+                    //убираем стандартную рамку сверху
+                    lRet = IntPtr.Zero;
+
+                    NCCALCSIZE_PARAMS pars = (NCCALCSIZE_PARAMS)Marshal.PtrToStructure(lParam, typeof(NCCALCSIZE_PARAMS));
+
+                    pars.rgrc[0].top = pars.rgrc[0].top;
+                    pars.rgrc[0].left = pars.rgrc[0].left + xborder;
+                    pars.rgrc[0].right = pars.rgrc[0].right - xborder * 2;
+                    pars.rgrc[0].bottom = pars.rgrc[0].bottom - yborder;
+                    
+                    Marshal.StructureToPtr(pars, lParam, false);
+
+                    handled = true;
+                    return lRet;
+                }
+            }
+
+            if (msg == WM_NCACTIVATE)
+            {
+                lRet = (IntPtr)1;
                 handled = true;
                 return lRet;
-            }
-        }
+            }                        
 
-        if (msg == WM_NCACTIVATE)
-        {
-            lRet = (IntPtr)1;
-            handled = true;
-            return lRet;
-        }                        
+            fCallDWP = !DwmDefWindowProc(hwnd, msg, wParam, lParam, ref lRet);
 
-        fCallDWP = !DwmDefWindowProc(hwnd, msg, wParam, lParam, ref lRet);
-
-        if (msg == WM_NCHITTEST &amp;amp;&amp;amp; lRet == IntPtr.Zero)
-        {
-            //обработка нажатий мыши
-            lRet = HitTestNCA(hwnd, wParam, lParam);
-
-            if (lRet != (IntPtr)HTNOWHERE)
+            if (msg == WM_NCHITTEST &amp;&amp; lRet == IntPtr.Zero)
             {
-                fCallDWP = false;
+                //обработка нажатий мыши
+                lRet = HitTestNCA(hwnd, wParam, lParam);
+
+                if (lRet != (IntPtr)HTNOWHERE)
+                {
+                    fCallDWP = false;
+                }
             }
+
+            //если сообщение не обработано, передаем базовой процедуре
+            if (fCallDWP) handled = false;
+            else handled = true;
+
+            return lRet;
         }
 
-        //если сообщение не обработано, передаем базовой процедуре
-        if (fCallDWP) handled = false;
-        else handled = true;
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            WindowInteropHelper h = new WindowInteropHelper(this);
+            HwndSource source = HwndSource.FromHwnd(h.Handle);
+            Handle = h.Handle;
+            source.AddHook(new HwndSourceHook(WndProc));//регистрируем обработчик сообщений
+            xborder = GetSystemMetrics(SM_CXSIZEFRAME);
+            yborder = GetSystemMetrics(SM_CYSIZEFRAME);
+        }
 
-        return lRet;
-    }
+        private void Button1_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(&quot;Button 1&quot;);
+        }
 
-    private void Window_Loaded(object sender, RoutedEventArgs e)
-    {
-        WindowInteropHelper h = new WindowInteropHelper(this);
-        HwndSource source = HwndSource.FromHwnd(h.Handle);
-        Handle = h.Handle;
-        source.AddHook(new HwndSourceHook(WndProc));//регистрируем обработчик сообщений
-        xborder = GetSystemMetrics(SM_CXSIZEFRAME);
-        yborder = GetSystemMetrics(SM_CYSIZEFRAME);
-    }
+        private void bMin_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
 
-    private void Button1_Click(object sender, RoutedEventArgs e)
-    {
-        MessageBox.Show(&amp;quot;Button 1&amp;quot;);
-    }
+        private void bMax_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.WindowState == System.Windows.WindowState.Normal) this.WindowState = System.Windows.WindowState.Maximized;
+            else this.WindowState = System.Windows.WindowState.Normal;
+        }
 
-    private void bMin_Click(object sender, RoutedEventArgs e)
-    {
-        this.WindowState = WindowState.Minimized;
-    }
-
-    private void bMax_Click(object sender, RoutedEventArgs e)
-    {
-        if (this.WindowState == System.Windows.WindowState.Normal) this.WindowState = System.Windows.WindowState.Maximized;
-        else this.WindowState = System.Windows.WindowState.Normal;
-    }
-
-    private void ButtonClose_Click(object sender, RoutedEventArgs e)
-    {
-        this.Close();
+        private void ButtonClose_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }
 </code></pre>
-<p>}
-</code></pre></p>
 <p>Выглядит так:</p>
 <p><a href="https://i.stack.imgur.com/LdUXp.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/LdUXp.png" alt="custom window"></a></p>
 <p>Заточено под Windows 10. В Windows 7 способ тоже работает и дает неплохой результат, но стиль окна должен быть <code>WindowStyle=&quot;None&quot;</code>. При других стилях мерцание противоположного края возвращается. В Windows 10 же при использовании стиля None исчезают анимации свертывания-развертывания, поэтому для разных версий Windows понадобится выставлять разный стиль.</p>

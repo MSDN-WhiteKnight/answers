@@ -84,113 +84,116 @@
 #include &lt;vector&gt;
 #include &lt;Windows.h&gt;
 #include &lt;WinInet.h&gt;
-<p>#pragma comment(lib,&quot;wininet&quot;)</p>
-<p>inline std::vector&lt;std::wstring&gt; scanDir(HINTERNET hInternetConnection, std::wstring dir)
+
+#pragma comment(lib,&quot;wininet&quot;)
+
+inline std::vector&lt;std::wstring&gt; scanDir(HINTERNET hInternetConnection, std::wstring dir)
 {
-std::vector&lt;std::wstring&gt; files;</p>
-<pre><code>if (!FtpSetCurrentDirectoryW(hInternetConnection, dir.c_str())) {
-    DWORD lastError = GetLastError();
-    std::wcout &amp;lt;&amp;lt; L&amp;quot;FtpSetCurrentDirectory error: &amp;quot; &amp;lt;&amp;lt; lastError &amp;lt;&amp;lt; std::endl;
+    std::vector&lt;std::wstring&gt; files;
 
-    return files;
-}
+    if (!FtpSetCurrentDirectoryW(hInternetConnection, dir.c_str())) {
+        DWORD lastError = GetLastError();
+        std::wcout &lt;&lt; L&quot;FtpSetCurrentDirectory error: &quot; &lt;&lt; lastError &lt;&lt; std::endl;
 
-WIN32_FIND_DATAA win32FindData;
-HINTERNET hFind = FtpFindFirstFileA(hInternetConnection, &amp;quot;*.*&amp;quot;, &amp;amp;win32FindData, INTERNET_FLAG_RESYNCHRONIZE, NULL);
+        return files;
+    }
 
-if (!hFind) {
-    std::wcout &amp;lt;&amp;lt; L&amp;quot;FtpFindFirstFile error: &amp;quot; &amp;lt;&amp;lt; GetLastError() &amp;lt;&amp;lt; std::endl;
+    WIN32_FIND_DATAA win32FindData;
+    HINTERNET hFind = FtpFindFirstFileA(hInternetConnection, &quot;*.*&quot;, &amp;win32FindData, INTERNET_FLAG_RESYNCHRONIZE, NULL);
 
-    return files;
-}
+    if (!hFind) {
+        std::wcout &lt;&lt; L&quot;FtpFindFirstFile error: &quot; &lt;&lt; GetLastError() &lt;&lt; std::endl;
 
-WCHAR buf[MAX_PATH] = L&amp;quot;&amp;quot;;
+        return files;
+    }
 
-MultiByteToWideChar(CP_UTF8, 0, win32FindData.cFileName, sizeof(win32FindData.cFileName), buf, MAX_PATH);
-files.push_back(buf);
+    WCHAR buf[MAX_PATH] = L&quot;&quot;;
 
-while (InternetFindNextFileA(hFind, &amp;amp;win32FindData)) {
     MultiByteToWideChar(CP_UTF8, 0, win32FindData.cFileName, sizeof(win32FindData.cFileName), buf, MAX_PATH);
     files.push_back(buf);
-}
 
-InternetCloseHandle(hFind);
-
-return files;
-</code></pre>
-<p>}</p>
-<p>int main()
-{<br>
-_setmode(_fileno(stdout), _O_U16TEXT);
-_setmode(_fileno(stdin), _O_U16TEXT);
-_setmode(_fileno(stderr), _O_U16TEXT);</p>
-<pre><code>std::wcout &amp;lt;&amp;lt; L&amp;quot;Старт&amp;quot; &amp;lt;&amp;lt; std::endl;    
-
-HINTERNET hInternetRoot = InternetOpenW(L&amp;quot;Mozilla&amp;quot;, INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, NULL);
-
-if (!hInternetRoot) {
-    std::wcout &amp;lt;&amp;lt; L&amp;quot;InternetOpen error: &amp;quot; &amp;lt;&amp;lt; GetLastError() &amp;lt;&amp;lt; std::endl;
-
-    return 0;
-}
-
-HINTERNET hInternetConnection = InternetConnectW(
-    hInternetRoot, L&amp;quot;server&amp;quot;, INTERNET_DEFAULT_FTP_PORT, L&amp;quot;user&amp;quot;, L&amp;quot;password&amp;quot;, INTERNET_SERVICE_FTP, INTERNET_FLAG_PASSIVE, NULL
-);
-
-if (!hInternetConnection) {
-    std::wcout &amp;lt;&amp;lt; L&amp;quot;InternetConnect error: &amp;quot; &amp;lt;&amp;lt; GetLastError() &amp;lt;&amp;lt; std::endl;
-    InternetCloseHandle(hInternetRoot);
-
-    return 0;
-}
-
-std::wstring command;
-WCHAR currentDir[MAX_PATH];
-DWORD currentDirBuffer = MAX_PATH;
-
-if (!FtpGetCurrentDirectoryW(hInternetConnection, currentDir, &amp;amp;currentDirBuffer)) {
-    std::wcout &amp;lt;&amp;lt; L&amp;quot;FtpGetCurrentDirectory error: &amp;quot; &amp;lt;&amp;lt; GetLastError() &amp;lt;&amp;lt; std::endl;
-
-    return 0;
-}
-
-while (true) {
-    std::wcout &amp;lt;&amp;lt; L&amp;quot;FTP&amp;gt;&amp;quot;;
-
-    WCHAR cmd[200] = L&amp;quot;&amp;quot;;
-    std::wcin.getline(cmd, 200);
-    command.assign(cmd);        
-
-    if (command == L&amp;quot;scandir&amp;quot;) {
-        std::vector&amp;lt;std::wstring&amp;gt; files;
-        int filesLen,
-            i;
-
-        files = scanDir(hInternetConnection, currentDir);
-        filesLen = files.size();
-
-        for (i = 0; i &amp;lt; filesLen; i++) {
-            std::wcout &amp;lt;&amp;lt; files[i].c_str() &amp;lt;&amp;lt; std::endl;
-        }
+    while (InternetFindNextFileA(hFind, &amp;win32FindData)) {
+        MultiByteToWideChar(CP_UTF8, 0, win32FindData.cFileName, sizeof(win32FindData.cFileName), buf, MAX_PATH);
+        files.push_back(buf);
     }
-    else if (command == L&amp;quot;setdir&amp;quot;) {
 
-    }
-    else if (command == L&amp;quot;exit&amp;quot;) {
+    InternetCloseHandle(hFind);
+
+    return files;
+}
+
+int main()
+{   
+    _setmode(_fileno(stdout), _O_U16TEXT);
+    _setmode(_fileno(stdin), _O_U16TEXT);
+    _setmode(_fileno(stderr), _O_U16TEXT);
+
+    std::wcout &lt;&lt; L&quot;Старт&quot; &lt;&lt; std::endl;    
+
+    HINTERNET hInternetRoot = InternetOpenW(L&quot;Mozilla&quot;, INTERNET_OPEN_TYPE_PRECONFIG, nullptr, nullptr, NULL);
+
+    if (!hInternetRoot) {
+        std::wcout &lt;&lt; L&quot;InternetOpen error: &quot; &lt;&lt; GetLastError() &lt;&lt; std::endl;
+
         return 0;
     }
-    else {
-        std::wcout &amp;lt;&amp;lt; L&amp;quot;Invalid command&amp;quot; &amp;lt;&amp;lt; std::endl;
+
+    HINTERNET hInternetConnection = InternetConnectW(
+        hInternetRoot, L&quot;server&quot;, INTERNET_DEFAULT_FTP_PORT, L&quot;user&quot;, L&quot;password&quot;, INTERNET_SERVICE_FTP, INTERNET_FLAG_PASSIVE, NULL
+    );
+
+    if (!hInternetConnection) {
+        std::wcout &lt;&lt; L&quot;InternetConnect error: &quot; &lt;&lt; GetLastError() &lt;&lt; std::endl;
+        InternetCloseHandle(hInternetRoot);
+
+        return 0;
     }
 
-    std::wcout &amp;lt;&amp;lt; std::endl;
-}
+    std::wstring command;
+    WCHAR currentDir[MAX_PATH];
+    DWORD currentDirBuffer = MAX_PATH;
 
-return 0;
+    if (!FtpGetCurrentDirectoryW(hInternetConnection, currentDir, &amp;currentDirBuffer)) {
+        std::wcout &lt;&lt; L&quot;FtpGetCurrentDirectory error: &quot; &lt;&lt; GetLastError() &lt;&lt; std::endl;
+
+        return 0;
+    }
+    
+    while (true) {
+        std::wcout &lt;&lt; L&quot;FTP&gt;&quot;;
+
+        WCHAR cmd[200] = L&quot;&quot;;
+        std::wcin.getline(cmd, 200);
+        command.assign(cmd);        
+
+        if (command == L&quot;scandir&quot;) {
+            std::vector&lt;std::wstring&gt; files;
+            int filesLen,
+                i;
+
+            files = scanDir(hInternetConnection, currentDir);
+            filesLen = files.size();
+
+            for (i = 0; i &lt; filesLen; i++) {
+                std::wcout &lt;&lt; files[i].c_str() &lt;&lt; std::endl;
+            }
+        }
+        else if (command == L&quot;setdir&quot;) {
+
+        }
+        else if (command == L&quot;exit&quot;) {
+            return 0;
+        }
+        else {
+            std::wcout &lt;&lt; L&quot;Invalid command&quot; &lt;&lt; std::endl;
+        }
+
+        std::wcout &lt;&lt; std::endl;
+    }
+
+    return 0;
+}
 </code></pre>
-<p>}
-</code></pre><p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

@@ -76,38 +76,40 @@
 <p>В Windows так:</p>
 <pre><code>using System;
 using System.Runtime.InteropServices;
-<p>class Program
-{<br>
-private struct MEMORYSTATUSEX
-{
-public uint dwLength;
-public uint dwMemoryLoad;
-public ulong ullTotalPhys;
-public ulong ullAvailPhys;
-public ulong ullTotalPageFile;
-public ulong ullAvailPageFile;
-public ulong ullTotalVirtual;
-public ulong ullAvailVirtual;
-public ulong ullAvailExtendedVirtual;
-}</p>
-<pre><code>[DllImport(&amp;quot;kernel32.dll&amp;quot;)]
-static extern int GlobalMemoryStatusEx([In, Out] ref MEMORYSTATUSEX lpBuffer);
 
-//...
+class Program
+{    
+    private struct MEMORYSTATUSEX
+    {
+        public uint dwLength;
+        public uint dwMemoryLoad;
+        public ulong ullTotalPhys;
+        public ulong ullAvailPhys;
+        public ulong ullTotalPageFile;
+        public ulong ullAvailPageFile;
+        public ulong ullTotalVirtual;
+        public ulong ullAvailVirtual;
+        public ulong ullAvailExtendedVirtual;
+    }
+            
+    [DllImport(&quot;kernel32.dll&quot;)]
+    static extern int GlobalMemoryStatusEx([In, Out] ref MEMORYSTATUSEX lpBuffer);
 
-MEMORYSTATUSEX ms = new MEMORYSTATUSEX();
-ms.dwLength = (uint)Marshal.SizeOf(ms);
+    //...
 
-if (GlobalMemoryStatusEx(ref ms) != 0)
-{
-    uint available_ram = ms.ullAvailPhys;
-    uint total_ram = ms.ullTotalPhys;
+    MEMORYSTATUSEX ms = new MEMORYSTATUSEX();
+    ms.dwLength = (uint)Marshal.SizeOf(ms);
+
+    if (GlobalMemoryStatusEx(ref ms) != 0)
+    {
+        uint available_ram = ms.ullAvailPhys;
+        uint total_ram = ms.ullTotalPhys;
+    }
+
+    //...
+
 }
-
-//...
 </code></pre>
-<p>}
-</code></pre><p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

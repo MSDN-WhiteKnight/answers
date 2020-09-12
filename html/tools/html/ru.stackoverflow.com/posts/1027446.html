@@ -86,63 +86,66 @@
 <p>Создадим проект C#, и добавим в него такой код:</p>
 <pre><code>using System;
 using System.IO;
-<p>namespace NetCoreTest
-{
-class Program
-{<br>
-public class foo
-{</p>
-<pre><code>    }
 
-    static void Main(string[] args)
-    {            
-        Console.WriteLine(&amp;quot;Hello World!&amp;quot;);
-        Console.ReadKey();
+namespace NetCoreTest
+{
+    class Program
+    {        
+        public class foo
+        {
+             
+        }
+
+        static void Main(string[] args)
+        {            
+            Console.WriteLine(&quot;Hello World!&quot;);
+            Console.ReadKey();
+        }
     }
 }
 </code></pre>
-<p>}
-</code></pre><p>
 <p>Студия подчеркнет пунктирной линией класс, названный с маленькой буквы, а также выведет в список ошибок сообщение с кодом IDE1006. (Коды, начинающиеся с IDE, относятся к стилю.) Если навести мышью на пунктир, появляется всплывающая подсказка, в которой можно выбрать предложенный вариант исправления.</p>
 <p>Также неиспользуемую директиву using студия выделила серым цветом. Это предупреждение по умолчанию не отображается в списке ошибок, но оно также имеет код (IDE0005). Аналогично, можно навести мышью и применить исправление, удаляющее неиспользуемую директиву.</p>
 <p><a href="https://i.stack.imgur.com/BfbWm.png" rel="noreferrer"><img src="https://i.stack.imgur.com/BfbWm.png" alt="source analysis"></a></p>
 <p>После исправления:</p>
 <pre><code>using System;
-<p>namespace NetCoreTest
-{
-class Program
-{<br>
-public class Foo
-{</p>
-<pre><code>    }
 
-    static void Main(string[] args)
-    {            
-        Console.WriteLine(&amp;quot;Hello World!&amp;quot;);
-        Console.ReadKey();
+namespace NetCoreTest
+{
+    class Program
+    {        
+        public class Foo
+        {
+             
+        }
+
+        static void Main(string[] args)
+        {            
+            Console.WriteLine(&quot;Hello World!&quot;);
+            Console.ReadKey();
+        }
     }
 }
 </code></pre>
-<p>}
-</code></pre></p>
 <p>Можно установить дополнительные анализаторы, которые будут также проверять архитектуру (у них коды предупреждений начинаются с &quot;CA&quot;). Подробнее см. <a href="https://docs.microsoft.com/en-us/visualstudio/code-quality/install-roslyn-analyzers" rel="noreferrer">Install .NET Compiler Platform code analyzers</a>.</p>
 <h1>Использование анализаторов скомпилированных сборок</h1>
 <p>Создадим проект .NET Framework, и добавим в него код:</p>
 <pre><code>using System;
-<p>namespace ConsoleApplication1
+
+namespace ConsoleApplication1
 {
-public class Program
-{
-public class Foo { }</p>
-<pre><code>    static void Main(string[] argv)
+    public class Program
     {
-        Console.WriteLine(&amp;quot;Hello world&amp;quot;);
-        Console.ReadKey();
-    }  
+        public class Foo { }
+
+        static void Main(string[] argv)
+        {
+            Console.WriteLine(&quot;Hello world&quot;);
+            Console.ReadKey();
+        }  
+    }
 }
 </code></pre>
-<p>}
-</code></pre><p>
 <p>Перейдем в свойства проекта, на вкладке <strong>Анализ кода</strong> установим галку &quot;Включить анализ кода в сборке&quot; и выберем набор правил &quot;Базовые нормы и правила разработки Microsoft&quot; (BasicDesignGuidelineRules.ruleset), или аналогичный более строгий. Выполним сборку проекта. Результат:</p>
 <p><a href="https://i.stack.imgur.com/q1Rvi.png" rel="noreferrer"><img src="https://i.stack.imgur.com/q1Rvi.png" alt="assembly analysis"></a></p>
 <p>Разберем предупреждения:</p>
@@ -165,20 +168,21 @@ public class Foo { }</p>
 <hr>
 <p>Исправлять в случае этого типа анализаторов нужно вручную. Получаем такой код после исправления этих предупреждений (он правда выводит новое, о неиспользуемом классе Foo):</p>
 <pre><code>using System;
-<p>namespace ConsoleApplication1
+
+namespace ConsoleApplication1
 {
-static class Program
-{
-class Foo { }</p>
-<pre><code>    static void Main()
+    static class Program
     {
-        Console.WriteLine(&amp;quot;Hello world&amp;quot;);
-        Console.ReadKey();
-    }  
+        class Foo { }
+
+        static void Main()
+        {
+            Console.WriteLine(&quot;Hello world&quot;);
+            Console.ReadKey();
+        }  
+    }
 }
 </code></pre>
-<p>}
-</code></pre></p>
 <p>До сих пор мы не коснулись меню <strong>Анализ</strong>. Зачем оно нужно? Пункт &quot;Выполнить анализ кода&quot;, видимо, рассчитан на те типы проектов, где он не выполняется автоматически при сборке. Для C# он бесполезен. &quot;Выполнить анализ кода и подавить активные ошибки&quot; позволяет пометить все текущие ошибки как игнорируемые, в случае, если мы не собираемся их исправлять. &quot;Настроить анализ кода&quot; - это просто другой вариант открыть аналогичную страницу свойств проекта. &quot;Вычислить метрики кода&quot; - рассчитывает какие-то количественные показатели для кода, в том числе на уровне проектов и классов. Практическая ценность сомнительна, но по крайней мере можно быстро посчитать число строк кода.</p>
 <p><a href="https://docs.microsoft.com/en-us/visualstudio/code-quality/code-analysis-for-managed-code-overview" rel="noreferrer">Документация по анализу кода</a></p>
 </blockquote>

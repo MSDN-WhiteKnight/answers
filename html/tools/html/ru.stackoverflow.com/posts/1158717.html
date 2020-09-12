@@ -81,43 +81,44 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Runtime.InteropServices;
-<p>class Program
+
+class Program
 {
-[StructLayout(LayoutKind.Sequential)]
-struct S
-{
-public byte x;
-public byte y;</p>
-<pre><code>    public override string ToString()
+    [StructLayout(LayoutKind.Sequential)]
+    struct S
     {
-        return x.ToString() + &amp;quot;;&amp;quot; + y.ToString();
+        public byte x;
+        public byte y;
+
+        public override string ToString()
+        {
+            return x.ToString() + &quot;;&quot; + y.ToString();
+        }
     }
-}
 
-static object Box(ReadOnlySpan&amp;lt;byte&amp;gt; data, Type type)
-{
-
-    var obj = Activator.CreateInstance(type);
-    GCHandle gch = GCHandle.Alloc(obj, GCHandleType.Pinned);
-    try
+    static object Box(ReadOnlySpan&lt;byte&gt; data, Type type)
     {
-        IntPtr p = gch.AddrOfPinnedObject();
-        Marshal.Copy(data.ToArray(), 0, p, data.Length);
+
+        var obj = Activator.CreateInstance(type);
+        GCHandle gch = GCHandle.Alloc(obj, GCHandleType.Pinned);
+        try
+        {
+            IntPtr p = gch.AddrOfPinnedObject();
+            Marshal.Copy(data.ToArray(), 0, p, data.Length);
+        }
+        finally { gch.Free(); }
+        return obj;
     }
-    finally { gch.Free(); }
-    return obj;
-}
 
-static void Main(string[] args)
-{
-    object x = Box(new byte[] { 1, 2 }, typeof(S));
-    Console.WriteLine(x); //Результат: 1;2
+    static void Main(string[] args)
+    {
+        object x = Box(new byte[] { 1, 2 }, typeof(S));
+        Console.WriteLine(x); //Результат: 1;2
 
-    Console.ReadKey();
+        Console.ReadKey();
+    }
 }
 </code></pre>
-<p>}
-</code></pre><p>
 <p>В общем случае, насколько я знаю, нет, стабильного решения не существует.</p>
 </blockquote>
 <hr>

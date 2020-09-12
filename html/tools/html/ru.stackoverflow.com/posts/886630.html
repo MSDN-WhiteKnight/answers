@@ -88,44 +88,48 @@
 <pre><code>#include &lt;Windows.h&gt;
 #include &lt;gdiplus.h&gt;
 #pragma comment(lib, &quot;gdiplus.lib&quot;)
-<p>const int W_IMAGE = 6000; //для метафайлов почему-то приходится задавать очень большую ширину и высоту, иначе они не попадают в область отображения.
-const int H_IMAGE = 6000;</p>
-<p>Gdiplus::Metafile * wmf = NULL;</p>
-<p>//...</p>
-<p>LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-switch (message)
-{
-case WM_CREATE:
-{
-//загрузка изображения
-wmf = new Gdiplus::Metafile(L&quot;D:\images\circle.wmf&quot;);
-}
-break;
-case WM_PAINT:
-{
-//отрисовка изображения
-PAINTSTRUCT ps;
-HDC hdc = BeginPaint(hWnd, &amp;ps);</p>
-<pre><code>        Gdiplus::Graphics g(hdc);            
-        
-        if(wmf != NULL){
-            g.DrawImage(wmf,0, 0, 0, 0, W_IMAGE, H_IMAGE, Gdiplus::Unit::UnitPixel);
-        }
 
-        EndPaint(hWnd, &amp;amp;ps);
+const int W_IMAGE = 6000; //для метафайлов почему-то приходится задавать очень большую ширину и высоту, иначе они не попадают в область отображения.
+const int H_IMAGE = 6000;
+
+Gdiplus::Metafile * wmf = NULL;
+
+//...
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+    case WM_CREATE:
+        {
+        //загрузка изображения
+        wmf = new Gdiplus::Metafile(L&quot;D:\\images\\circle.wmf&quot;);
+        }
+        break;
+    case WM_PAINT:
+        {
+            //отрисовка изображения
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hWnd, &amp;ps);
+
+            Gdiplus::Graphics g(hdc);            
+            
+            if(wmf != NULL){
+                g.DrawImage(wmf,0, 0, 0, 0, W_IMAGE, H_IMAGE, Gdiplus::Unit::UnitPixel);
+            }
+
+            EndPaint(hWnd, &amp;ps);
+        }
+        break;
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
     }
-    break;
-case WM_DESTROY:
-    PostQuitMessage(0);
-    break;
-default:
-    return DefWindowProc(hWnd, message, wParam, lParam);
+    return 0;
 }
-return 0;
 </code></pre>
-<p>}
-</code></pre><p>
 <p>Результат:</p>
 <p><img src="https://i.stack.imgur.com/a6fnR.png" alt="screenshot"></p>
 <h1>Вариант 3 - Преобразование в растровое изображение</h1>
@@ -139,206 +143,222 @@ return 0;
 #include &lt;Mshtml.h&gt;
 #include &lt;gdiplus.h&gt;
 #pragma comment(lib, &quot;gdiplus.lib&quot;)
-<p>const int W_IMAGE = 600;
-const int H_IMAGE = 600;</p>
-<p>//Глобальные переменные
+
+const int W_IMAGE = 600;
+const int H_IMAGE = 600;
+
+//Глобальные переменные
 HINSTANCE hInst;                               // текущий экземпляр
 WCHAR szTitle[100] = L&quot;Window&quot;;                  // текст строки заголовка
 WCHAR szWindowClass[100] = L&quot;MyClass&quot;;           // имя класса главного окна
-Gdiplus::Bitmap* svgbitmap = NULL;             // объект изображения</p>
-<p>//объявления функций, включенных в этот модуль кода:
+Gdiplus::Bitmap* svgbitmap = NULL;             // объект изображения
+
+//объявления функций, включенных в этот модуль кода:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
-LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);</p>
-<p>void DocumentWrite(IHTMLDocument2* pdoc, const WCHAR* content) {</p>
-<pre><code>HRESULT hr = 0;
-VARIANT *param;
-BSTR bstr = SysAllocString(content);
+LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
-// Creates a new one-dimensional array
-SAFEARRAY *psaStrings = SafeArrayCreateVector(VT_VARIANT, 0, 1);
-if (psaStrings == NULL) {
-    goto cleanup;
-}
+void DocumentWrite(IHTMLDocument2* pdoc, const WCHAR* content) {
 
-hr = SafeArrayAccessData(psaStrings, (LPVOID*)&amp;amp;param);
-param-&amp;gt;vt = VT_BSTR;
-param-&amp;gt;bstrVal = bstr;
-hr = SafeArrayUnaccessData(psaStrings);
-hr = pdoc-&amp;gt;write(psaStrings);
-</code></pre>
-<p>cleanup:
-// SafeArrayDestroy calls SysFreeString for each BSTR
-if (psaStrings != NULL) {
-SafeArrayDestroy(psaStrings);
-}
-}</p>
-<p>// *** Преобразование SVG в Bitmap ***
-Gdiplus::Bitmap* SvgToBitmap(const WCHAR* svgcontent, int w_image, int h_image) {</p>
-<pre><code>const int HIMETRIC_INCH = 2540; 
-SIZEL sz = { 0 };
-RECTL rcClient = { 0 };
-HDC screendc;
-HDC hdc;
+    HRESULT hr = 0;
+    VARIANT *param;
+    BSTR bstr = SysAllocString(content);
 
-WCHAR svghtml1[] = L&amp;quot;&amp;lt;html&amp;gt;&amp;lt;head&amp;gt;&amp;lt;meta http-equiv=\&amp;quot;X-UA-Compatible\&amp;quot; content=\&amp;quot;IE=11\&amp;quot; /&amp;gt;&amp;lt;/head&amp;gt;&amp;lt;body&amp;gt;&amp;quot;;
-WCHAR svghtml2[] = L&amp;quot;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;&amp;quot;;
-
-Gdiplus::Bitmap* bmp = NULL;
-Gdiplus::Graphics* g = NULL;
-IHTMLDocument2* d2 = NULL;
-IOleObject* pObj = NULL;
-IViewObject* pView = NULL;
-
-BOOL b = SystemParametersInfo(SPI_GETWORKAREA, 0, &amp;amp;rcClient, 0);
-if (b == FALSE) { rcClient.bottom = 480; rcClient.right = 640; }
-
-int width = (int)(rcClient.right - rcClient.left);
-int height = (int)(rcClient.bottom - rcClient.top);
-    
-
-//создание документа
-HRESULT hr = CoCreateInstance(CLSID_HTMLDocument, NULL, CLSCTX_INPROC_SERVER, IID_IHTMLDocument2, (LPVOID*)&amp;amp;d2);
-if (FAILED(hr)) {
-    MessageBox(NULL, L&amp;quot;CoCreateInstance failed&amp;quot;, NULL, MB_OK|MB_ICONERROR); goto End;
-}
-
-hr = d2-&amp;gt;QueryInterface(IID_IOleObject, (LPVOID*)&amp;amp;pObj);
-if (FAILED(hr)) { MessageBox(NULL, L&amp;quot;QueryInterface failed&amp;quot;, 0, 0); goto End; }
-
-//установка размера документа
-screendc = GetDC(NULL);
-sz.cx = (UINT)MulDiv(width, HIMETRIC_INCH, GetDeviceCaps(screendc, LOGPIXELSX));
-sz.cy = (UINT)MulDiv(height, HIMETRIC_INCH, GetDeviceCaps(screendc, LOGPIXELSY));
-ReleaseDC(NULL,screendc);
-
-hr = pObj-&amp;gt;SetExtent(DVASPECT_CONTENT,&amp;amp;sz);
-if (FAILED(hr)) { MessageBox(NULL, L&amp;quot;SetExtent failed&amp;quot;, NULL, MB_OK | MB_ICONERROR); goto End; }
-    
-//запись SVG в документ
-DocumentWrite(d2, svghtml1);
-DocumentWrite(d2, svgcontent);
-DocumentWrite(d2, svghtml2);
-d2-&amp;gt;close();    
-
-//преобразование в Bitmap
-hr = d2-&amp;gt;QueryInterface(IID_IViewObject, (LPVOID*)&amp;amp;pView);
-if (FAILED(hr)) { MessageBox(NULL, L&amp;quot;Cannot get IViewObject!&amp;quot;, NULL, MB_OK | MB_ICONERROR); goto End; }
-
-bmp = new Gdiplus::Bitmap(w_image, h_image);
-g = Gdiplus::Graphics::FromImage(bmp);
-
-hdc = g-&amp;gt;GetHDC();
-hr = pView-&amp;gt;Draw(DVASPECT_CONTENT,-1, NULL, NULL, NULL, hdc, &amp;amp; rcClient, NULL,NULL, 0); 
-g-&amp;gt;ReleaseHDC(hdc); 
-
-if (FAILED(hr)) MessageBox(NULL, L&amp;quot;Draw failed&amp;quot;, NULL, MB_OK | MB_ICONERROR);
-</code></pre>
-<p>End:</p>
-<pre><code>if( g != NULL) delete g;
-if (d2 != NULL)d2-&amp;gt;Release();
-if (pObj != NULL)pObj-&amp;gt;Release();
-if (pView != NULL)pView-&amp;gt;Release(); 
-
-return bmp;
-</code></pre>
-<p>}</p>
-<p>// *** GUI ***
-int APIENTRY wWinMain(<em>In</em> HINSTANCE hInstance,
-<em>In_opt</em> HINSTANCE hPrevInstance,
-<em>In</em> LPWSTR    lpCmdLine,
-<em>In</em> int       nCmdShow)
-{
-UNREFERENCED_PARAMETER(hPrevInstance);
-UNREFERENCED_PARAMETER(lpCmdLine);</p>
-<pre><code>CoInitialize(NULL);    
-Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-ULONG_PTR gdiplusToken;
-Gdiplus::GdiplusStartup(&amp;amp;gdiplusToken, &amp;amp;gdiplusStartupInput, NULL);
-MyRegisterClass(hInstance);
-
-// Выполнить инициализацию приложения
-if (!InitInstance (hInstance, nCmdShow))
-{
-    return FALSE;
-}    
-
-MSG msg;
-
-while (GetMessage(&amp;amp;msg, nullptr, 0, 0))
-{       
-        TranslateMessage(&amp;amp;msg);
-        DispatchMessage(&amp;amp;msg);        
-}
-
-return (int) msg.wParam;
-</code></pre>
-<p>}</p>
-<p>ATOM MyRegisterClass(HINSTANCE hInstance)
-{
-WNDCLASSEXW wcex = { 0 };
-wcex.cbSize = sizeof(WNDCLASSEX);
-wcex.style          = CS_HREDRAW | CS_VREDRAW;
-wcex.lpfnWndProc    = WndProc;
-wcex.cbClsExtra     = 0;
-wcex.cbWndExtra     = 0;
-wcex.hInstance      = hInstance;<br>
-wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);<br>
-wcex.lpszClassName  = szWindowClass;<br>
-return RegisterClassExW(&amp;wcex);
-}</p>
-<p>BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
-{
-hInst = hInstance; // Сохранить маркер экземпляра в глобальной переменной</p>
-<p>HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);</p>
-<p>if (!hWnd)
-{
-return FALSE;
-}</p>
-<p>ShowWindow(hWnd, nCmdShow);
-UpdateWindow(hWnd);</p>
-<p>return TRUE;
-}</p>
-<p>LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-switch (message)
-{
-case WM_CREATE:
-{</p>
-<pre><code>    //загрузка изображения
-    std::wifstream fStream(L&amp;quot;c:\\web\\image.svg&amp;quot;);      
-    std::wstringstream wstrStream;
-    wstrStream &amp;lt;&amp;lt; fStream.rdbuf();
-    std::wstring s = wstrStream.str();      
-    
-    svgbitmap = SvgToBitmap(s.c_str(), W_IMAGE, H_IMAGE);
-        
+    // Creates a new one-dimensional array
+    SAFEARRAY *psaStrings = SafeArrayCreateVector(VT_VARIANT, 0, 1);
+    if (psaStrings == NULL) {
+        goto cleanup;
     }
-    break;
-case WM_PAINT:
+    
+    hr = SafeArrayAccessData(psaStrings, (LPVOID*)&amp;param);
+    param-&gt;vt = VT_BSTR;
+    param-&gt;bstrVal = bstr;
+    hr = SafeArrayUnaccessData(psaStrings);
+    hr = pdoc-&gt;write(psaStrings);
+cleanup:
+    // SafeArrayDestroy calls SysFreeString for each BSTR
+    if (psaStrings != NULL) {
+        SafeArrayDestroy(psaStrings);
+    }
+}
+
+// *** Преобразование SVG в Bitmap ***
+Gdiplus::Bitmap* SvgToBitmap(const WCHAR* svgcontent, int w_image, int h_image) {
+        
+    const int HIMETRIC_INCH = 2540; 
+    SIZEL sz = { 0 };
+    RECTL rcClient = { 0 };
+    HDC screendc;
+    HDC hdc;
+
+    WCHAR svghtml1[] = L&quot;&lt;html&gt;&lt;head&gt;&lt;meta http-equiv=\&quot;X-UA-Compatible\&quot; content=\&quot;IE=11\&quot; /&gt;&lt;/head&gt;&lt;body&gt;&quot;;
+    WCHAR svghtml2[] = L&quot;&lt;/body&gt;&lt;/html&gt;&quot;;
+
+    Gdiplus::Bitmap* bmp = NULL;
+    Gdiplus::Graphics* g = NULL;
+    IHTMLDocument2* d2 = NULL;
+    IOleObject* pObj = NULL;
+    IViewObject* pView = NULL;
+
+    BOOL b = SystemParametersInfo(SPI_GETWORKAREA, 0, &amp;rcClient, 0);
+    if (b == FALSE) { rcClient.bottom = 480; rcClient.right = 640; }
+
+    int width = (int)(rcClient.right - rcClient.left);
+    int height = (int)(rcClient.bottom - rcClient.top);
+        
+
+    //создание документа
+    HRESULT hr = CoCreateInstance(CLSID_HTMLDocument, NULL, CLSCTX_INPROC_SERVER, IID_IHTMLDocument2, (LPVOID*)&amp;d2);
+    if (FAILED(hr)) {
+        MessageBox(NULL, L&quot;CoCreateInstance failed&quot;, NULL, MB_OK|MB_ICONERROR); goto End;
+    }
+    
+    hr = d2-&gt;QueryInterface(IID_IOleObject, (LPVOID*)&amp;pObj);
+    if (FAILED(hr)) { MessageBox(NULL, L&quot;QueryInterface failed&quot;, 0, 0); goto End; }
+
+    //установка размера документа
+    screendc = GetDC(NULL);
+    sz.cx = (UINT)MulDiv(width, HIMETRIC_INCH, GetDeviceCaps(screendc, LOGPIXELSX));
+    sz.cy = (UINT)MulDiv(height, HIMETRIC_INCH, GetDeviceCaps(screendc, LOGPIXELSY));
+    ReleaseDC(NULL,screendc);
+
+    hr = pObj-&gt;SetExtent(DVASPECT_CONTENT,&amp;sz);
+    if (FAILED(hr)) { MessageBox(NULL, L&quot;SetExtent failed&quot;, NULL, MB_OK | MB_ICONERROR); goto End; }
+        
+    //запись SVG в документ
+    DocumentWrite(d2, svghtml1);
+    DocumentWrite(d2, svgcontent);
+    DocumentWrite(d2, svghtml2);
+    d2-&gt;close();    
+
+    //преобразование в Bitmap
+    hr = d2-&gt;QueryInterface(IID_IViewObject, (LPVOID*)&amp;pView);
+    if (FAILED(hr)) { MessageBox(NULL, L&quot;Cannot get IViewObject!&quot;, NULL, MB_OK | MB_ICONERROR); goto End; }
+    
+    bmp = new Gdiplus::Bitmap(w_image, h_image);
+    g = Gdiplus::Graphics::FromImage(bmp);
+    
+    hdc = g-&gt;GetHDC();
+    hr = pView-&gt;Draw(DVASPECT_CONTENT,-1, NULL, NULL, NULL, hdc, &amp; rcClient, NULL,NULL, 0); 
+    g-&gt;ReleaseHDC(hdc); 
+
+    if (FAILED(hr)) MessageBox(NULL, L&quot;Draw failed&quot;, NULL, MB_OK | MB_ICONERROR);
+
+End:
+    
+    if( g != NULL) delete g;
+    if (d2 != NULL)d2-&gt;Release();
+    if (pObj != NULL)pObj-&gt;Release();
+    if (pView != NULL)pView-&gt;Release(); 
+
+    return bmp;
+}
+
+// *** GUI ***
+int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+                     _In_opt_ HINSTANCE hPrevInstance,
+                     _In_ LPWSTR    lpCmdLine,
+                     _In_ int       nCmdShow)
+{
+    UNREFERENCED_PARAMETER(hPrevInstance);
+    UNREFERENCED_PARAMETER(lpCmdLine);
+    
+    CoInitialize(NULL);    
+    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+    ULONG_PTR gdiplusToken;
+    Gdiplus::GdiplusStartup(&amp;gdiplusToken, &amp;gdiplusStartupInput, NULL);
+    MyRegisterClass(hInstance);
+
+    // Выполнить инициализацию приложения
+    if (!InitInstance (hInstance, nCmdShow))
     {
-        //отрисовка изображения
-        PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hWnd, &amp;amp;ps);
-        Gdiplus::Graphics g(hdc);
-        
-        Gdiplus::Status res = g.DrawImage(svgbitmap, 0, 0, 0, 0, W_IMAGE, H_IMAGE, Gdiplus::Unit::UnitPixel);
-        
-        EndPaint(hWnd, &amp;amp;ps);
+        return FALSE;
+    }    
+
+    MSG msg;
+    
+    while (GetMessage(&amp;msg, nullptr, 0, 0))
+    {       
+            TranslateMessage(&amp;msg);
+            DispatchMessage(&amp;msg);        
     }
-    break;
-case WM_DESTROY:
-    PostQuitMessage(0);
-    break;
-default:
-    return DefWindowProc(hWnd, message, wParam, lParam);
+
+    return (int) msg.wParam;
 }
-return 0;
+
+
+ATOM MyRegisterClass(HINSTANCE hInstance)
+{
+    WNDCLASSEXW wcex = { 0 };
+    wcex.cbSize = sizeof(WNDCLASSEX);
+    wcex.style          = CS_HREDRAW | CS_VREDRAW;
+    wcex.lpfnWndProc    = WndProc;
+    wcex.cbClsExtra     = 0;
+    wcex.cbWndExtra     = 0;
+    wcex.hInstance      = hInstance;   
+    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
+    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);    
+    wcex.lpszClassName  = szWindowClass;    
+    return RegisterClassExW(&amp;wcex);
+}
+
+
+BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
+{
+   hInst = hInstance; // Сохранить маркер экземпляра в глобальной переменной
+
+   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+
+   if (!hWnd)
+   {
+      return FALSE;
+   }
+   
+   ShowWindow(hWnd, nCmdShow);
+   UpdateWindow(hWnd);
+
+   return TRUE;
+}
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+    case WM_CREATE:
+        {
+
+        //загрузка изображения
+        std::wifstream fStream(L&quot;c:\\web\\image.svg&quot;);      
+        std::wstringstream wstrStream;
+        wstrStream &lt;&lt; fStream.rdbuf();
+        std::wstring s = wstrStream.str();      
+        
+        svgbitmap = SvgToBitmap(s.c_str(), W_IMAGE, H_IMAGE);
+            
+        }
+        break;
+    case WM_PAINT:
+        {
+            //отрисовка изображения
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hWnd, &amp;ps);
+            Gdiplus::Graphics g(hdc);
+            
+            Gdiplus::Status res = g.DrawImage(svgbitmap, 0, 0, 0, 0, W_IMAGE, H_IMAGE, Gdiplus::Unit::UnitPixel);
+            
+            EndPaint(hWnd, &amp;ps);
+        }
+        break;
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    return 0;
+}
 </code></pre>
-<p>}
-</code></pre></p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

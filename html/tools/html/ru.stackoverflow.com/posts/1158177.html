@@ -78,131 +78,132 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Runtime.InteropServices;
-<p>namespace ConsoleApp1
+
+namespace ConsoleApp1
 {
-class Program
-{
-//Объявления COM Interop для Core Audio API</p>
-<pre><code>    [ComImport]
-    [Guid(&amp;quot;BCDE0395-E52F-467C-8E3D-C4579291692E&amp;quot;)]
-    internal class MMDeviceEnumerator
+    class Program
     {
-    }
+        //Объявления COM Interop для Core Audio API 
 
-    internal enum EDataFlow
-    {
-        eRender,
-        eCapture,
-        eAll,
-        EDataFlow_enum_count
-    }
-
-    internal enum ERole
-    {
-        eConsole,
-        eMultimedia,
-        eCommunications,
-        ERole_enum_count
-    }
-
-    [ComImport]
-    [Guid(&amp;quot;A95664D2-9614-4F35-A746-DE8DB63617E6&amp;quot;), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    internal interface IMMDeviceEnumerator
-    {
-        int NotImpl1();
-
-        [PreserveSig]
-        int GetDefaultAudioEndpoint(EDataFlow dataFlow, ERole role, out IMMDevice ppDevice);
-
-        // the rest is not implemented
-    }
-
-    [ComImport]
-    [Guid(&amp;quot;D666063F-1587-4E43-81F1-B948E807363F&amp;quot;), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    internal interface IMMDevice
-    {
-        [PreserveSig]
-        int Activate(ref Guid iid, int dwClsCtx, IntPtr pActivationParams, [MarshalAs(UnmanagedType.IUnknown)] out object ppInterface);
-
-        // the rest is not implemented
-    }
-
-    [ComImport]
-    [Guid(&amp;quot;5CDF2C82-841E-4546-9722-0CF74078229A&amp;quot;), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    internal interface IAudioEndpointVolume
-    {
-        void A();
-
-        void B();
-
-        void C();
-
-        void SetMasterVolumeLevel(float level,[MarshalAs(UnmanagedType.LPStruct)] Guid eventContext);
-
-        void SetMasterVolumeLevelScalar(float level, [MarshalAs(UnmanagedType.LPStruct)] Guid eventContext);
-                    
-        float GetMasterVolumeLevel();
-                    
-        float GetMasterVolumeLevelScalar();
-
-        void SetChannelVolumeLevel(uint channelNumber, float level,[MarshalAs(UnmanagedType.LPStruct)] Guid eventContext);
-
-        void SetChannelVolumeLevelScalar(uint channelNumber,float level,[MarshalAs(UnmanagedType.LPStruct)] Guid eventContext);
-
-        void GetChannelVolumeLevel( uint channelNumber, out float level);
-                    
-        float GetChannelVolumeLevelScalar(uint channelNumber);
-
-        void SetMute([MarshalAs(UnmanagedType.Bool)] bool isMuted,[MarshalAs(UnmanagedType.LPStruct)] Guid eventContext);
-
-        [return: MarshalAs(UnmanagedType.Bool)] bool GetMute();
-
-        // the rest is not implemented
-    }
-
-    static void SafeRelease&amp;lt;T&amp;gt;(ref T ptr) where T:class
-    {
-        if (ptr != null)
+        [ComImport]
+        [Guid(&quot;BCDE0395-E52F-467C-8E3D-C4579291692E&quot;)]
+        internal class MMDeviceEnumerator
         {
-            Marshal.ReleaseComObject(ptr);
-            ptr = null;
         }
-    }
 
-    private static void SetVolume(float newvalue) //задаем громкость микрофона по умолчанию
-    {
-        IMMDeviceEnumerator deviceEnumerator = null;
-        IMMDevice micro = null;
-        IAudioEndpointVolume vol = null;
-        Guid IID_IAudioEndpointVolume = typeof(IAudioEndpointVolume).GUID;
-        object o;
-
-        try
-        {                
-            deviceEnumerator = (IMMDeviceEnumerator)(new MMDeviceEnumerator());
-            deviceEnumerator.GetDefaultAudioEndpoint(EDataFlow.eCapture, ERole.eMultimedia, out micro);
-            
-            micro.Activate(ref IID_IAudioEndpointVolume, 0, IntPtr.Zero, out o);
-            vol = (IAudioEndpointVolume)o;
-            vol.SetMasterVolumeLevel(newvalue, new Guid());                
-        }
-        finally
+        internal enum EDataFlow
         {
-            SafeRelease(ref vol);
-            SafeRelease(ref micro);
-            SafeRelease(ref deviceEnumerator);
+            eRender,
+            eCapture,
+            eAll,
+            EDataFlow_enum_count
         }
-    }
 
-    static void Main(string[] args)
-    {
-        SetVolume(2);
-        Console.Read();
+        internal enum ERole
+        {
+            eConsole,
+            eMultimedia,
+            eCommunications,
+            ERole_enum_count
+        }
+
+        [ComImport]
+        [Guid(&quot;A95664D2-9614-4F35-A746-DE8DB63617E6&quot;), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        internal interface IMMDeviceEnumerator
+        {
+            int NotImpl1();
+
+            [PreserveSig]
+            int GetDefaultAudioEndpoint(EDataFlow dataFlow, ERole role, out IMMDevice ppDevice);
+
+            // the rest is not implemented
+        }
+
+        [ComImport]
+        [Guid(&quot;D666063F-1587-4E43-81F1-B948E807363F&quot;), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        internal interface IMMDevice
+        {
+            [PreserveSig]
+            int Activate(ref Guid iid, int dwClsCtx, IntPtr pActivationParams, [MarshalAs(UnmanagedType.IUnknown)] out object ppInterface);
+
+            // the rest is not implemented
+        }
+
+        [ComImport]
+        [Guid(&quot;5CDF2C82-841E-4546-9722-0CF74078229A&quot;), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        internal interface IAudioEndpointVolume
+        {
+            void A();
+
+            void B();
+
+            void C();
+
+            void SetMasterVolumeLevel(float level,[MarshalAs(UnmanagedType.LPStruct)] Guid eventContext);
+
+            void SetMasterVolumeLevelScalar(float level, [MarshalAs(UnmanagedType.LPStruct)] Guid eventContext);
+                        
+            float GetMasterVolumeLevel();
+                        
+            float GetMasterVolumeLevelScalar();
+
+            void SetChannelVolumeLevel(uint channelNumber, float level,[MarshalAs(UnmanagedType.LPStruct)] Guid eventContext);
+
+            void SetChannelVolumeLevelScalar(uint channelNumber,float level,[MarshalAs(UnmanagedType.LPStruct)] Guid eventContext);
+
+            void GetChannelVolumeLevel( uint channelNumber, out float level);
+                        
+            float GetChannelVolumeLevelScalar(uint channelNumber);
+
+            void SetMute([MarshalAs(UnmanagedType.Bool)] bool isMuted,[MarshalAs(UnmanagedType.LPStruct)] Guid eventContext);
+
+            [return: MarshalAs(UnmanagedType.Bool)] bool GetMute();
+
+            // the rest is not implemented
+        }
+
+        static void SafeRelease&lt;T&gt;(ref T ptr) where T:class
+        {
+            if (ptr != null)
+            {
+                Marshal.ReleaseComObject(ptr);
+                ptr = null;
+            }
+        }
+
+        private static void SetVolume(float newvalue) //задаем громкость микрофона по умолчанию
+        {
+            IMMDeviceEnumerator deviceEnumerator = null;
+            IMMDevice micro = null;
+            IAudioEndpointVolume vol = null;
+            Guid IID_IAudioEndpointVolume = typeof(IAudioEndpointVolume).GUID;
+            object o;
+
+            try
+            {                
+                deviceEnumerator = (IMMDeviceEnumerator)(new MMDeviceEnumerator());
+                deviceEnumerator.GetDefaultAudioEndpoint(EDataFlow.eCapture, ERole.eMultimedia, out micro);
+                
+                micro.Activate(ref IID_IAudioEndpointVolume, 0, IntPtr.Zero, out o);
+                vol = (IAudioEndpointVolume)o;
+                vol.SetMasterVolumeLevel(newvalue, new Guid());                
+            }
+            finally
+            {
+                SafeRelease(ref vol);
+                SafeRelease(ref micro);
+                SafeRelease(ref deviceEnumerator);
+            }
+        }
+
+        static void Main(string[] args)
+        {
+            SetVolume(2);
+            Console.Read();
+        }
     }
 }
 </code></pre>
-<p>}
-</code></pre><p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

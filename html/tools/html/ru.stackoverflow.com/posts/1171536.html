@@ -81,222 +81,224 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Runtime.InteropServices;
-<p>namespace ConsoleApp1
+
+namespace ConsoleApp1
 {
-public struct ShellItem
-{
-public string DisplayName { get; set; }
-public string Path { get; set; }
-}</p>
-<pre><code>class Program
-{
-    public const uint SHGFI_DISPLAYNAME = 0x000000200;
-    public const uint SHGFI_ICON = 0x000000100;
-    public const uint SHGFI_PIDL = 0x000000008;
-    public const uint GIL_FORSHELL = 0x0002;
-    public const int SHGDN_NORMAL = 0x0000;
-    public const int SHGDN_FORPARSING = 0x8000;
-    public const int SHCONTF_FOLDERS = 0x0020;
-    public const int SHCONTF_NONFOLDERS = 0x0040;
-
-    [DllImport(&amp;quot;shell32.dll&amp;quot;)]
-    public static extern int SHGetKnownFolderIDList(ref Guid rfid, int dwFlags, IntPtr hToken, out IntPtr ppidl);
-
-    [DllImport(&amp;quot;ole32.dll&amp;quot;)]
-    public static extern void CoTaskMemFree(IntPtr pv);
-
-    [DllImport(&amp;quot;shell32.dll&amp;quot;)]
-    public static extern int SHBindToObject(
-        IShellFolder psf,
-        IntPtr pidl,
-        [MarshalAs(UnmanagedType.IUnknown)] object pbc,
-        ref Guid riid,
-        out IShellFolder ppv);
-
-    [DllImport(&amp;quot;Shlwapi.dll&amp;quot;, CharSet = CharSet.Unicode)]
-    public static extern int StrRetToStr(ref STRRET pstr, IntPtr pidl, out IntPtr ppsz);
-
-    [DllImport(&amp;quot;user32.dll&amp;quot;)]
-    public static extern bool DestroyIcon(IntPtr hIcon);
-
-
-    /* COM Interfaces */
-
-    [ComImport]
-    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    [Guid(&amp;quot;000214E6-0000-0000-C000-000000000046&amp;quot;)]
-    public interface IShellFolder
+    public struct ShellItem
     {
-        void ParseDisplayName(IntPtr hwnd, IntPtr pbc, String pszDisplayName, UInt32 pchEaten, out IntPtr ppidl, UInt32 pdwAttributes);
-        void EnumObjects(IntPtr hwnd, int grfFlags, out IEnumIDList ppenumIDList);
-        void BindToObject(IntPtr pidl, IntPtr pbc, [In]ref Guid riid, out IntPtr ppv);
-        void BindToStorage(IntPtr pidl, IntPtr pbc, [In]ref Guid riid, out IntPtr ppv);
-        [PreserveSig]
-        Int32 CompareIDs(Int32 lParam, IntPtr pidl1, IntPtr pidl2);
-        void CreateViewObject(IntPtr hwndOwner, [In] ref Guid riid, out IntPtr ppv);
-        void GetAttributesOf(UInt32 cidl, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)]IntPtr[] apidl, ref uint rgfInOut);
-        void GetUIObjectOf(IntPtr hwndOwner, UInt32 cidl, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)]IntPtr[] apidl,
-            [In] ref Guid riid, UInt32 rgfReserved, out IExtractIcon ppv);
-        void GetDisplayNameOf(IntPtr pidl, int uFlags, out STRRET pName);
-        void SetNameOf(IntPtr hwnd, IntPtr pidl, String pszName, int uFlags, out IntPtr ppidlOut);
+        public string DisplayName { get; set; }
+        public string Path { get; set; }
     }
 
-    [StructLayout(LayoutKind.Explicit, Size = 520)]
-    public struct STRRETinternal
+    class Program
     {
-        [FieldOffset(0)]
-        public IntPtr pOleStr;
+        public const uint SHGFI_DISPLAYNAME = 0x000000200;
+        public const uint SHGFI_ICON = 0x000000100;
+        public const uint SHGFI_PIDL = 0x000000008;
+        public const uint GIL_FORSHELL = 0x0002;
+        public const int SHGDN_NORMAL = 0x0000;
+        public const int SHGDN_FORPARSING = 0x8000;
+        public const int SHCONTF_FOLDERS = 0x0020;
+        public const int SHCONTF_NONFOLDERS = 0x0040;
 
-        [FieldOffset(0)]
-        public IntPtr pStr;
+        [DllImport(&quot;shell32.dll&quot;)]
+        public static extern int SHGetKnownFolderIDList(ref Guid rfid, int dwFlags, IntPtr hToken, out IntPtr ppidl);
 
-        [FieldOffset(0)]
-        public uint uOffset;
-    }
+        [DllImport(&quot;ole32.dll&quot;)]
+        public static extern void CoTaskMemFree(IntPtr pv);
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct STRRET
-    {
-        public uint uType;
-        public STRRETinternal data;
-    }
+        [DllImport(&quot;shell32.dll&quot;)]
+        public static extern int SHBindToObject(
+            IShellFolder psf,
+            IntPtr pidl,
+            [MarshalAs(UnmanagedType.IUnknown)] object pbc,
+            ref Guid riid,
+            out IShellFolder ppv);
 
-    [ComImport]
-    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    [Guid(&amp;quot;000214F2-0000-0000-C000-000000000046&amp;quot;)]
-    public interface IEnumIDList
-    {
-        [PreserveSig()]
-        uint Next(uint celt, out IntPtr rgelt, IntPtr pceltFetched);
-        [PreserveSig()]
-        uint Skip(uint celt);
-        [PreserveSig()]
-        uint Reset();
-        [PreserveSig()]
-        uint Clone(out IEnumIDList ppenum);
-    }
+        [DllImport(&quot;Shlwapi.dll&quot;, CharSet = CharSet.Unicode)]
+        public static extern int StrRetToStr(ref STRRET pstr, IntPtr pidl, out IntPtr ppsz);
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public struct SHFILEINFO
-    {
-        public IntPtr hIcon;
-        public int iIcon;
-        public uint dwAttributes;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-        public string szDisplayName;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
-        public string szTypeName;
-    }
-
-    [ComImport()]
-    [Guid(&amp;quot;000214fa-0000-0000-c000-000000000046&amp;quot;)]
-    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IExtractIcon
-    {
-        [PreserveSig]
-        int GetIconLocation(
-            uint uFlags,
-            [Out, MarshalAs(UnmanagedType.LPWStr, SizeParamIndex = 2)] StringBuilder szIconFile,
-            int cchMax,
-            out int piIndex,
-            out uint pwFlags);
+        [DllImport(&quot;user32.dll&quot;)]
+        public static extern bool DestroyIcon(IntPtr hIcon);
 
 
-        [PreserveSig]
-        int Extract(
-            [MarshalAs(UnmanagedType.LPWStr)] string pszFile, uint nIconIndex, out IntPtr phiconLarge,
-            out IntPtr phiconSmall, uint nIconSize);
-    }                
+        /* COM Interfaces */
 
-    public static List&amp;lt;ShellItem&amp;gt; GetItems(Guid FolderID) //Получает список элементов каталога по GUID
-    {
-        IntPtr p = IntPtr.Zero;
-        IShellFolder pFolder = null;
-        IEnumIDList pEnum = null;
-        IntPtr pItem = IntPtr.Zero;
-        IntPtr lpStr = IntPtr.Zero;
-        STRRET strret;
-        Guid guid = typeof(IShellFolder).GUID;
-        List&amp;lt;ShellItem&amp;gt; items = new List&amp;lt;ShellItem&amp;gt;();
-        ShellItem si;
-
-        try
+        [ComImport]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        [Guid(&quot;000214E6-0000-0000-C000-000000000046&quot;)]
+        public interface IShellFolder
         {
-            int hr = SHGetKnownFolderIDList(ref FolderID, 0, IntPtr.Zero, out p);
-            if (hr != 0) throw Marshal.GetExceptionForHR(hr);
+            void ParseDisplayName(IntPtr hwnd, IntPtr pbc, String pszDisplayName, UInt32 pchEaten, out IntPtr ppidl, UInt32 pdwAttributes);
+            void EnumObjects(IntPtr hwnd, int grfFlags, out IEnumIDList ppenumIDList);
+            void BindToObject(IntPtr pidl, IntPtr pbc, [In]ref Guid riid, out IntPtr ppv);
+            void BindToStorage(IntPtr pidl, IntPtr pbc, [In]ref Guid riid, out IntPtr ppv);
+            [PreserveSig]
+            Int32 CompareIDs(Int32 lParam, IntPtr pidl1, IntPtr pidl2);
+            void CreateViewObject(IntPtr hwndOwner, [In] ref Guid riid, out IntPtr ppv);
+            void GetAttributesOf(UInt32 cidl, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)]IntPtr[] apidl, ref uint rgfInOut);
+            void GetUIObjectOf(IntPtr hwndOwner, UInt32 cidl, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)]IntPtr[] apidl,
+                [In] ref Guid riid, UInt32 rgfReserved, out IExtractIcon ppv);
+            void GetDisplayNameOf(IntPtr pidl, int uFlags, out STRRET pName);
+            void SetNameOf(IntPtr hwnd, IntPtr pidl, String pszName, int uFlags, out IntPtr ppidlOut);
+        }
 
-            hr = SHBindToObject(null, p, null, ref guid, out pFolder);
-            if (hr != 0) throw Marshal.GetExceptionForHR(hr);
+        [StructLayout(LayoutKind.Explicit, Size = 520)]
+        public struct STRRETinternal
+        {
+            [FieldOffset(0)]
+            public IntPtr pOleStr;
 
-            pFolder.EnumObjects(IntPtr.Zero, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, out pEnum);
+            [FieldOffset(0)]
+            public IntPtr pStr;
 
-            while (true)
+            [FieldOffset(0)]
+            public uint uOffset;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct STRRET
+        {
+            public uint uType;
+            public STRRETinternal data;
+        }
+
+        [ComImport]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        [Guid(&quot;000214F2-0000-0000-C000-000000000046&quot;)]
+        public interface IEnumIDList
+        {
+            [PreserveSig()]
+            uint Next(uint celt, out IntPtr rgelt, IntPtr pceltFetched);
+            [PreserveSig()]
+            uint Skip(uint celt);
+            [PreserveSig()]
+            uint Reset();
+            [PreserveSig()]
+            uint Clone(out IEnumIDList ppenum);
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public struct SHFILEINFO
+        {
+            public IntPtr hIcon;
+            public int iIcon;
+            public uint dwAttributes;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+            public string szDisplayName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
+            public string szTypeName;
+        }
+
+        [ComImport()]
+        [Guid(&quot;000214fa-0000-0000-c000-000000000046&quot;)]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        public interface IExtractIcon
+        {
+            [PreserveSig]
+            int GetIconLocation(
+                uint uFlags,
+                [Out, MarshalAs(UnmanagedType.LPWStr, SizeParamIndex = 2)] StringBuilder szIconFile,
+                int cchMax,
+                out int piIndex,
+                out uint pwFlags);
+
+
+            [PreserveSig]
+            int Extract(
+                [MarshalAs(UnmanagedType.LPWStr)] string pszFile, uint nIconIndex, out IntPtr phiconLarge,
+                out IntPtr phiconSmall, uint nIconSize);
+        }                
+
+        public static List&lt;ShellItem&gt; GetItems(Guid FolderID) //Получает список элементов каталога по GUID
+        {
+            IntPtr p = IntPtr.Zero;
+            IShellFolder pFolder = null;
+            IEnumIDList pEnum = null;
+            IntPtr pItem = IntPtr.Zero;
+            IntPtr lpStr = IntPtr.Zero;
+            STRRET strret;
+            Guid guid = typeof(IShellFolder).GUID;
+            List&lt;ShellItem&gt; items = new List&lt;ShellItem&gt;();
+            ShellItem si;
+
+            try
             {
-                string s;
-                pItem = IntPtr.Zero;
-                uint res = pEnum.Next(1, out pItem, IntPtr.Zero);
-                if (res != 0) break;
-                si = new ShellItem();
+                int hr = SHGetKnownFolderIDList(ref FolderID, 0, IntPtr.Zero, out p);
+                if (hr != 0) throw Marshal.GetExceptionForHR(hr);
 
-                //display name
-                try
+                hr = SHBindToObject(null, p, null, ref guid, out pFolder);
+                if (hr != 0) throw Marshal.GetExceptionForHR(hr);
+
+                pFolder.EnumObjects(IntPtr.Zero, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, out pEnum);
+
+                while (true)
                 {
+                    string s;
+                    pItem = IntPtr.Zero;
+                    uint res = pEnum.Next(1, out pItem, IntPtr.Zero);
+                    if (res != 0) break;
+                    si = new ShellItem();
+
+                    //display name
+                    try
+                    {
+                        lpStr = IntPtr.Zero;
+                        strret = new STRRET();
+
+                        pFolder.GetDisplayNameOf(pItem, SHGDN_NORMAL, out strret);
+
+                        hr = StrRetToStr(ref strret, pItem, out lpStr);
+                        if (hr != 0) throw Marshal.GetExceptionForHR(hr);
+
+                        s = Marshal.PtrToStringUni(lpStr);
+                        si.DisplayName = s;
+                        CoTaskMemFree(lpStr);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                    }
+
+                    //path
                     lpStr = IntPtr.Zero;
                     strret = new STRRET();
-
-                    pFolder.GetDisplayNameOf(pItem, SHGDN_NORMAL, out strret);
-
+                    pFolder.GetDisplayNameOf(pItem, SHGDN_FORPARSING, out strret);
                     hr = StrRetToStr(ref strret, pItem, out lpStr);
                     if (hr != 0) throw Marshal.GetExceptionForHR(hr);
-
                     s = Marshal.PtrToStringUni(lpStr);
-                    si.DisplayName = s;
+                    si.Path = s;
                     CoTaskMemFree(lpStr);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.ToString());
-                }
 
-                //path
-                lpStr = IntPtr.Zero;
-                strret = new STRRET();
-                pFolder.GetDisplayNameOf(pItem, SHGDN_FORPARSING, out strret);
-                hr = StrRetToStr(ref strret, pItem, out lpStr);
-                if (hr != 0) throw Marshal.GetExceptionForHR(hr);
-                s = Marshal.PtrToStringUni(lpStr);
-                si.Path = s;
-                CoTaskMemFree(lpStr);
-
-                items.Add(si);
-                CoTaskMemFree(pItem);
+                    items.Add(si);
+                    CoTaskMemFree(pItem);
+                }
             }
-        }
 
-        finally
+            finally
+            {
+                if (p != IntPtr.Zero) CoTaskMemFree(p);
+                if (pFolder != null) Marshal.ReleaseComObject(pFolder);
+                if (pEnum != null) Marshal.ReleaseComObject(pEnum);
+            }
+            return items;
+        }
+        
+        static void Main(string[] args)
         {
-            if (p != IntPtr.Zero) CoTaskMemFree(p);
-            if (pFolder != null) Marshal.ReleaseComObject(pFolder);
-            if (pEnum != null) Marshal.ReleaseComObject(pEnum);
-        }
-        return items;
-    }
-    
-    static void Main(string[] args)
-    {
-        var list = GetItems(Guid.Parse(&amp;quot;82A74AEB-AEB4-465C-A014-D097EE346D63&amp;quot;));//Панель управления
+            var list = GetItems(Guid.Parse(&quot;82A74AEB-AEB4-465C-A014-D097EE346D63&quot;));//Панель управления
 
-        for (int i = 0; i &amp;lt; list.Count; i++)
-        {
-            Console.WriteLine(&amp;quot;{0} {1}&amp;quot;, list[i].DisplayName, list[i].Path);
-        }
+            for (int i = 0; i &lt; list.Count; i++)
+            {
+                Console.WriteLine(&quot;{0} {1}&quot;, list[i].DisplayName, list[i].Path);
+            }
 
-        Console.ReadKey();
+            Console.ReadKey();
+        }
     }
+
 }
 </code></pre>
-<p>}
-</code></pre><p>
 <p>Результат:</p>
 <pre class="lang-none prettyprint-override"><code>Электропитание ::{26EE0668-A00A-44D7-9371-BEB064C98683}\0\::{025A5937-A6BE-4686-A844-36FE4BEC8B6D}
 Панель задач и навигация ::{26EE0668-A00A-44D7-9371-BEB064C98683}\0\::{0DF44EAA-FF21-4412-828E-260A8728E7F1}

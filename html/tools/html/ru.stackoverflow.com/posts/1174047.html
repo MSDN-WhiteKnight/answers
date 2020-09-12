@@ -79,50 +79,52 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
-<p>namespace WindowsFormsApp1
-{
-public partial class Form1 : Form
-{
-Image img;
-System.Drawing.Imaging.FrameDimension dim;
-int frame = 0;</p>
-<pre><code>    public Form1()
-    {
-        InitializeComponent();            
-    }
-            
-    private void bNext_Click(object sender, EventArgs e)
-    {
-        int count = img.GetFrameCount(dim);
-        frame++;
-        if (frame &amp;gt;= count) frame = 0;
-        img.SelectActiveFrame(dim, frame);
-        panel1.Invalidate();
-        panel1.Update();
-    }
 
-    private void Form1_Load(object sender, EventArgs e)
+namespace WindowsFormsApp1
+{
+    public partial class Form1 : Form
     {
-        img = Bitmap.FromFile(@&amp;quot;...&amp;quot;);
-        Guid[] dims = img.FrameDimensionsList;
+        Image img;
+        System.Drawing.Imaging.FrameDimension dim;
+        int frame = 0;
 
-        if (dims.Length == 0)
+        public Form1()
         {
-            MessageBox.Show(&amp;quot;Error - image does not have frame dimensions!&amp;quot;);
-            return;
+            InitializeComponent();            
+        }
+                
+        private void bNext_Click(object sender, EventArgs e)
+        {
+            int count = img.GetFrameCount(dim);
+            frame++;
+            if (frame &gt;= count) frame = 0;
+            img.SelectActiveFrame(dim, frame);
+            panel1.Invalidate();
+            panel1.Update();
         }
 
-        dim = new System.Drawing.Imaging.FrameDimension(dims[0]);
-    }        
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            img = Bitmap.FromFile(@&quot;...&quot;);
+            Guid[] dims = img.FrameDimensionsList;
 
-    private void panel1_Paint(object sender, PaintEventArgs e)
-    {
-        if (img != null) e.Graphics.DrawImage(img, 0.0f, 0.0f);
+            if (dims.Length == 0)
+            {
+                MessageBox.Show(&quot;Error - image does not have frame dimensions!&quot;);
+                return;
+            }
+
+            dim = new System.Drawing.Imaging.FrameDimension(dims[0]);
+        }        
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+            if (img != null) e.Graphics.DrawImage(img, 0.0f, 0.0f);
+        }
     }
 }
+
 </code></pre>
-<p>}</p>
-<p></code></pre><p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>
