@@ -78,33 +78,34 @@
 <pre><code>#define _CRT_SECURE_NO_WARNINGS
 #include &lt;stdio.h&gt;
 #include &lt;Windows.h&gt;
-<p>int main() {</p>
-<pre><code>HANDLE h = CreateFileW(L&amp;quot;c:\\Test\\&amp;quot;,
-    GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL
-);
 
-BY_HANDLE_FILE_INFORMATION info;
-SYSTEMTIME st;
-SYSTEMTIME stLocal;
+int main() {
 
-if (GetFileInformationByHandle(h, &amp;amp;info) == FALSE) {
-    printf(&amp;quot;GetFileInformationByHandle Error\n&amp;quot;);
-}
-else {
-    FileTimeToSystemTime(&amp;amp;info.ftCreationTime, &amp;amp;st);
-    SystemTimeToTzSpecificLocalTime(NULL, &amp;amp;st, &amp;amp;stLocal);
-    printf(
-        &amp;quot;Creation Time: %02u.%02u.%u  %02u:%02u\n&amp;quot;, 
-        (UINT)stLocal.wDay, (UINT)stLocal.wMonth, 
-        (UINT)stLocal.wYear, (UINT)stLocal.wHour, 
-        (UINT)stLocal.wMinute
+    HANDLE h = CreateFileW(L&quot;c:\\Test\\&quot;,
+        GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL
     );
-}
 
-getchar();
+    BY_HANDLE_FILE_INFORMATION info;
+    SYSTEMTIME st;
+    SYSTEMTIME stLocal;
+
+    if (GetFileInformationByHandle(h, &amp;info) == FALSE) {
+        printf(&quot;GetFileInformationByHandle Error\n&quot;);
+    }
+    else {
+        FileTimeToSystemTime(&amp;info.ftCreationTime, &amp;st);
+        SystemTimeToTzSpecificLocalTime(NULL, &amp;st, &amp;stLocal);
+        printf(
+            &quot;Creation Time: %02u.%02u.%u  %02u:%02u\n&quot;, 
+            (UINT)stLocal.wDay, (UINT)stLocal.wMonth, 
+            (UINT)stLocal.wYear, (UINT)stLocal.wHour, 
+            (UINT)stLocal.wMinute
+        );
+    }
+
+    getchar();
+}
 </code></pre>
-<p>}
-</code></pre><p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>
