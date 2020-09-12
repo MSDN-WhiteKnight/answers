@@ -8,6 +8,43 @@ namespace StackOverflowAnswers
 {
     class Program
     {
+        public static string FixPostBody(string source)
+        {
+            //insert newlines before codeblocks - fix for CommonMark
+            int i = 0;
+            string body = source;
+
+            while (true)
+            {
+                int next = body.IndexOf("<pre><code>", i);
+                if (next < 0) break;
+                char c = body[next - 3];
+
+                if (next > 5)
+                {
+                    bool has_newline = false;
+
+                    string sub = body.Substring(next - 4, 4);
+                    if (sub == "\r\n\r\n") has_newline = true;
+
+                    sub = body.Substring(next - 2, 2);
+                    if (sub == "\n\n") has_newline = true;
+
+                    if (!has_newline)
+                    {
+                        string s1 = body.Substring(0, next);
+                        string s2 = body.Substring(next);
+                        body = s1 + Environment.NewLine + s2;
+                    }
+                }
+                i = next + 12;
+
+                if (i >= body.Length) break;
+            }
+
+            return body;
+        }
+
         public static void SaveUserAnswers(string site, int userid)
         {
             string datadir = "..\\..\\..\\..\\data\\" + site + "\\";
@@ -52,6 +89,11 @@ namespace StackOverflowAnswers
                 {
                     AnswerMarkdown post = AnswerMarkdown.FromJsonData(site, answers[key]);
                     post.Title = title;
+
+                    //insert newlines before code blocks - fix for CommonMark
+                    string body = post.Body;
+                    post.Body = FixPostBody(body);
+
                     post.ToMarkdown(wr);
                 }
             }
@@ -104,6 +146,11 @@ namespace StackOverflowAnswers
                 dynamic data = JSON.Parse(a);
                 AnswerMarkdown post = AnswerMarkdown.FromJsonData(site, data);
                 post.Title = title;
+
+                //insert newlines before code blocks - fix for CommonMark
+                string body = post.Body;
+                post.Body = FixPostBody(body);
+
                 post.ToMarkdown(wr);
             }
 
