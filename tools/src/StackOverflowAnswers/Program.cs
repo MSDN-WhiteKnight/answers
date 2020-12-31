@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using RuSoLib;
 
 namespace StackOverflowAnswers
@@ -157,6 +158,112 @@ namespace StackOverflowAnswers
             Console.WriteLine("Success");
         }
 
+        public static Dictionary<int, QuestionMarkdown> LoadQuestionsSequence(string site,IEnumerable<int> question_ids)
+        {
+            int[] sequence;
+
+            //load questions
+            int[] q_arr = question_ids.ToArray();
+            int i1 = 0;
+            int i2 = 99;
+            if (i2 >= q_arr.Length) i2 = q_arr.Length - 1;
+
+            SeApiClient client = new SeApiClient(Archive.APIURL, site);
+            Dictionary<int, QuestionMarkdown> ret = new Dictionary<int, QuestionMarkdown>();
+
+            while (true)
+            {
+                sequence = new int[i2 - i1 + 1];
+                Console.WriteLine("Loading questions from #{0} to #{1}...", i1, i2);
+                Array.Copy(q_arr, i1, sequence, 0, sequence.Length);
+                Dictionary<int, object> questions = client.LoadQuestionsSequence(sequence);
+
+                Console.WriteLine("{0} questions loaded", questions.Count);
+
+                for (int i = 0; i < sequence.Length; i++)
+                {
+                    int id = sequence[i];
+                    QuestionMarkdown q = QuestionMarkdown.FromJsonData(site, questions[id]);
+                    ret[id] = q; 
+                }
+
+                i1 = i2 + 1;
+                if (i1 >= q_arr.Length) break;
+                i2 = i1 + 99;
+                if (i2 >= q_arr.Length) i2 = q_arr.Length - 1;
+            }
+
+            return ret;
+        }
+
+        public static void UpdateTitles(string site, string subdir)
+        {
+            string datadir = "..\\..\\..\\..\\data\\" + site + "\\";
+            string postsdir = Path.Combine(datadir, subdir + "\\");
+
+            Console.WriteLine("Updating titles for saved answers ({0}, {1})...", site, subdir);
+
+            PostSet posts = PostSet.LoadFromDir(postsdir, site);
+            Dictionary<int, Question> questions = posts.Questions;
+
+            Console.WriteLine("Answers without parent question: {0}", posts.MarkdownAnswers.Count);
+
+            int n = 0;
+            List<int> question_ids = new List<int>(posts.MarkdownAnswers.Count);
+
+            foreach (int a in posts.MarkdownAnswers.Keys)
+            {
+                try
+                {
+                    question_ids.Add(posts.MarkdownAnswers[a].QuestionId);
+                    n++;
+                    //if (n > 70) break;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.GetType() + ": " + ex.Message);
+                    //System.Threading.Thread.Sleep(20 * 1000);
+                }
+            }
+            
+            Dictionary<int,QuestionMarkdown> loaded = LoadQuestionsSequence(site,question_ids);
+
+            foreach (int a in posts.MarkdownAnswers.Keys)
+            {
+                try
+                {
+                    int key = posts.MarkdownAnswers[a].QuestionId;
+
+                    if (!loaded.ContainsKey(key))
+                    {
+                        Console.WriteLine("Not found Q" + key.ToString());
+                        continue;
+                    }
+
+                    QuestionMarkdown qmd = loaded[key];
+                    string newtitle = posts.MarkdownAnswers[a].Title;
+
+                    if (!String.IsNullOrEmpty(qmd.Title))
+                    {
+                        newtitle = "Ответ на \"" + qmd.Title + "\"";
+                    }
+
+                    posts.MarkdownAnswers[a].Title = newtitle;
+                    string filepath = Path.Combine(postsdir, "A" + a.ToString() + ".md");
+                    TextWriter wr = new StreamWriter(filepath, false, Encoding.UTF8);
+
+                    using (wr)
+                    {
+                        posts.MarkdownAnswers[a].ToMarkdown(wr);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.GetType() + ": " + ex.Message);
+                }
+            }
+        }
+
         [STAThread]
         static void Main(string[] args)
         {
@@ -192,7 +299,7 @@ namespace StackOverflowAnswers
             }
             else if (args.Length >= 3 && args[0] == "sync")
             {
-                Archive.SaveQuestionsForSavedAnswers(args[1], args[2]);
+                UpdateTitles(args[1], args[2]);
                 Console.WriteLine("Done");
             }
             else if (args.Length >= 1 && args[0] == "generate")
