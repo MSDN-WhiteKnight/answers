@@ -1,0 +1,137 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1072;&#1082; &#1088;&#1072;&#1073;&#1086;&#1090;&#1072;&#1077;&#1090; &#1080;&#1084;&#1087;&#1086;&#1088;&#1090; &#1074; &#1087;&#1088;&#1086;&#1075;&#1088;&#1072;&#1084;&#1084;&#1072;&#1093;?&quot; | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1072;&#1082; &#1088;&#1072;&#1073;&#1086;&#1090;&#1072;&#1077;&#1090; &#1080;&#1084;&#1087;&#1086;&#1088;&#1090; &#1074; &#1087;&#1088;&#1086;&#1075;&#1088;&#1072;&#1084;&#1084;&#1072;&#1093;?&quot; | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
+<h1>Ответ на "Как работает импорт в программах?"</h1>
+<h2>Answer 1182252</h2>
+<p><a href="https://ru.stackoverflow.com/a/1182252/">Link</a></p>
+<blockquote>
+<blockquote>
+<p>Если написать такой код ... Мы получим адрес функции Beep из подгруженной библиотеки kernel32.dll</p>
+</blockquote>
+<p>То, что выведет код <code>std::cout &lt;&lt; Beep</code>, далеко не обязательно реальный адрес функции, причины описаны здесь: <a href="https://ru.stackoverflow.com/q/1107372/240512">Что такое адрес функции?</a></p>
+<blockquote>
+<p>Читаю про регистр ds,он должен ссылаться на секцию данных</p>
+</blockquote>
+<p>Скорее всего, это просто ошибка дизассемблера, с чего бы адресу функции быть в секции данных? У меня вызов функции Beep превращается вот в такое в выводе <code>dumpbin /disasm</code>:</p>
+<pre><code>FF 15 00 B0 41 00  call dword ptr [__imp__Beep@8]
+</code></pre>
+<p>Код инструкции FF 15 (с учетом opcode extensions) здесь обозначает &quot;Call near, absolute indirect, address given in r/m32&quot; - т.е. вызов функции по адресу в заданной ячейке памяти (см. <a href="https://c9x.me/x86/html/file_module_x86_id_26.html" rel="noreferrer">https://c9x.me/x86/html/file_module_x86_id_26.html</a>). Операнд 00 B0 41 00 - сам адрес (перевернутый). Человеко-читаемый адрес тут будет: 0x41B000. Смотрим в выводе dumpbin секции:</p>
+<pre class="lang-none prettyprint-override"><code>SECTION HEADER #5
+  .idata name
+     CDF virtual size
+   1B000 virtual address (0041B000 to 0041BCDE)
+</code></pre>
+<p>То есть адрес функции ожидаемо попадает в секцию .idata, таблицу импорта. Из вывода <code>dumpbin /imports</code> узнать более точно:</p>
+<pre class="lang-none prettyprint-override"><code>KERNEL32.dll
+    41B000 Import Address Table
+    41B268 Import Name Table
+</code></pre>
+<p>Как видно, 41B000 - это начало Import Address Table модуля KERNEL32.dll. Эта таблица заполняется загрузчиком ОС при запуске программы, куда он пишет уже реальные адреса функций в загруженных модулях.</p>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span><script type="text/javascript">(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(65150713, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/65150713" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,375 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;FluentBuilder &#1076;&#1083;&#1103; immutable &#1082;&#1083;&#1072;&#1089;&#1089;&#1072;&quot; | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;FluentBuilder &#1076;&#1083;&#1103; immutable &#1082;&#1083;&#1072;&#1089;&#1089;&#1072;&quot; | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
+<h1>Ответ на "FluentBuilder для immutable класса"</h1>
+<h2>Answer 1216199</h2>
+<p><a href="https://ru.stackoverflow.com/a/1216199/">Link</a></p>
+<blockquote>
+<blockquote>
+<p>А хотелось бы в результате как-то так...</p>
+</blockquote>
+<p>Я бы покритиковал сам постановку задачи.</p>
+<ol>
+<li><p>В чем смысл PersonBuilder? Это какая-то искусственная сущность, по сути мутабельный двойник иммутабельного класса, который нужно дублировать для каждого такого класса. Не лучше ли строить объекты унифицированным способом?</p>
+</li>
+<li><p><code>.Set(p =&gt; p.FirstName, &quot;Андрей&quot;)</code> - использование лямбда-выражения ни с того, ни с сего, хотя анонимная функция тут вообще не вызывается. Почему не <code>.Set(&quot;FirstName&quot;, &quot;Андрей&quot;)</code>?</p>
+</li>
+<li><p><code>.Include(p =&gt; p)</code> - вообще не понятно, что такое. Как включить самого себя? По логике, происходит переход к родительскому объекту, так что лучше бы создать отдельный метод &quot;ToParent&quot;</p>
+</li>
+</ol>
+<p>Я бы сделал это так. Допустим, мы принимаем соглашение, что у иммутабельного класса имена get-only свойств начинаются с большой буквы. Параметры конструктора соответствуют по типу его свойствам, а имя параметра начинается путем замены первой буквы имени свойства на такую же маленькую букву. Создадим такой класс:</p>
+<pre><code>public class ImmutableEntity
+{
+    static Dictionary&lt;Type, Delegate[]&gt; gettersCache = new Dictionary&lt;Type, Delegate[]&gt;();
+    static Dictionary&lt;Type, Delegate&gt; constrCache = new Dictionary&lt;Type, Delegate&gt;();
+
+    ImmutableEntity parent;//родительский объект, если этот объект - значение свойства другого объекта
+    string parentProperty;//свойство родительского объекта
+    
+    Delegate[] getters;
+    Delegate constr;
+
+    protected ImmutableEntity()
+    {
+        if (gettersCache.ContainsKey(this.GetType()))
+        {
+            constr = constrCache[this.GetType()];
+            getters = gettersCache[this.GetType()];
+        }
+        else
+        {
+            PropertyInfo p;
+            //получаем первый конструктор, имеющий параметры
+            ConstructorInfo ci = this.GetType().GetConstructors().
+                Where(x =&gt; x.GetParameters().Length &gt; 0).First();
+            ParameterInfo[] p_arr;
+            p_arr = ci.GetParameters();
+
+            //получаем массив делегатов для получения значений свойств
+            ParameterExpression[] expressions = new ParameterExpression[p_arr.Length];
+            this.getters = new Delegate[p_arr.Length];
+
+            for (int i = 0; i &lt; p_arr.Length; i++)
+            {
+                //получаем имя свойства
+                string propname = p_arr[i].Name;
+                propname = Char.ToUpper(propname[0]).ToString() + propname.Substring(1);
+
+                //создаем делегат
+                p = this.GetType().GetProperty(
+                 propname, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
+                );
+
+                MethodInfo mb = p.GetGetMethod();
+                Type delegateType = typeof(Func&lt;,&gt;).MakeGenericType(this.GetType(), p.PropertyType);
+                getters[i] = mb.CreateDelegate(delegateType);
+
+                //создаем выражение для параметра
+                expressions[i] = Expression.Parameter(p.PropertyType);
+            }
+
+            //создаем делегат для вызова конструктора
+            LambdaExpression expr = Expression.Lambda(Expression.New(ci, expressions), expressions);
+            constr = expr.Compile();
+
+            //сохраняем делегаты, чтобы не пересоздавать для каждого объекта одного типа
+            gettersCache[this.GetType()] = getters;
+            constrCache[this.GetType()] = constr;
+        }
+    }
+    
+    public ImmutableEntity Set(string prop, object val)
+    {
+        //получаем имя параметра из имени свойства
+        string pname = prop;
+        pname = Char.ToLower(pname[0]).ToString() + pname.Substring(1);
+
+        //получаем первый конструктор, имеющий параметры
+        ConstructorInfo ci = this.GetType().GetConstructors().
+            Where(x =&gt; x.GetParameters().Length &gt; 0).First();
+
+        //формируем массив значений параметров
+        ParameterInfo[] p_arr;
+        p_arr = ci.GetParameters();
+        object[] pars = new object[p_arr.Length];
+
+        for (int i = 0; i &lt; p_arr.Length; i++)
+        {
+            if (p_arr[i].Name == pname) 
+            {
+                //свойство, которое изменилось
+                pars[i] = val; 
+            }
+            else
+            {
+                pars[i] = this.getters[i].DynamicInvoke(this);
+            }
+        }
+
+        //создаем измененный объект
+        ImmutableEntity ret=(ImmutableEntity)constr.DynamicInvoke(pars);
+        ret.parent = this.parent;
+        ret.parentProperty = this.parentProperty;
+        return ret;
+    }
+
+    public static object GetDefault(Type t)
+    {
+        if (t.IsValueType) return Activator.CreateInstance(t);
+        else return null;
+    }
+
+    public ImmutableEntity Include(string prop)
+    {
+        //получаем имя параметра из имени свойства
+        string pname = prop;
+        pname = Char.ToLower(pname[0]).ToString() + pname.Substring(1);
+
+        //получаем первый конструктор, имеющий параметры
+        ConstructorInfo ci = this.GetType().GetConstructors().
+            Where(x =&gt; x.GetParameters().Length &gt; 0).First();
+
+        //формируем массив значений параметров
+        ParameterInfo[] p_arr;
+        p_arr = ci.GetParameters();
+        object[] pars = new object[p_arr.Length];
+        ImmutableEntity included =null;
+
+        for (int i = 0; i &lt; p_arr.Length; i++)
+        {
+            if (p_arr[i].Name == pname)
+            {
+                //свойство для включения
+                included = this.getters[i].DynamicInvoke(this) as ImmutableEntity;
+
+                if (included == null)
+                {
+                    included = New(p_arr[i].ParameterType);
+                    included.parentProperty = prop;
+                }
+
+                pars[i] = included;
+            }
+            else
+            {
+                pars[i] = this.getters[i].DynamicInvoke(this);
+            }
+        }
+
+        //включаем объект в родительский
+        included.parent = (ImmutableEntity)constr.DynamicInvoke(pars);
+        return included;
+    }
+
+    public ImmutableEntity ToParent()
+    {
+        if (this.parent == null) return null;
+
+        return this.parent.Set(this.parentProperty, this);
+    }
+
+    public static T New&lt;T&gt;() where T:ImmutableEntity
+    {
+        return (T)New(typeof(T));
+    }
+
+    public static ImmutableEntity New(Type t)
+    {
+        //создаем пустой объект указанного типа
+        ConstructorInfo ci = t.GetConstructors().
+            Where(x =&gt; x.GetParameters().Length &gt; 0).First();
+        ParameterInfo[] p_arr = ci.GetParameters();
+        object[] pars = new object[p_arr.Length];
+
+        for (int i = 0; i &lt; p_arr.Length; i++)
+        {
+            pars[i] = GetDefault(p_arr[i].ParameterType);
+        }
+
+        return (ImmutableEntity)ci.Invoke(pars);
+    }
+}
+</code></pre>
+<p>Его суть в использовании выражений для вызова конструктора объекта и получения значений свойств. Так можно строить любой объект, который удовлетворяет нашим соглашениям.</p>
+<p>Сделаем иммутабельные классы производными от него:</p>
+<pre><code>public class Person: ImmutableEntity
+{
+    public Person(string firstName, string lastName,
+    Address address, Employment employment)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        Address = address;
+        Employment = employment;
+    }
+
+    public string FirstName { get; }
+    public string LastName { get; }
+    public Address Address { get; }
+    public Employment Employment { get; }
+
+    public override string ToString()
+    {
+        return $&quot;{FirstName} {LastName}: &quot;
+            + Environment.NewLine +
+            $&quot;{Address}&quot;
+            + Environment.NewLine +
+            $&quot;{Employment}&quot;;
+    }
+}
+
+public class Address : ImmutableEntity
+{
+    public Address(string city, int postCode)
+    {
+        this.City = city;
+        this.PostCode = postCode;
+    }
+
+    public string City { get; }
+    public int PostCode { get; }
+
+    public override string ToString()
+    {
+        return $&quot;Адрес: {City}-{PostCode} &quot;;
+    }
+}
+
+public class Employment : ImmutableEntity
+{
+    public Employment(string companyName, string position,int annualIncome)
+    {
+        this.CompanyName = companyName;
+        this.Position = position;
+        this.AnnualIncome = annualIncome;
+    }
+
+    public string CompanyName { get;  }
+    public string Position { get;  }
+    public int AnnualIncome { get;  }
+
+    public override string ToString()
+    {
+        return $&quot;Работа: {CompanyName}, должность: {Position}, зарплата: {AnnualIncome}&quot;;
+    }
+}
+</code></pre>
+<p>Тогда использовать можно так:</p>
+<pre><code>var person = (Person)ImmutableEntity.New&lt;Person&gt;().
+    Set(nameof(Person.FirstName), &quot;Ivan&quot;).
+    Set(nameof(Person.LastName), &quot;Ivanov&quot;).
+    Include(nameof(Person.Address)).
+    Set(nameof(Address.City), &quot;Chelyabinsk&quot;).
+    ToParent().
+    Include(nameof(Person.Employment)).
+    Set(nameof(Employment.Position), &quot;Engineer&quot;).
+    ToParent();
+</code></pre>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span><script type="text/javascript">(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(65150713, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/65150713" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>
