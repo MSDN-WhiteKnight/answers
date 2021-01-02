@@ -89,14 +89,14 @@
         mc:Ignorable=&quot;d&quot;
         x:Class=&quot;WpfApp1.MainWindow&quot;
         Title=&quot;MainWindow&quot; Height=&quot;400&quot; Width=&quot;600&quot; &gt;
-<pre><code>&amp;lt;Grid HorizontalAlignment=&amp;quot;Stretch&amp;quot; VerticalAlignment=&amp;quot;Stretch&amp;quot; x:Name=&amp;quot;grid&amp;quot; &amp;gt;
-    &amp;lt;Button Content=&amp;quot;Button&amp;quot; HorizontalAlignment=&amp;quot;Left&amp;quot; Height=&amp;quot;50&amp;quot; Margin=&amp;quot;20,20,0,0&amp;quot; 
-            VerticalAlignment=&amp;quot;Top&amp;quot; Width=&amp;quot;217&amp;quot; Click=&amp;quot;Button_Click&amp;quot;/&amp;gt;
-    &amp;lt;Image HorizontalAlignment=&amp;quot;Stretch&amp;quot;  Margin=&amp;quot;40,100,40,40&amp;quot; VerticalAlignment=&amp;quot;Stretch&amp;quot; x:Name=&amp;quot;img&amp;quot;/&amp;gt;
-&amp;lt;/Grid&amp;gt;
+
+    &lt;Grid HorizontalAlignment=&quot;Stretch&quot; VerticalAlignment=&quot;Stretch&quot; x:Name=&quot;grid&quot; &gt;
+        &lt;Button Content=&quot;Button&quot; HorizontalAlignment=&quot;Left&quot; Height=&quot;50&quot; Margin=&quot;20,20,0,0&quot; 
+                VerticalAlignment=&quot;Top&quot; Width=&quot;217&quot; Click=&quot;Button_Click&quot;/&gt;
+        &lt;Image HorizontalAlignment=&quot;Stretch&quot;  Margin=&quot;40,100,40,40&quot; VerticalAlignment=&quot;Stretch&quot; x:Name=&quot;img&quot;/&gt;
+    &lt;/Grid&gt;
+&lt;/Window&gt;
 </code></pre>
-<p>&lt;/Window&gt;
-</code></pre><p>
 <p>C#</p>
 <pre class="lang-cs prettyprint-override"><code>using System;
 using System.IO;
@@ -108,36 +108,37 @@ using System.Windows.Controls;
 using Windows.Data.Pdf;
 using Windows.Storage;
 using Windows.Storage.Streams;
-<p>namespace WpfApp1
+
+namespace WpfApp1
 {
-public partial class MainWindow : Window
-{
-public MainWindow()
-{
-InitializeComponent();<br>
-}</p>
-<pre><code>    private async void Button_Click(object sender, RoutedEventArgs e)
+    public partial class MainWindow : Window
     {
-        StorageFile file = await StorageFile.GetFileFromPathAsync(@&amp;quot;C:\files\document.pdf&amp;quot;);
-        PdfDocument pdf = await PdfDocument.LoadFromFileAsync(file);
-        PdfPage page = pdf.GetPage(0);
-        BitmapImage image = new BitmapImage();
-
-        using (var stream = new InMemoryRandomAccessStream())
+        public MainWindow()
         {
-            await page.RenderToStreamAsync(stream);
+            InitializeComponent();            
+        }        
 
-            image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad;
-            image.StreamSource = stream.AsStream();
-            image.EndInit();
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            StorageFile file = await StorageFile.GetFileFromPathAsync(@&quot;C:\files\document.pdf&quot;);
+            PdfDocument pdf = await PdfDocument.LoadFromFileAsync(file);
+            PdfPage page = pdf.GetPage(0);
+            BitmapImage image = new BitmapImage();
+
+            using (var stream = new InMemoryRandomAccessStream())
+            {
+                await page.RenderToStreamAsync(stream);
+
+                image.BeginInit();
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.StreamSource = stream.AsStream();
+                image.EndInit();
+            }
+            img.Source = image;      
         }
-        img.Source = image;      
-    }
-}    
+    }    
+}
 </code></pre>
-<p>}
-</code></pre></p>
 <p>Источник: <a href="https://blogs.u2u.be/lander/post/2018/01/23/Creating-a-PDF-Viewer-in-WPF-using-Windows-10-APIs" rel="nofollow noreferrer">Lander Verhack. Creating a PDF Viewer in WPF using Windows 10 APIs</a></p>
 <h1>Предыдущие версии Windows</h1>
 <p>Использовать какую-либо стороннюю библиотеку, например:</p>

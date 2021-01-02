@@ -93,159 +93,161 @@ using Microsoft.Diagnostics.Runtime.Utilities.Pdb;
 using ICSharpCode.Decompiler;
 using ICSharpCode.Decompiler.CSharp;
 using ICSharpCode.Decompiler.CSharp.Syntax;
-<p>namespace ConsoleTest1
+
+namespace ConsoleTest1
 {
-class Program
-{<br>
-public static string GetSourceFromPdb&lt;T&gt;(Predicate&lt;T&gt; match)
-{<br>
-int token = match.Method.MetadataToken;</p>
-<pre><code>        //построим путь к файлу символов
-        string module_path = match.Method.Module.FullyQualifiedName;
-        string pdb_path = Path.Combine(
-            Path.GetDirectoryName(module_path),
-            Path.GetFileNameWithoutExtension(module_path) + &amp;quot;.pdb&amp;quot;
-            );            
+    class Program
+    {       
+        public static string GetSourceFromPdb&lt;T&gt;(Predicate&lt;T&gt; match)
+        {            
+            int token = match.Method.MetadataToken;
 
-        StringBuilder sb = new StringBuilder();
-        PdbReader reader = new PdbReader(pdb_path);
+            //построим путь к файлу символов
+            string module_path = match.Method.Module.FullyQualifiedName;
+            string pdb_path = Path.Combine(
+                Path.GetDirectoryName(module_path),
+                Path.GetFileNameWithoutExtension(module_path) + &quot;.pdb&quot;
+                );            
 
-        using (reader)
-        {
-            //найдем метод в символах
-            var func = reader.GetFunctionFromToken((uint)token);                
+            StringBuilder sb = new StringBuilder();
+            PdbReader reader = new PdbReader(pdb_path);
 
-            foreach (PdbSequencePointCollection coll in func.SequencePoints)
+            using (reader)
             {
-                //считываем файл исходников
-                string[] lines = File.ReadAllLines(coll.File.Name, System.Text.Encoding.UTF8);                    
+                //найдем метод в символах
+                var func = reader.GetFunctionFromToken((uint)token);                
 
-                //найдем номера строк в файле, соответствующие началу и концу метода
-                var points_sorted = coll.Lines.
-                    Where&amp;lt;PdbSequencePoint&amp;gt;((x)=&amp;gt; x.LineBegin &amp;lt;= lines.Length &amp;amp;&amp;amp; x.LineEnd&amp;lt;=lines.Length).
-                    OrderBy&amp;lt;PdbSequencePoint, uint&amp;gt;((x) =&amp;gt; x.Offset);
-                PdbSequencePoint start = points_sorted.First();
-                PdbSequencePoint end = points_sorted.Last();   
-                
-                bool reading = false;
-                int index_start;                    
-                int index_end;
-                                    
-                //считаем код метода из исходников
-                for(int i=1; i&amp;lt;=lines.Length;i++)
+                foreach (PdbSequencePointCollection coll in func.SequencePoints)
                 {
-                    string line = lines[i-1];
-                    index_start = 0;
-                    index_end = line.Length;
+                    //считываем файл исходников
+                    string[] lines = File.ReadAllLines(coll.File.Name, System.Text.Encoding.UTF8);                    
 
-                    if (!reading)
+                    //найдем номера строк в файле, соответствующие началу и концу метода
+                    var points_sorted = coll.Lines.
+                        Where&lt;PdbSequencePoint&gt;((x)=&gt; x.LineBegin &lt;= lines.Length &amp;&amp; x.LineEnd&lt;=lines.Length).
+                        OrderBy&lt;PdbSequencePoint, uint&gt;((x) =&gt; x.Offset);
+                    PdbSequencePoint start = points_sorted.First();
+                    PdbSequencePoint end = points_sorted.Last();   
+                    
+                    bool reading = false;
+                    int index_start;                    
+                    int index_end;
+                                        
+                    //считаем код метода из исходников
+                    for(int i=1; i&lt;=lines.Length;i++)
                     {
-                        if (i &amp;gt;= start.LineBegin)
-                        {
-                            //первая строка
-                            reading = true;
-                            index_start = start.ColBegin - 1;
-                            if (index_start &amp;lt; 0) index_start = 0;                    
-                        }
-                    }                        
+                        string line = lines[i-1];
+                        index_start = 0;
+                        index_end = line.Length;
 
-                    if (reading)
-                    {
-                        if (i &amp;gt;= end.LineEnd)
+                        if (!reading)
                         {
-                            //последняя строка
-                            index_end = end.ColEnd - 1;
-                            if (index_end &amp;gt; line.Length) index_end = line.Length;
+                            if (i &gt;= start.LineBegin)
+                            {
+                                //первая строка
+                                reading = true;
+                                index_start = start.ColBegin - 1;
+                                if (index_start &lt; 0) index_start = 0;                    
+                            }
+                        }                        
 
+                        if (reading)
+                        {
+                            if (i &gt;= end.LineEnd)
+                            {
+                                //последняя строка
+                                index_end = end.ColEnd - 1;
+                                if (index_end &gt; line.Length) index_end = line.Length;
+
+                                sb.AppendLine(line.Substring(index_start, index_end - index_start));
+                                break;
+                            }
+
+                            //считывание текущей строки
                             sb.AppendLine(line.Substring(index_start, index_end - index_start));
-                            break;
-                        }
+                        }  
+                    }      
+                }
 
-                        //считывание текущей строки
-                        sb.AppendLine(line.Substring(index_start, index_end - index_start));
-                    }  
-                }      
             }
-
+                        
+            return sb.ToString();
         }
-                    
-        return sb.ToString();
-    }
 
-    public static AstNode FindNode(AstNode root,string match)
-    {            
-        //поиск метода в синтаксическом дереве
-        var children = root.Children;
+        public static AstNode FindNode(AstNode root,string match)
+        {            
+            //поиск метода в синтаксическом дереве
+            var children = root.Children;
 
-        foreach (AstNode x in children)
-        {
-            var s = x.ToString();
-            if (s == match &amp;amp;&amp;amp; x.Parent.NodeType == NodeType.Member)
+            foreach (AstNode x in children)
             {
-                return x.Parent;
+                var s = x.ToString();
+                if (s == match &amp;&amp; x.Parent.NodeType == NodeType.Member)
+                {
+                    return x.Parent;
+                }
+
+                AstNode res = FindNode(x, match);
+                if (res != null) return res;
+            }
+            return null;
+        }
+
+        public static string GetSourceDecompiled&lt;T&gt;(Predicate&lt;T&gt; match)
+        {        
+            string module_path = match.Method.Module.FullyQualifiedName;            
+                        
+            var settings = new DecompilerSettings();
+            settings.AnonymousMethods = false; //отключим подстановку кода анонимных методов         
+
+            var decompiler = new CSharpDecompiler( module_path, settings );            
+
+            //декомпилируем тип, содержащий метод
+            SyntaxTree tree = decompiler.DecompileType(
+                new ICSharpCode.Decompiler.TypeSystem.FullTypeName(match.Method.DeclaringType.FullName)
+                );
+            
+            //найдем метод в синтаксическом дереве
+            var children = tree.Children.ToList();
+            AstNode res = null;
+            foreach (var x in children)
+            {
+                res = FindNode(x, match.Method.Name);
+                if (res != null) break;
             }
 
-            AstNode res = FindNode(x, match);
-            if (res != null) return res;
-        }
-        return null;
-    }
+            string s = &quot;&quot;;
+            if (res != null) s = res.ToString();
+            return s;
+        }        
 
-    public static string GetSourceDecompiled&amp;lt;T&amp;gt;(Predicate&amp;lt;T&amp;gt; match)
-    {        
-        string module_path = match.Method.Module.FullyQualifiedName;            
-                    
-        var settings = new DecompilerSettings();
-        settings.AnonymousMethods = false; //отключим подстановку кода анонимных методов         
-
-        var decompiler = new CSharpDecompiler( module_path, settings );            
-
-        //декомпилируем тип, содержащий метод
-        SyntaxTree tree = decompiler.DecompileType(
-            new ICSharpCode.Decompiler.TypeSystem.FullTypeName(match.Method.DeclaringType.FullName)
-            );
-        
-        //найдем метод в синтаксическом дереве
-        var children = tree.Children.ToList();
-        AstNode res = null;
-        foreach (var x in children)
+        static void Main(string[] args)
         {
-            res = FindNode(x, match.Method.Name);
-            if (res != null) break;
+            string source;
+            Console.WriteLine(&quot;*** Source from PDB: ***&quot;);
+            source = GetSourceFromPdb&lt;string&gt;( (s) =&gt;  s == &quot;Test&quot;  ||  s.Length==0);            
+            Console.WriteLine(source);            
+
+            Console.WriteLine(&quot;*** Decompiled source: ***&quot;);
+            source = GetSourceDecompiled&lt;string&gt;((s) =&gt; s == &quot;Test&quot; || s.Length==0);            
+            Console.WriteLine(source);            
+
+            Console.ReadKey();
         }
-
-        string s = &amp;quot;&amp;quot;;
-        if (res != null) s = res.ToString();
-        return s;
-    }        
-
-    static void Main(string[] args)
-    {
-        string source;
-        Console.WriteLine(&amp;quot;*** Source from PDB: ***&amp;quot;);
-        source = GetSourceFromPdb&amp;lt;string&amp;gt;( (s) =&amp;gt;  s == &amp;quot;Test&amp;quot;  ||  s.Length==0);            
-        Console.WriteLine(source);            
-
-        Console.WriteLine(&amp;quot;*** Decompiled source: ***&amp;quot;);
-        source = GetSourceDecompiled&amp;lt;string&amp;gt;((s) =&amp;gt; s == &amp;quot;Test&amp;quot; || s.Length==0);            
-        Console.WriteLine(source);            
-
-        Console.ReadKey();
-    }
-}    
+    }    
+}
 </code></pre>
-<p>}
-</code></pre><p>
 <p>Результат:</p>
 <pre class="lang-none prettyprint-override"><code>*** Source from PDB: ***
 s == &quot;Test&quot;  ||  s.Length==0
-<p>*** Decompiled source: ***
+
+*** Decompiled source: ***
 [CompilerGenerated]
 private static bool &lt;Main&gt;b__6 (string s)
 {
-return s == &quot;Test&quot; || s.Length == 0;
+        return s == &quot;Test&quot; || s.Length == 0;
 }
-</code></pre></p>
+</code></pre>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

@@ -88,32 +88,32 @@
         mc:Ignorable=&quot;d&quot; 
         WindowStyle=&quot;None&quot; AllowsTransparency=&quot;True&quot; Background=&quot;Transparent&quot;
         Height=&quot;450&quot; Width=&quot;600&quot; Loaded=&quot;Window_Loaded&quot;&gt;
-<pre><code>&amp;lt;Grid x:Name=&amp;quot;grid&amp;quot;&amp;gt;
 
-    &amp;lt;Grid x:Name=&amp;quot;window1&amp;quot; HorizontalAlignment=&amp;quot;Left&amp;quot; Width=&amp;quot;250&amp;quot; Margin=&amp;quot;0,0,0,0&amp;quot; VerticalAlignment=&amp;quot;Stretch&amp;quot;  
-              Background=&amp;quot;AliceBlue&amp;quot;&amp;gt;
-        &amp;lt;Button x:Name=&amp;quot;bClose&amp;quot; Content=&amp;quot;X&amp;quot; HorizontalAlignment=&amp;quot;Right&amp;quot; Height=&amp;quot;36&amp;quot; VerticalAlignment=&amp;quot;Top&amp;quot; Width=&amp;quot;36&amp;quot; 
-                Margin=&amp;quot;0,0,0,0&amp;quot; Click=&amp;quot;Button_Click&amp;quot; /&amp;gt;
-        &amp;lt;Label x:Name=&amp;quot;labelTitle&amp;quot; Content=&amp;quot;Window 1&amp;quot; HorizontalAlignment=&amp;quot;Stretch&amp;quot; Height=&amp;quot;36&amp;quot; Margin=&amp;quot;0,0,36,0&amp;quot; 
-                   VerticalAlignment=&amp;quot;Top&amp;quot; &amp;gt;
-            &amp;lt;Label.Background&amp;gt;
-                &amp;lt;SolidColorBrush Color=&amp;quot;{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}&amp;quot;/&amp;gt;
-            &amp;lt;/Label.Background&amp;gt;
-        &amp;lt;/Label&amp;gt;
-        &amp;lt;RadioButton Content=&amp;quot;On&amp;quot; HorizontalAlignment=&amp;quot;Left&amp;quot; Height=&amp;quot;22&amp;quot; Margin=&amp;quot;25,60,0,0&amp;quot; 
-                         VerticalAlignment=&amp;quot;Top&amp;quot; Click=&amp;quot;On_Click&amp;quot;/&amp;gt;
-        &amp;lt;RadioButton Content=&amp;quot;Off&amp;quot; HorizontalAlignment=&amp;quot;Left&amp;quot; Height=&amp;quot;22&amp;quot; Margin=&amp;quot;70,60,0,0&amp;quot; 
-                         VerticalAlignment=&amp;quot;Top&amp;quot; IsChecked=&amp;quot;True&amp;quot; Click=&amp;quot;Off_Click&amp;quot;/&amp;gt;
-    &amp;lt;/Grid&amp;gt;
-    &amp;lt;Grid x:Name=&amp;quot;window2&amp;quot; HorizontalAlignment=&amp;quot;Left&amp;quot; Height=&amp;quot;200&amp;quot; Margin=&amp;quot;251,0,0,0&amp;quot; VerticalAlignment=&amp;quot;Top&amp;quot; Width=&amp;quot;250&amp;quot; 
-              Background=&amp;quot;AliceBlue&amp;quot; &amp;gt;
-            &amp;lt;Label Content=&amp;quot;Window 2&amp;quot; HorizontalAlignment=&amp;quot;Left&amp;quot; Height=&amp;quot;27&amp;quot; Margin=&amp;quot;0,0,0,0&amp;quot; 
-                   VerticalAlignment=&amp;quot;Top&amp;quot; Width=&amp;quot;120&amp;quot;/&amp;gt;
-        &amp;lt;/Grid&amp;gt;
-    &amp;lt;/Grid&amp;gt;    
+    &lt;Grid x:Name=&quot;grid&quot;&gt;
+
+        &lt;Grid x:Name=&quot;window1&quot; HorizontalAlignment=&quot;Left&quot; Width=&quot;250&quot; Margin=&quot;0,0,0,0&quot; VerticalAlignment=&quot;Stretch&quot;  
+                  Background=&quot;AliceBlue&quot;&gt;
+            &lt;Button x:Name=&quot;bClose&quot; Content=&quot;X&quot; HorizontalAlignment=&quot;Right&quot; Height=&quot;36&quot; VerticalAlignment=&quot;Top&quot; Width=&quot;36&quot; 
+                    Margin=&quot;0,0,0,0&quot; Click=&quot;Button_Click&quot; /&gt;
+            &lt;Label x:Name=&quot;labelTitle&quot; Content=&quot;Window 1&quot; HorizontalAlignment=&quot;Stretch&quot; Height=&quot;36&quot; Margin=&quot;0,0,36,0&quot; 
+                       VerticalAlignment=&quot;Top&quot; &gt;
+                &lt;Label.Background&gt;
+                    &lt;SolidColorBrush Color=&quot;{DynamicResource {x:Static SystemColors.ActiveCaptionColorKey}}&quot;/&gt;
+                &lt;/Label.Background&gt;
+            &lt;/Label&gt;
+            &lt;RadioButton Content=&quot;On&quot; HorizontalAlignment=&quot;Left&quot; Height=&quot;22&quot; Margin=&quot;25,60,0,0&quot; 
+                             VerticalAlignment=&quot;Top&quot; Click=&quot;On_Click&quot;/&gt;
+            &lt;RadioButton Content=&quot;Off&quot; HorizontalAlignment=&quot;Left&quot; Height=&quot;22&quot; Margin=&quot;70,60,0,0&quot; 
+                             VerticalAlignment=&quot;Top&quot; IsChecked=&quot;True&quot; Click=&quot;Off_Click&quot;/&gt;
+        &lt;/Grid&gt;
+        &lt;Grid x:Name=&quot;window2&quot; HorizontalAlignment=&quot;Left&quot; Height=&quot;200&quot; Margin=&quot;251,0,0,0&quot; VerticalAlignment=&quot;Top&quot; Width=&quot;250&quot; 
+                  Background=&quot;AliceBlue&quot; &gt;
+                &lt;Label Content=&quot;Window 2&quot; HorizontalAlignment=&quot;Left&quot; Height=&quot;27&quot; Margin=&quot;0,0,0,0&quot; 
+                       VerticalAlignment=&quot;Top&quot; Width=&quot;120&quot;/&gt;
+            &lt;/Grid&gt;
+        &lt;/Grid&gt;    
+&lt;/Window&gt;
 </code></pre>
-<p>&lt;/Window&gt;
-</code></pre><p>
 <hr>
 <pre><code>using System;
 using System.Collections.Generic;
