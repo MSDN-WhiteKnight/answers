@@ -17,7 +17,7 @@ namespace StackOverflowAnswers
 
             while (true)
             {
-                int next = body.IndexOf("<pre><code>", i);
+                int next = body.IndexOf("<pre", i);
                 if (next < 0) break;
                 char c = body[next - 3];
 
