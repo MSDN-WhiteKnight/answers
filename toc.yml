@@ -1,2 +1,6 @@
 ﻿- name: "Stack Overflow answers"
   href: tools/html/index.md
+- name: "CIL Tools"
+  href: https://github.com/MSDN-WhiteKnight/CilTools/
+- name: "SmallSoft - бесплатные программы"
+  href: https://smallsoft2.blogspot.com/
