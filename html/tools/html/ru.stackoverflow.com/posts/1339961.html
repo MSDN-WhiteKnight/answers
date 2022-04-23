@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1057;&#1082;&#1086;&#1083;&#1100;&#1082;&#1086; &#1087;&#1072;&#1084;&#1103;&#1090;&#1080; &#1079;&#1072;&#1085;&#1080;&#1084;&#1072;&#1102;&#1090; &#1086;&#1073;&#1098;&#1077;&#1082;&#1090;&#1099;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1069;&#1090;&#1072;&#1087;&#1099; &#1088;&#1072;&#1073;&#1086;&#1090;&#1099; &#1082;&#1086;&#1084;&#1087;&#1080;&#1083;&#1103;&#1090;&#1086;&#1088;&#1072; MSVC&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1057;&#1082;&#1086;&#1083;&#1100;&#1082;&#1086; &#1087;&#1072;&#1084;&#1103;&#1090;&#1080; &#1079;&#1072;&#1085;&#1080;&#1084;&#1072;&#1102;&#1090; &#1086;&#1073;&#1098;&#1077;&#1082;&#1090;&#1099;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1069;&#1090;&#1072;&#1087;&#1099; &#1088;&#1072;&#1073;&#1086;&#1090;&#1099; &#1082;&#1086;&#1084;&#1087;&#1080;&#1083;&#1103;&#1090;&#1086;&#1088;&#1072; MSVC&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,57 +69,43 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Сколько памяти занимают объекты?"</h1>
-<h2>Answer 779212</h2>
-<p><a href="https://ru.stackoverflow.com/a/779212/">Link</a></p>
+<h1>Ответ на "Этапы работы компилятора MSVC"</h1>
+<h2>Answer 1339961</h2>
+<p><a href="https://ru.stackoverflow.com/a/1339961/">Link</a></p>
 <blockquote>
-<p>Во первых, в данном коде неправильно измеряется размер для массива ссылочных типов. Код:</p>
-<pre><code>var size = GC.GetTotalMemory(true);
-var arr = new object[count];
-
-for (var i = 0; i &lt; count; ++i)
-{
-        arr[i] = new object();
-}
-
-var mem = GC.GetTotalMemory(true) - size;
+<p>В самом выводе системы сборки. После сборки проекта в окне вывода Visual Studio выбираем &quot;Показать выходные данные из:&quot; - &quot;Сборка&quot;. Результат выглядит так:</p>
+<pre class="lang-none prettyprint-override"><code>1&gt;------ Сборка начата: проект: CppConsole, Конфигурация: Debug Win32 ------
+1&gt;Сборка начата 19.10.2021 9:08:23.
+1&gt;Целевой объект InitializeBuildStatus:
+1&gt;  Создание &quot;Debug\CppConsole.tlog\unsuccessfulbuild&quot;, так как было задано &quot;AlwaysCreate&quot;.
+1&gt;Целевой объект ClCompile:
+1&gt;  CppConsole.cpp
+1&gt;Целевой объект Link:
+1&gt;  CppConsole.vcxproj -&gt; C:\PROJECTS_2017\CppConsole\Debug\CppConsole.exe
+1&gt;Целевой объект FinalizeBuildStatus:
+1&gt;  Файл &quot;Debug\CppConsole.tlog\unsuccessfulbuild&quot; удаляется.
+1&gt;  Обращение к &quot;Debug\CppConsole.tlog\CppConsole.lastbuildstate&quot;.
+1&gt;
+1&gt;Сборка успешно завершена.
+1&gt;    Предупреждений: 0
+1&gt;    Ошибок: 0
+1&gt;
+1&gt;Прошло времени 00:00:01.04
+========== Сборка: успешно: 1, с ошибками: 0, без изменений: 0, пропущено: 0 ==========
 </code></pre>
-<p>Измеряет память под массив ссылок + память под объекты. Надо так:</p>
-<pre><code>var arr = new object[count];
-var size = GC.GetTotalMemory(true);
-
-for (var i = 0; i &lt; count; ++i)
-{
-        arr[i] = new object();
-}
-
-var mem = GC.GetTotalMemory(true) - size;
-</code></pre>
-<p>Во вторых, арифметика <code>Размер C = Размер object + 2 * Размер int</code> не работает: все несколько сложнее.</p>
-<ol>
-<li><p>В CLR существует минимальный размер объекта, см. <a href="https://github.com/dotnet/coreclr/blob/master/src/vm/object.h" rel="nofollow noreferrer">object.h</a></p>
-<pre><code> //
- // The generational GC requires that every object be at least 12 bytes
- // in size.   
-
- #define MIN_OBJECT_SIZE     (2*sizeof(BYTE*) + sizeof(ObjHeader))
-</code></pre>
+<p>Видно, что в сборке есть несколько этапов, которые представлены &quot;Целевыми объектами&quot; (Target) MSBuild. Эти целевые объекты для С++ документированы здесь: <a href="https://docs.microsoft.com/en-us/cpp/build/reference/msbuild-visual-cpp-overview?view=msvc-160#targets" rel="nofollow noreferrer">https://docs.microsoft.com/en-us/cpp/build/reference/msbuild-visual-cpp-overview?view=msvc-160#targets</a>. В нашем случае были такие этапы:</p>
+<ul>
+<li><p><strong>InitializeBuildStatus</strong>. Считывает результаты последней сборки, что позволяет выполнять сборку только тех входных файлов, которые изменились.</p>
 </li>
-</ol>
-<p>Для 64-разрядной версии минимальный размер 2 * 8 + 8 = 24. Размер типа, меньшего 24 байта, дополняется до 24.</p>
-<p>(Определение ObjHeader здесь: <a href="https://github.com/dotnet/coreclr/blob/master/src/gc/env/gcenv.object.h" rel="nofollow noreferrer">https://github.com/dotnet/coreclr/blob/master/src/gc/env/gcenv.object.h</a>)</p>
-<ol start="2">
-<li><p>Размер служебного блока, добавляемого к любому ссылочному типу, равен 16 байт (для x86 - 8 байт, см. например <a href="https://www.codeproject.com/Articles/20481/NET-Type-Internals-From-a-Microsoft-CLR-Perspecti#4" rel="nofollow noreferrer">здесь</a>, для x64 в два раза больше).</p>
+<li><p><strong>ClCompile</strong>. Вызывает компилятор, cl.exe, для каждого входного файла .cpp, получая на выходе объектный файл. Препроцессор включен в этот этап.</p>
 </li>
-<li><p>Кроме того, предположительно, работает дополнение размера до числа, кратного 8.</p>
+<li><p><strong>Link</strong>. Вызывает компоновщик, link.exe, подавая на вход объектные файлы и необходимые зависимости.</p>
 </li>
-</ol>
-<p>Таким образом:</p>
-<blockquote>
-<p>Размер объекта с 1 int полем = 24 байта<br>
-Размер объекта с 2 int полями = 24 байта<br>
-Размер объекта с 3 int полями = 32 байта</p>
-</blockquote>
+<li><p><strong>FinalizeBuildStatus</strong>. Соответственно, сохраняет результаты этой сборки в файл lastbuildstate, чтобы их можно было прочитать при последующих сборках.</p>
+</li>
+</ul>
+<p>Можно узнать больше о содержании этих этапов, включив более подробный вывод MSBuild (Параметры - Проекты и решения - Сборка и запуск - Уровень детализации выходных данных сборки проекта MSBuild - выбрать &quot;Подробные&quot;).</p>
+<p>Компоновка в проекте Visual Studio является отдельным этапом, но cl.exe может и автоматически вызывать компоновщик. Система проектов передает компилятору параметр <a href="https://docs.microsoft.com/en-us/cpp/build/reference/c-compile-without-linking?view=msvc-160" rel="nofollow noreferrer">/c</a>, который отключает автоматическую компоновку, вероятно, потому что большинство реальных проектов имеют дополнительные этапы сборки, вроде компиляции ресурсов, которые должны идти до компоновки.</p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1054;&#1089;&#1074;&#1086;&#1073;&#1086;&#1076;&#1080;&#1090;&#1100; &#1092;&#1072;&#1081;&#1083; &#1086;&#1090; &#1087;&#1088;&#1086;&#1094;&#1077;&#1089;&#1089;&#1072; - &#1082;&#1072;&#1082; &#1091;&#1089;&#1086;&#1074;&#1077;&#1088;&#1096;&#1077;&#1085;&#1089;&#1090;&#1074;&#1086;&#1074;&#1072;&#1090;&#1100; &#1101;&#1090;&#1086;&#1090; &#1082;&#1086;&#1076;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1055;&#1086;&#1095;&#1077;&#1084;&#1091; &#1085;&#1072;&#1087;&#1080;&#1089;&#1072;&#1085;&#1085;&#1072;&#1103; &#1084;&#1085;&#1086;&#1081; &#1086;&#1073;&#1077;&#1088;&#1090;&#1082;&#1072; &#1076;&#1083;&#1103; COM, &#1088;&#1072;&#1073;&#1086;&#1090;&#1072;&#1077;&#1090; &#1073;&#1099;&#1089;&#1090;&#1088;&#1077;&#1077; &#1095;&#1077;&#1084; &#1090;&#1086; &#1095;&#1090;&#1086; &#1087;&#1088;&#1077;&#1076;&#1083;&#1072;&#1075;&#1072;&#1077;&#1090; .NET?&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1054;&#1089;&#1074;&#1086;&#1073;&#1086;&#1076;&#1080;&#1090;&#1100; &#1092;&#1072;&#1081;&#1083; &#1086;&#1090; &#1087;&#1088;&#1086;&#1094;&#1077;&#1089;&#1089;&#1072; - &#1082;&#1072;&#1082; &#1091;&#1089;&#1086;&#1074;&#1077;&#1088;&#1096;&#1077;&#1085;&#1089;&#1090;&#1074;&#1086;&#1074;&#1072;&#1090;&#1100; &#1101;&#1090;&#1086;&#1090; &#1082;&#1086;&#1076;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1055;&#1086;&#1095;&#1077;&#1084;&#1091; &#1085;&#1072;&#1087;&#1080;&#1089;&#1072;&#1085;&#1085;&#1072;&#1103; &#1084;&#1085;&#1086;&#1081; &#1086;&#1073;&#1077;&#1088;&#1090;&#1082;&#1072; &#1076;&#1083;&#1103; COM, &#1088;&#1072;&#1073;&#1086;&#1090;&#1072;&#1077;&#1090; &#1073;&#1099;&#1089;&#1090;&#1088;&#1077;&#1077; &#1095;&#1077;&#1084; &#1090;&#1086; &#1095;&#1090;&#1086; &#1087;&#1088;&#1077;&#1076;&#1083;&#1072;&#1075;&#1072;&#1077;&#1090; .NET?&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,67 +69,21 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Освободить файл от процесса - как усовершенствовать этот код?"</h1>
-<h2>Answer 1225636</h2>
-<p><a href="https://ru.stackoverflow.com/a/1225636/">Link</a></p>
+<h1>Ответ на "Почему написанная мной обертка для COM, работает быстрее чем то что предлагает .NET?"</h1>
+<h2>Answer 1264694</h2>
+<p><a href="https://ru.stackoverflow.com/a/1264694/">Link</a></p>
 <blockquote>
-<p>Не глядя натравливать TerminateProcess на любой процесс, который держит файл, весьма сомнительная идея. Помимо обычного приложения, файл может быть открыт системной службой. Например, если файл лежит в общей сетевой папке и открыт с другого компьютера, ваш код прибьет службу общих файлов. Собственно, Restart Manager для того и создан, чтобы корректно обрабатывать подобные ситуации. Вместо TerminateProcess используйте RmShutdown и RmRestart:</p>
-<pre><code>void FreeProcess(const WCHAR* file)
-{
-    DWORD hSess = 0;
-    WCHAR key[50] = L&quot;MySession&quot;;
-    DWORD res;
-
-    res = RmStartSession(&amp;hSess, 0, key);
-
-    if (res != 0)
-    {
-        // Cannot start session
-        return;
-    }
-
-    LPCWSTR filenames[] = { file };
-    res = RmRegisterResources(hSess, 1, filenames, 0, NULL, 0, NULL);
-
-    if (res != 0)
-    {
-        // Cannot register resource
-        RmEndSession(hSess);
-        return;
-    }
-
-    UINT procInfoNeeded;
-    UINT procInfo = 10;
-    DWORD rebootReasons;
-    RM_PROCESS_INFO info[10];
-    res = RmGetList(hSess, &amp;procInfoNeeded, &amp;procInfo, info, &amp;rebootReasons);
-
-    if (res != 0)
-    {
-        // Cannot get list of processes
-        RmEndSession(hSess);
-        return;
-    }
-
-    for (int i = 0; i &lt; procInfo; i++)
-        wprintf(L&quot;%u: %s\n&quot;, info[i].Process.dwProcessId, info[i].strAppName);
-
-    res=RmShutdown(hSess, RmForceShutdown, NULL); //останавливаем процесс
-
-    if (res != 0)
-    {
-        fputws(L&quot;RmShutdown failed&quot;,stdout);
-        RmEndSession(hSess);
-        return;
-    }
-
-    //выполняем необходимые операции с файлом...
-
-    RmRestart(hSess, 0, NULL); //перезапускаем процесс, если это поддерживается
-
-    RmEndSession(hSess);
-}
-</code></pre>
+<blockquote>
+<p>Почему написанная мной обертка для COM, работает быстрее чем то что предлагает .NET?<br>
+...<br>
+IDXGIFactory</p>
+</blockquote>
+<p>Дело в том, что DirectX Использует особый облегченный вариант COM: <a href="https://docs.microsoft.com/ru-ru/archive/blogs/thomasolsen/introducing-the-microsoft-direct2d-api" rel="nofollow noreferrer">https://docs.microsoft.com/ru-ru/archive/blogs/thomasolsen/introducing-the-microsoft-direct2d-api</a></p>
+<blockquote>
+<p>Lightweight COM – Should use C++ style interfaces which model Direct3D usage. No support for proxies, cross-process remoting, BSTRs, VARIANTs, COM registration (e.g. the heavyweight stuff).</p>
+</blockquote>
+<p>В DirectX используется API, основанный на IUnknown, и счетчики ссылок, но другие возможности COM, вроде регистрации COM-объектов в реестре, разных моделей многопоточности и т.п., не используются. Если обычный COM-объект создается через CoCreateInstance, то IDXGIFactory создается через отдельную функцию <a href="https://docs.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-createdxgifactory" rel="nofollow noreferrer">CreateDXGIFactory</a>, которая не инициализирует возможности COM.</p>
+<p>Но COM Interop в .NET рассчитан на полноценный COM, поэтому он довольно тяжелый. Этот код работает быстрее, потому что он с нуля реализует поддержку облегченного COM.</p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

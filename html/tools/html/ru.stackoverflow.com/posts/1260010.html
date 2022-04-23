@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1054;&#1089;&#1074;&#1086;&#1073;&#1086;&#1076;&#1080;&#1090;&#1100; &#1092;&#1072;&#1081;&#1083; &#1086;&#1090; &#1087;&#1088;&#1086;&#1094;&#1077;&#1089;&#1089;&#1072; - &#1082;&#1072;&#1082; &#1091;&#1089;&#1086;&#1074;&#1077;&#1088;&#1096;&#1077;&#1085;&#1089;&#1090;&#1074;&#1086;&#1074;&#1072;&#1090;&#1100; &#1101;&#1090;&#1086;&#1090; &#1082;&#1086;&#1076;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1086;&#1075;&#1076;&#1072; &#1084;&#1086;&#1078;&#1077;&#1090; &#1087;&#1088;&#1080;&#1075;&#1086;&#1076;&#1080;&#1090;&#1089;&#1103; &#1087;&#1088;&#1086;&#1089;&#1090;&#1088;&#1072;&#1085;&#1089;&#1090;&#1074;&#1086; &#1080;&#1084;&#1077;&#1085; System.Reflection.Emit?&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1054;&#1089;&#1074;&#1086;&#1073;&#1086;&#1076;&#1080;&#1090;&#1100; &#1092;&#1072;&#1081;&#1083; &#1086;&#1090; &#1087;&#1088;&#1086;&#1094;&#1077;&#1089;&#1089;&#1072; - &#1082;&#1072;&#1082; &#1091;&#1089;&#1086;&#1074;&#1077;&#1088;&#1096;&#1077;&#1085;&#1089;&#1090;&#1074;&#1086;&#1074;&#1072;&#1090;&#1100; &#1101;&#1090;&#1086;&#1090; &#1082;&#1086;&#1076;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1086;&#1075;&#1076;&#1072; &#1084;&#1086;&#1078;&#1077;&#1090; &#1087;&#1088;&#1080;&#1075;&#1086;&#1076;&#1080;&#1090;&#1089;&#1103; &#1087;&#1088;&#1086;&#1089;&#1090;&#1088;&#1072;&#1085;&#1089;&#1090;&#1074;&#1086; &#1080;&#1084;&#1077;&#1085; System.Reflection.Emit?&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,67 +69,12 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Освободить файл от процесса - как усовершенствовать этот код?"</h1>
-<h2>Answer 1225636</h2>
-<p><a href="https://ru.stackoverflow.com/a/1225636/">Link</a></p>
+<h1>Ответ на "Когда может пригодится пространство имен System.Reflection.Emit?"</h1>
+<h2>Answer 1260010</h2>
+<p><a href="https://ru.stackoverflow.com/a/1260010/">Link</a></p>
 <blockquote>
-<p>Не глядя натравливать TerminateProcess на любой процесс, который держит файл, весьма сомнительная идея. Помимо обычного приложения, файл может быть открыт системной службой. Например, если файл лежит в общей сетевой папке и открыт с другого компьютера, ваш код прибьет службу общих файлов. Собственно, Restart Manager для того и создан, чтобы корректно обрабатывать подобные ситуации. Вместо TerminateProcess используйте RmShutdown и RmRestart:</p>
-<pre><code>void FreeProcess(const WCHAR* file)
-{
-    DWORD hSess = 0;
-    WCHAR key[50] = L&quot;MySession&quot;;
-    DWORD res;
-
-    res = RmStartSession(&amp;hSess, 0, key);
-
-    if (res != 0)
-    {
-        // Cannot start session
-        return;
-    }
-
-    LPCWSTR filenames[] = { file };
-    res = RmRegisterResources(hSess, 1, filenames, 0, NULL, 0, NULL);
-
-    if (res != 0)
-    {
-        // Cannot register resource
-        RmEndSession(hSess);
-        return;
-    }
-
-    UINT procInfoNeeded;
-    UINT procInfo = 10;
-    DWORD rebootReasons;
-    RM_PROCESS_INFO info[10];
-    res = RmGetList(hSess, &amp;procInfoNeeded, &amp;procInfo, info, &amp;rebootReasons);
-
-    if (res != 0)
-    {
-        // Cannot get list of processes
-        RmEndSession(hSess);
-        return;
-    }
-
-    for (int i = 0; i &lt; procInfo; i++)
-        wprintf(L&quot;%u: %s\n&quot;, info[i].Process.dwProcessId, info[i].strAppName);
-
-    res=RmShutdown(hSess, RmForceShutdown, NULL); //останавливаем процесс
-
-    if (res != 0)
-    {
-        fputws(L&quot;RmShutdown failed&quot;,stdout);
-        RmEndSession(hSess);
-        return;
-    }
-
-    //выполняем необходимые операции с файлом...
-
-    RmRestart(hSess, 0, NULL); //перезапускаем процесс, если это поддерживается
-
-    RmEndSession(hSess);
-}
-</code></pre>
+<p>Существующие ответы несколько устарели. В дополнение к ним следует отметить, что в .NET Core и .NET 5+ возможности System.Reflection.Emit (SRE) ограничены по сравнению с .NET Framework/Mono: генерировать динамические сборки в памяти можно, но <a href="https://github.com/dotnet/runtime/issues/15704" rel="nofollow noreferrer">сохранить их в исполняемый файл нельзя</a>. Это значит, что если кто-то хотел бы использовать SRE как основу для кодогенерации в своем компиляторе, эту идею придется отбросить в условиях современного .NET. Использованию SRE для генерации сериализаторов/мапперов это не мешает, разве что теперь динамическую сборку нельзя кэшировать между разными запусками программы - ее нужно всегда генерировать заново, даже для одного и того же типа. Если нужно сохранять динамическую сборку в файл, в качестве альтернативы можно использовать <a href="https://www.mono-project.com/docs/tools+libraries/libraries/Mono.Cecil/" rel="nofollow noreferrer">Mono.Cecil</a> или <a href="https://www.nuget.org/packages/System.Reflection.Metadata/" rel="nofollow noreferrer">System.Reflection.Metadata</a>.</p>
+<p>Кроме того, в C# недавно появился новый функционал для динамической генерации кода, <a href="https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/" rel="nofollow noreferrer">Source generators</a>. В некоторых случаях, когда обычно использовался SRE/CodeDom/T4, теперь можно попробовать его.</p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

@@ -1,0 +1,275 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1072;&#1082; &#1089;&#1076;&#1077;&#1083;&#1072;&#1090;&#1100;, &#1095;&#1090;&#1086;&#1073;&#1099; &#1087;&#1086;&#1083;&#1100;&#1079;&#1086;&#1074;&#1072;&#1090;&#1077;&#1083;&#1100; &#1084;&#1086;&#1075; &#1080;&#1079;&#1084;&#1077;&#1085;&#1103;&#1090;&#1100; &#1088;&#1072;&#1079;&#1084;&#1077;&#1088; &#1087;&#1072;&#1085;&#1077;&#1083;&#1080; &#1074; &#1091;&#1078;&#1077; &#1074;&#1082;&#1083;&#1102;&#1095;&#1105;&#1085;&#1085;&#1086;&#1081; &#1087;&#1088;&#1086;&#1075;&#1088;&#1072;&#1084;&#1084;&#1077;?&quot; | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1072;&#1082; &#1089;&#1076;&#1077;&#1083;&#1072;&#1090;&#1100;, &#1095;&#1090;&#1086;&#1073;&#1099; &#1087;&#1086;&#1083;&#1100;&#1079;&#1086;&#1074;&#1072;&#1090;&#1077;&#1083;&#1100; &#1084;&#1086;&#1075; &#1080;&#1079;&#1084;&#1077;&#1085;&#1103;&#1090;&#1100; &#1088;&#1072;&#1079;&#1084;&#1077;&#1088; &#1087;&#1072;&#1085;&#1077;&#1083;&#1080; &#1074; &#1091;&#1078;&#1077; &#1074;&#1082;&#1083;&#1102;&#1095;&#1105;&#1085;&#1085;&#1086;&#1081; &#1087;&#1088;&#1086;&#1075;&#1088;&#1072;&#1084;&#1084;&#1077;?&quot; | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
+<h1>Ответ на "Как сделать, чтобы пользователь мог изменять размер панели в уже включённой программе?"</h1>
+<h2>Answer 1286226</h2>
+<p><a href="https://ru.stackoverflow.com/a/1286226/">Link</a></p>
+<blockquote>
+<p>Ну так чем не устаивает решение с WS_THICKFRAME, кода немного, да и пересоздавать ничего не нужно. Правда, просто так поменять стиль уже созданного элемента управления, похоже, невозможно, но можно ввести промежуточную форму. Как-то так:</p>
+<pre><code>const uint WS_THICKFRAME = 0x00040000;
+const int GWL_STYLE = (-16);
+
+[DllImport(&quot;user32.dll&quot;)]
+public static extern uint SetWindowLong(IntPtr hWnd, int nIndex, uint dwNewLong);
+
+[DllImport(&quot;user32.dll&quot;)]
+public static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
+
+[DllImport(&quot;user32.dll&quot;)]
+public static extern int SetParent(IntPtr hWnd, IntPtr NewParent);
+
+// ...
+
+Point loc = panel1.Location;            
+Form f = new Form();
+f.FormBorderStyle = FormBorderStyle.None;            
+f.Size = panel1.Size;
+f.CreateControl();
+SetParent(f.Handle, this.Handle);
+uint x = GetWindowLong(f.Handle, GWL_STYLE);
+x |= WS_THICKFRAME;
+SetWindowLong(f.Handle, GWL_STYLE,x);
+panel1.Location = new Point(0, 0);
+panel1.Parent = f;
+panel1.Dock = DockStyle.Fill;
+f.Location = loc;
+f.Show();
+</code></pre>
+<p>Здесь создается промежуточная форма f, без заголовка, но с рамкой изменения размера. В форму добавляется заранее созданная панель panel1. Затем форма f делается дочерней для основной формы, а ее положение и размер устанавливаются такими же, как у panel1. Благодаря этому, размером панели можно управлять рамкой формы f. Панель panel1 при этом может быть создана в конструкторе, и установленные через конструктор события не слетают при изменении владельца окна.</p>
+<hr>
+<p><strong>Дополнение</strong></p>
+<p>Если нужно убрать рамку, мало кода уже не получится. Нужно создавать свой класс элемента управления с переопределением стиля и оконной процедуры (как в ответе <a href="https://stackoverflow.com/users/5045688/alexander-petrov">Alexander Petrov</a> здесь: <a href="https://stackoverflow.com/a/37943359/8674428">https://stackoverflow.com/a/37943359/8674428</a>), и добавлять шаманство с неклиентской областью окна, начало которому было положено здесь: <a href="https://ru.stackoverflow.com/a/1130986/240512">https://ru.stackoverflow.com/a/1130986/240512</a></p>
+<p>Вот код:</p>
+<pre><code>public class SizeablePanel : Panel
+{
+    protected override CreateParams CreateParams
+    {
+        get
+        {
+            const int WS_SIZEBOX = 0x40000;
+
+            var cp = base.CreateParams;
+            cp.Style |= WS_SIZEBOX;
+
+            return cp;
+        }
+    }
+
+    const uint WM_NCCALCSIZE = 0x0083;
+    const uint WM_NCHITTEST = 0x0084;
+    const uint HTTOPLEFT = 13;
+    const uint HTTOPRIGHT = 14;
+    const uint HTTOP = 12;
+    const uint HTCAPTION = 2;
+    const uint HTLEFT = 10;
+    const uint HTNOWHERE = 0;
+    const uint HTRIGHT = 11;
+    const uint HTBOTTOM = 15;
+    const uint HTBOTTOMLEFT = 16;
+    const uint HTBOTTOMRIGHT = 17;
+
+    int xborder=5;
+    int yborder=5;
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RECT
+    {
+        public int left, top, right, bottom;
+    }
+
+    static int GET_X_LPARAM(IntPtr lp)
+    {
+        short loword = (short)((ulong)lp &amp; 0xffff);
+        return loword;
+    }
+
+    static int GET_Y_LPARAM(IntPtr lp)
+    {
+        short hiword = (short)((((ulong)lp) &gt;&gt; 16) &amp; 0xffff);
+        return hiword;
+    }
+
+    [DllImport(&quot;user32.dll&quot;, SetLastError = true)]
+    static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
+            
+
+    //обработка координат мыши для неклиентской области
+    IntPtr HitTestNCA(IntPtr hWnd, IntPtr wParam, IntPtr lParam)
+    {
+        // Get the point coordinates for the hit test.
+        var ptMouse = new Point(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+
+        // Get the window rectangle.
+        RECT rcWindow;
+        GetWindowRect(hWnd, out rcWindow);                        
+
+        // Determine if the hit test is for resizing. Default middle (1,1).
+        ushort uRow = 1;
+        ushort uCol = 1;            
+
+        // Determine if the point is at the top or bottom of the window.
+        if (ptMouse.Y &gt;= rcWindow.top &amp;&amp; ptMouse.Y &lt; rcWindow.top + yborder)
+        {
+            //fOnResizeBorder = (ptMouse.Y &lt; (rcWindow.top - rcWindow.top));
+            uRow = 0;
+        }
+        else if (ptMouse.Y &lt; rcWindow.bottom &amp;&amp; ptMouse.Y &gt;= rcWindow.bottom - yborder)
+        {
+            uRow = 2;
+        }
+
+        // Determine if the point is at the left or right of the window.
+        if (ptMouse.X &gt;= rcWindow.left &amp;&amp; ptMouse.X &lt; rcWindow.left + xborder)
+        {
+            uCol = 0; // left side
+        }
+        else if (ptMouse.X &lt; rcWindow.right &amp;&amp; ptMouse.X &gt;= rcWindow.right - xborder)
+        {
+            uCol = 2; // right side
+        }
+
+        // Hit test (HTTOPLEFT, ... HTBOTTOMRIGHT)
+        IntPtr[,] hitTests = new IntPtr[,]
+        {
+            { (IntPtr)HTTOPLEFT, (IntPtr)HTTOP, (IntPtr)HTTOPRIGHT },
+            { (IntPtr)HTLEFT,  (IntPtr)HTNOWHERE, (IntPtr)HTRIGHT},
+            { (IntPtr)HTBOTTOMLEFT, (IntPtr)HTBOTTOM, (IntPtr)HTBOTTOMRIGHT },
+        };
+
+        return hitTests[uRow, uCol];
+    }
+
+    protected override void WndProc(ref Message m)
+    {
+        if (m.Msg == WM_NCCALCSIZE)
+        {
+            //убираем рамку
+            m.Result = IntPtr.Zero;
+            return;
+        }
+
+        if (m.Msg == WM_NCHITTEST)
+        {
+            //обработка событий мыши
+            IntPtr lRet = HitTestNCA(m.HWnd, m.WParam, m.LParam);
+
+            if (lRet != (IntPtr)HTNOWHERE)
+            {
+                m.Result = lRet;
+                return;
+            }
+        }
+
+        base.WndProc(ref m);
+    }
+}
+</code></pre>
+<p>SizeablePanel не имеет видимой рамки, но ее размер можно изменять перетаскиванием за 5-пиксельную область у края. Цвет панели, естественно, должен отличаться от цвета формы, чтобы можно было найти этот край. Панель также можно поместить на форму через конструктор (не забудьте перестроить решение, чтобы элемент управления появился на панели конструктора).</p>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span><script type="text/javascript">(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(65150713, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/65150713" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>

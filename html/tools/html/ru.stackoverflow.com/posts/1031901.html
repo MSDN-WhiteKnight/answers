@@ -74,17 +74,37 @@
 <p><a href="https://ru.stackoverflow.com/a/1031901/">Link</a></p>
 <blockquote>
 <blockquote>
-  <p>Есть масса кода написанного на IL, который требуется перевести на рельсы .NET Core, однако, при чтении документации выяснилось, что ilasm.exe там не предусмотрен.</p>
+<p>Есть масса кода написанного на IL, который требуется перевести на рельсы .NET Core, однако, при чтении документации выяснилось, что ilasm.exe там не предусмотрен.</p>
 </blockquote>
 <p>Это так. Однако, в .NET Core, начиная с версии 2.0, поддерживается запуск сборок, скомпилированных под .NET Framework (естественно, они должны использовать только то, что есть в .NET Core, иначе будет ошибка во время выполнения). Так что эта проблема может быть и не очень критична.</p>
 <blockquote>
-  <p>Вроде есть что-то в NuGet, но тянуть оттуда возможности нет, так как компьютер, на котором планируется проводить сборку изолирован от интернета. Бегать же с флешкой что-то загружать тоже не айс. </p>
+<p>Вроде есть что-то в NuGet, но тянуть оттуда возможности нет, так как компьютер, на котором планируется проводить сборку изолирован от интернета. Бегать же с флешкой что-то загружать тоже не айс.</p>
 </blockquote>
 <p>Ну так если нельзя ни скачивать с интернета, ни приносить на флешке, как вообще вести разработку под .NET Core? Для этого нужен как минимум .NET Core SDK, который желательно иногда обновлять.</p>
 <blockquote>
-  <p>Но в виду того, что классы для генерации IL кода и последующего создания из него сборок есть в самой платформе, подумал набросать свой собственный небольшой компилятор. Однако к каким классам обратиться, инфы нигде не нашел.</p>
+<p>Но в виду того, что классы для генерации IL кода и последующего создания из него сборок есть в самой платформе, подумал набросать свой собственный небольшой компилятор. Однако к каким классам обратиться, инфы нигде не нашел.</p>
 </blockquote>
 <p><a href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit" rel="nofollow noreferrer">System.Reflection.Emit</a> ?</p>
+<hr>
+<p><strong>Дополнение.</strong> Сборка IL для .NET Core возможна при использовании специального SDK <a href="https://www.nuget.org/packages/Microsoft.NET.Sdk.IL" rel="nofollow noreferrer">Microsoft.NET.Sdk.IL</a>. Ранее он использовался только внутренне в репозитории CoreCLR, но теперь его выложили в общую галерею NuGet. Чтобы его использовать, нужно добавить в каталог с проектом файл global.json подобного содержания (версию по необходимости поменять):</p>
+<pre><code>{  
+  &quot;msbuild-sdks&quot;: {    
+    &quot;Microsoft.NET.Sdk.IL&quot;: &quot;5.0.0&quot;
+  }
+}
+</code></pre>
+<p>Затем нужно создать файл .ilproj:</p>
+<pre><code>&lt;Project Sdk=&quot;Microsoft.NET.Sdk.IL&quot;&gt;
+
+  &lt;PropertyGroup&gt;
+    &lt;OutputType&gt;Exe&lt;/OutputType&gt;
+    &lt;TargetFramework&gt;net5.0&lt;/TargetFramework&gt;
+  &lt;/PropertyGroup&gt;
+  
+&lt;/Project&gt;
+</code></pre>
+<p>После этого можно добавлять в каталог файлы с расширением .il, они автоматически подхватятся для сборки. Сборка делается командой dotnet build (VS не поддерживается). Полный пример проекта можно посмотреть здесь: <a href="https://github.com/MSDN-WhiteKnight/CodeSamples/tree/master/IL" rel="nofollow noreferrer">https://github.com/MSDN-WhiteKnight/CodeSamples/tree/master/IL</a></p>
+<p>Источник: <a href="https://github.com/dotnet/runtime/issues/11411#issuecomment-436427961" rel="nofollow noreferrer">https://github.com/dotnet/runtime/issues/11411#issuecomment-436427961</a></p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

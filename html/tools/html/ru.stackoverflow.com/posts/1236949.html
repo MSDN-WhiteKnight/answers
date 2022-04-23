@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1054;&#1089;&#1074;&#1086;&#1073;&#1086;&#1076;&#1080;&#1090;&#1100; &#1092;&#1072;&#1081;&#1083; &#1086;&#1090; &#1087;&#1088;&#1086;&#1094;&#1077;&#1089;&#1089;&#1072; - &#1082;&#1072;&#1082; &#1091;&#1089;&#1086;&#1074;&#1077;&#1088;&#1096;&#1077;&#1085;&#1089;&#1090;&#1074;&#1086;&#1074;&#1072;&#1090;&#1100; &#1101;&#1090;&#1086;&#1090; &#1082;&#1086;&#1076;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1072;&#1082; &#1088;&#1077;&#1072;&#1083;&#1080;&#1079;&#1086;&#1074;&#1072;&#1090;&#1100; &#1090;&#1077;&#1082;&#1089;&#1090;&#1073;&#1086;&#1082;&#1089;, &#1079;&#1072;&#1074;&#1080;&#1089;&#1103;&#1097;&#1080;&#1081; &#1086;&#1090; &#1080;&#1079;&#1084;&#1077;&#1085;&#1103;&#1102;&#1097;&#1077;&#1081;&#1089;&#1103; &#1087;&#1077;&#1088;&#1077;&#1084;&#1077;&#1085;&#1085;&#1086;&#1081;&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1054;&#1089;&#1074;&#1086;&#1073;&#1086;&#1076;&#1080;&#1090;&#1100; &#1092;&#1072;&#1081;&#1083; &#1086;&#1090; &#1087;&#1088;&#1086;&#1094;&#1077;&#1089;&#1089;&#1072; - &#1082;&#1072;&#1082; &#1091;&#1089;&#1086;&#1074;&#1077;&#1088;&#1096;&#1077;&#1085;&#1089;&#1090;&#1074;&#1086;&#1074;&#1072;&#1090;&#1100; &#1101;&#1090;&#1086;&#1090; &#1082;&#1086;&#1076;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1072;&#1082; &#1088;&#1077;&#1072;&#1083;&#1080;&#1079;&#1086;&#1074;&#1072;&#1090;&#1100; &#1090;&#1077;&#1082;&#1089;&#1090;&#1073;&#1086;&#1082;&#1089;, &#1079;&#1072;&#1074;&#1080;&#1089;&#1103;&#1097;&#1080;&#1081; &#1086;&#1090; &#1080;&#1079;&#1084;&#1077;&#1085;&#1103;&#1102;&#1097;&#1077;&#1081;&#1089;&#1103; &#1087;&#1077;&#1088;&#1077;&#1084;&#1077;&#1085;&#1085;&#1086;&#1081;&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,65 +69,79 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Освободить файл от процесса - как усовершенствовать этот код?"</h1>
-<h2>Answer 1225636</h2>
-<p><a href="https://ru.stackoverflow.com/a/1225636/">Link</a></p>
+<h1>Ответ на "Как реализовать текстбокс, зависящий от изменяющейся переменной"</h1>
+<h2>Answer 1236949</h2>
+<p><a href="https://ru.stackoverflow.com/a/1236949/">Link</a></p>
 <blockquote>
-<p>Не глядя натравливать TerminateProcess на любой процесс, который держит файл, весьма сомнительная идея. Помимо обычного приложения, файл может быть открыт системной службой. Например, если файл лежит в общей сетевой папке и открыт с другого компьютера, ваш код прибьет службу общих файлов. Собственно, Restart Manager для того и создан, чтобы корректно обрабатывать подобные ситуации. Вместо TerminateProcess используйте RmShutdown и RmRestart:</p>
-<pre><code>void FreeProcess(const WCHAR* file)
+<p>Основная сложность тут не в том, чтобы запустить вашу функцию в отдельном потоке, а в том, как реализовать взаимодействие фонового потока с UI, учитывая что Winforms - однопоточный фреймворк. Для этого можно использовать BeginInvoke, но на этом проблемы не заканчиваются, так как BeginInvoke нельзя вызывать после закрытия окна. Попытка просто проверить свойство IsDisposed наталкивается на состояние гонки, ведь окно может быть закрыто одновременно с проверкой. Итоговый код с учетом этого будет выглядеть так (я слегка упростил функцию Convert_string_to_String):</p>
+<pre class="lang-cpp prettyprint-override"><code>public ref class MyForm : public System::Windows::Forms::Form
 {
-    DWORD hSess = 0;
-    WCHAR key[50] = L&quot;MySession&quot;;
-    DWORD res;
+    public:
 
-    res = RmStartSession(&amp;hSess, 0, key);
+    System::Threading::Thread^ thread;
+    bool exit;
+    System::Object^ sync;
 
-    if (res != 0)
+    MyForm(void)
     {
-        // Cannot start session
-        return;
+        InitializeComponent();
+        thread=nullptr;
+        exit=false;
+        sync = gcnew System::Object();
+    }
+    
+    std::string COMMaster(){
+        //...
+    }
+    
+    String^ Convert_string_to_String(std::string&amp; os) {
+        return gcnew System::String(os.c_str());    
     }
 
-    LPCWSTR filenames[] = { file };
-    res = RmRegisterResources(hSess, 1, filenames, 0, NULL, 0, NULL);
+    void SetTexbox(System::String^ val){        
+        textBox1-&gt;Text=val; //установка значения TextBox
+    }   
 
-    if (res != 0)
-    {
-        // Cannot register resource
-        RmEndSession(hSess);
-        return;
+    void ThreadProc(){
+        auto deleg=gcnew System::Action&lt;System::String^&gt;(this,&amp;MyForm::SetTexbox);
+
+        while(1){
+            //читаем строку
+            auto str=COMMaster();
+            System::String^ str_converted=Convert_string_to_String(str);
+
+            System::Threading::Monitor::Enter(sync);
+            try{
+                if(exit)break; //поток остановлен
+                this-&gt;BeginInvoke(deleg,str_converted); //устанавливаем значения TextBox
+            }
+            finally{
+                System::Threading::Monitor::Exit(sync);
+            }
+        }
     }
-
-    UINT procInfoNeeded;
-    UINT procInfo = 10;
-    DWORD rebootReasons;
-    RM_PROCESS_INFO info[10];
-    res = RmGetList(hSess, &amp;procInfoNeeded, &amp;procInfo, info, &amp;rebootReasons);
-
-    if (res != 0)
-    {
-        // Cannot get list of processes
-        RmEndSession(hSess);
-        return;
+        
+    System::Void button1_Click(System::Object^  sender, System::EventArgs^  e) {
+        if(thread!=nullptr)return;
+        
+        //запускаем поток
+        auto x=gcnew System::Threading::ThreadStart(this,&amp;MyForm::ThreadProc);
+        thread = gcnew System::Threading::Thread(x);
+        thread-&gt;Start();
     }
-
-    for (int i = 0; i &lt; procInfo; i++)
-        wprintf(L&quot;%u: %s\n&quot;, info[i].Process.dwProcessId, info[i].strAppName);
-
-    res=RmShutdown(hSess, RmForceShutdown, NULL); //останавливаем процесс
-
-    if (res != 0)
-    {
-        fputws(L&quot;RmShutdown failed&quot;,stdout);
-        RmEndSession(hSess);
-        return;
+     
+    System::Void MyForm_FormClosed(System::Object^  sender, System::Windows::Forms::FormClosedEventArgs^  e) {
+         
+         //при закрытии формы останавливаем поток
+         System::Threading::Monitor::Enter(sync);
+         try{
+             exit=true;
+         }
+         finally{
+             System::Threading::Monitor::Exit(sync);
+         }
+                
     }
-
-    //выполняем необходимые операции с файлом...
-
-    RmRestart(hSess, 0, NULL); //перезапускаем процесс, если это поддерживается
-
-    RmEndSession(hSess);
 }
 </code></pre>
 </blockquote>

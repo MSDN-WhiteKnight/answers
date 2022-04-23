@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1054;&#1089;&#1074;&#1086;&#1073;&#1086;&#1076;&#1080;&#1090;&#1100; &#1092;&#1072;&#1081;&#1083; &#1086;&#1090; &#1087;&#1088;&#1086;&#1094;&#1077;&#1089;&#1089;&#1072; - &#1082;&#1072;&#1082; &#1091;&#1089;&#1086;&#1074;&#1077;&#1088;&#1096;&#1077;&#1085;&#1089;&#1090;&#1074;&#1086;&#1074;&#1072;&#1090;&#1100; &#1101;&#1090;&#1086;&#1090; &#1082;&#1086;&#1076;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1048;&#1079;&#1084;&#1077;&#1085;&#1080;&#1090;&#1100; &#1080; &#1087;&#1088;&#1086;&#1076;&#1086;&#1083;&#1078;&#1080;&#1090;&#1100;&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1054;&#1089;&#1074;&#1086;&#1073;&#1086;&#1076;&#1080;&#1090;&#1100; &#1092;&#1072;&#1081;&#1083; &#1086;&#1090; &#1087;&#1088;&#1086;&#1094;&#1077;&#1089;&#1089;&#1072; - &#1082;&#1072;&#1082; &#1091;&#1089;&#1086;&#1074;&#1077;&#1088;&#1096;&#1077;&#1085;&#1089;&#1090;&#1074;&#1086;&#1074;&#1072;&#1090;&#1100; &#1101;&#1090;&#1086;&#1090; &#1082;&#1086;&#1076;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1048;&#1079;&#1084;&#1077;&#1085;&#1080;&#1090;&#1100; &#1080; &#1087;&#1088;&#1086;&#1076;&#1086;&#1083;&#1078;&#1080;&#1090;&#1100;&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,67 +69,12 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Освободить файл от процесса - как усовершенствовать этот код?"</h1>
-<h2>Answer 1225636</h2>
-<p><a href="https://ru.stackoverflow.com/a/1225636/">Link</a></p>
+<h1>Ответ на "Изменить и продолжить"</h1>
+<h2>Answer 1304223</h2>
+<p><a href="https://ru.stackoverflow.com/a/1304223/">Link</a></p>
 <blockquote>
-<p>Не глядя натравливать TerminateProcess на любой процесс, который держит файл, весьма сомнительная идея. Помимо обычного приложения, файл может быть открыт системной службой. Например, если файл лежит в общей сетевой папке и открыт с другого компьютера, ваш код прибьет службу общих файлов. Собственно, Restart Manager для того и создан, чтобы корректно обрабатывать подобные ситуации. Вместо TerminateProcess используйте RmShutdown и RmRestart:</p>
-<pre><code>void FreeProcess(const WCHAR* file)
-{
-    DWORD hSess = 0;
-    WCHAR key[50] = L&quot;MySession&quot;;
-    DWORD res;
-
-    res = RmStartSession(&amp;hSess, 0, key);
-
-    if (res != 0)
-    {
-        // Cannot start session
-        return;
-    }
-
-    LPCWSTR filenames[] = { file };
-    res = RmRegisterResources(hSess, 1, filenames, 0, NULL, 0, NULL);
-
-    if (res != 0)
-    {
-        // Cannot register resource
-        RmEndSession(hSess);
-        return;
-    }
-
-    UINT procInfoNeeded;
-    UINT procInfo = 10;
-    DWORD rebootReasons;
-    RM_PROCESS_INFO info[10];
-    res = RmGetList(hSess, &amp;procInfoNeeded, &amp;procInfo, info, &amp;rebootReasons);
-
-    if (res != 0)
-    {
-        // Cannot get list of processes
-        RmEndSession(hSess);
-        return;
-    }
-
-    for (int i = 0; i &lt; procInfo; i++)
-        wprintf(L&quot;%u: %s\n&quot;, info[i].Process.dwProcessId, info[i].strAppName);
-
-    res=RmShutdown(hSess, RmForceShutdown, NULL); //останавливаем процесс
-
-    if (res != 0)
-    {
-        fputws(L&quot;RmShutdown failed&quot;,stdout);
-        RmEndSession(hSess);
-        return;
-    }
-
-    //выполняем необходимые операции с файлом...
-
-    RmRestart(hSess, 0, NULL); //перезапускаем процесс, если это поддерживается
-
-    RmEndSession(hSess);
-}
-</code></pre>
+<p>Ничего особенного для этого делать не нужно, режим <a href="https://docs.microsoft.com/en-us/visualstudio/debugger/edit-and-continue-visual-csharp?view=vs-2019" rel="nofollow noreferrer">Edit and Continue</a> в Visual Studio существует и отлично работает. В версии 2012 и ранее он поддерживался только для 32-разрядных приложений. В современных версиях он работает при любой разрядности, и при любой поддерживаемой целевой платформе (.NET Framework, .NET Core и .NET 5). Реализована эта возможность путем отправки в работающий процесс изменений в метаданных и IL-коде методов, затронутых при редактировании, в особом недокументированном формате - так называемой &quot;дельты&quot;, которая передается через функцию <a href="https://github.com/dotnet/runtime/blob/57bfe474518ab5b7cfe6bf7424a79ce3af9d6657/src/coreclr/vm/encee.cpp#L87" rel="nofollow noreferrer">ApplyEditAndContinue</a> во внутреннем интерфейсе CLR с отладчиком.</p>
+<p>Для того, чтобы воспользоваться этим режимом, нужно только приостановить выполнение программы (кнопкой &quot;Прервать все&quot; или Ctrl + Alt + Break), внести изменения, а затем нажать &quot;Продолжить&quot;. В новых версиях студии можно просто редактировать код в реальном времени - изменения подчеркиваются зеленым, и при следующей остановке и запуске они будут применены. Но поддерживаются не любые изменения - см. <a href="https://docs.microsoft.com/en-us/visualstudio/debugger/supported-code-changes-csharp?view=vs-2019" rel="nofollow noreferrer">Supported code changes</a>. Изменения, которые можно выразить дельтой IL, обычно поддерживаются (например, изменения в коде внутри метода, не затрагивающие блоки исключений), тогда как изменения, затрагивающие методы в целом, например удаление параметров из метода, не поддерживаются. Если вы сделаете неподдерживаемое изменение, продолжить отладку не получится, придется пересобирать проект и запускать отладку заново. Кроме того, Edit and Continue не поддерживается при отладке кода с оптимизацией (по умолчанию она включена в конфигурации Release).</p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

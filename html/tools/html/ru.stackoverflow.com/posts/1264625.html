@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1054;&#1089;&#1074;&#1086;&#1073;&#1086;&#1076;&#1080;&#1090;&#1100; &#1092;&#1072;&#1081;&#1083; &#1086;&#1090; &#1087;&#1088;&#1086;&#1094;&#1077;&#1089;&#1089;&#1072; - &#1082;&#1072;&#1082; &#1091;&#1089;&#1086;&#1074;&#1077;&#1088;&#1096;&#1077;&#1085;&#1089;&#1090;&#1074;&#1086;&#1074;&#1072;&#1090;&#1100; &#1101;&#1090;&#1086;&#1090; &#1082;&#1086;&#1076;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1072;&#1082; &#1089;&#1075;&#1077;&#1085;&#1077;&#1088;&#1080;&#1088;&#1086;&#1074;&#1072;&#1090;&#1100; HTML &#1089;&#1090;&#1088;&#1072;&#1085;&#1080;&#1094;&#1099; &#1076;&#1086;&#1082;&#1091;&#1084;&#1077;&#1085;&#1090;&#1072;&#1094;&#1080;&#1080; &#1087;&#1086; XML &#1082;&#1086;&#1084;&#1084;&#1077;&#1085;&#1090;&#1072;&#1088;&#1080;&#1103;&#1084;?&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1054;&#1089;&#1074;&#1086;&#1073;&#1086;&#1076;&#1080;&#1090;&#1100; &#1092;&#1072;&#1081;&#1083; &#1086;&#1090; &#1087;&#1088;&#1086;&#1094;&#1077;&#1089;&#1089;&#1072; - &#1082;&#1072;&#1082; &#1091;&#1089;&#1086;&#1074;&#1077;&#1088;&#1096;&#1077;&#1085;&#1089;&#1090;&#1074;&#1086;&#1074;&#1072;&#1090;&#1100; &#1101;&#1090;&#1086;&#1090; &#1082;&#1086;&#1076;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1072;&#1082; &#1089;&#1075;&#1077;&#1085;&#1077;&#1088;&#1080;&#1088;&#1086;&#1074;&#1072;&#1090;&#1100; HTML &#1089;&#1090;&#1088;&#1072;&#1085;&#1080;&#1094;&#1099; &#1076;&#1086;&#1082;&#1091;&#1084;&#1077;&#1085;&#1090;&#1072;&#1094;&#1080;&#1080; &#1087;&#1086; XML &#1082;&#1086;&#1084;&#1084;&#1077;&#1085;&#1090;&#1072;&#1088;&#1080;&#1103;&#1084;?&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,66 +69,94 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Освободить файл от процесса - как усовершенствовать этот код?"</h1>
-<h2>Answer 1225636</h2>
-<p><a href="https://ru.stackoverflow.com/a/1225636/">Link</a></p>
+<h1>Ответ на "Как сгенерировать HTML страницы документации по XML комментариям?"</h1>
+<h2>Answer 1264625</h2>
+<p><a href="https://ru.stackoverflow.com/a/1264625/">Link</a></p>
 <blockquote>
-<p>Не глядя натравливать TerminateProcess на любой процесс, который держит файл, весьма сомнительная идея. Помимо обычного приложения, файл может быть открыт системной службой. Например, если файл лежит в общей сетевой папке и открыт с другого компьютера, ваш код прибьет службу общих файлов. Собственно, Restart Manager для того и создан, чтобы корректно обрабатывать подобные ситуации. Вместо TerminateProcess используйте RmShutdown и RmRestart:</p>
-<pre><code>void FreeProcess(const WCHAR* file)
-{
-    DWORD hSess = 0;
-    WCHAR key[50] = L&quot;MySession&quot;;
-    DWORD res;
-
-    res = RmStartSession(&amp;hSess, 0, key);
-
-    if (res != 0)
+<p>Такой мануал для DocFX есть здесь: <a href="https://dotnet.github.io/docfx/tutorial/walkthrough/walkthrough_create_a_docfx_project_2.html" rel="nofollow noreferrer">https://dotnet.github.io/docfx/tutorial/walkthrough/walkthrough_create_a_docfx_project_2.html</a></p>
+<p>Чтобы подключить XML-документацию к сайту DocFX, нужно добавить в источники либо *.csproj проекта (чтобы документация бралась из исходников), либо собранные файлы *.dll (чтобы документация бралась из *.xml файлов, сгенерированных компилятором рядом с DLL). Первый способ обычно лучше, но он требует установленной Visual Studio 2019 на машине, где осуществляется сборка документации, даже если сам проект создан в более старой версии.</p>
+<p>Вот пример docfx.json с использованием XML-документации:</p>
+<pre><code>{
+  &quot;metadata&quot;: [
     {
-        // Cannot start session
-        return;
+      &quot;src&quot;: [
+        {
+          &quot;files&quot;: [&quot;*.dll&quot;],          
+          &quot;src&quot;: &quot;MyLib/bin/Debug/&quot;
+        }
+      ],
+      &quot;dest&quot;: &quot;api&quot;      
     }
-
-    LPCWSTR filenames[] = { file };
-    res = RmRegisterResources(hSess, 1, filenames, 0, NULL, 0, NULL);
-
-    if (res != 0)
-    {
-        // Cannot register resource
-        RmEndSession(hSess);
-        return;
-    }
-
-    UINT procInfoNeeded;
-    UINT procInfo = 10;
-    DWORD rebootReasons;
-    RM_PROCESS_INFO info[10];
-    res = RmGetList(hSess, &amp;procInfoNeeded, &amp;procInfo, info, &amp;rebootReasons);
-
-    if (res != 0)
-    {
-        // Cannot get list of processes
-        RmEndSession(hSess);
-        return;
-    }
-
-    for (int i = 0; i &lt; procInfo; i++)
-        wprintf(L&quot;%u: %s\n&quot;, info[i].Process.dwProcessId, info[i].strAppName);
-
-    res=RmShutdown(hSess, RmForceShutdown, NULL); //останавливаем процесс
-
-    if (res != 0)
-    {
-        fputws(L&quot;RmShutdown failed&quot;,stdout);
-        RmEndSession(hSess);
-        return;
-    }
-
-    //выполняем необходимые операции с файлом...
-
-    RmRestart(hSess, 0, NULL); //перезапускаем процесс, если это поддерживается
-
-    RmEndSession(hSess);
+  ],
+  &quot;build&quot;: {
+    &quot;content&quot;: [
+      {
+        &quot;files&quot;: [
+          &quot;api/**.yml&quot;,
+          &quot;api/index.md&quot;
+        ]
+      },
+      {
+        &quot;files&quot;: [
+          &quot;articles/**.md&quot;,
+          &quot;articles/**/toc.yml&quot;,
+          &quot;toc.yml&quot;,
+          &quot;*.md&quot;
+        ]
+      }
+    ],
+    &quot;resource&quot;: [
+      {
+        &quot;files&quot;: [
+          &quot;images/**&quot;
+        ]
+      }
+    ],
+    &quot;overwrite&quot;: [
+      {
+        &quot;files&quot;: [
+          &quot;apidoc/**.md&quot;
+        ],
+        &quot;exclude&quot;: [
+          &quot;obj/**&quot;,
+          &quot;_site/**&quot;
+        ]
+      }
+    ],
+    &quot;dest&quot;: &quot;docs&quot;,
+    &quot;globalMetadata&quot;: {
+      &quot;_appTitle&quot;: &quot;My Lib&quot;
+    },
+    &quot;globalMetadataFiles&quot;: [],
+    &quot;fileMetadataFiles&quot;: [],
+    &quot;template&quot;: [
+      &quot;default&quot;
+    ],
+    &quot;postProcessors&quot;: [],
+    &quot;markdownEngineName&quot;: &quot;markdig&quot;,
+    &quot;noLangKeyword&quot;: false,
+    &quot;keepFileLink&quot;: false    
+  }
 }
+</code></pre>
+<p>Здесь исходными данными для документации являются файлы XML для всех DLL из каталога <code>MyLib/bin/Debug/</code>, файлы .md из каталога articles и изображения из каталога images. (Несмотря на то, что в json исходными файлами считается DLL, на самом деле информация будет браться из XML-файлов.)</p>
+<p>Для генерации на основе проекта секцию metadata нужно будет поменять так:</p>
+<pre><code>&quot;metadata&quot;: [
+    {
+      &quot;src&quot;: [
+        {
+          &quot;files&quot;: [
+            &quot;MyLib/**.csproj&quot;
+          ],
+          &quot;exclude&quot;: [
+            &quot;**/bin/**&quot;,
+            &quot;**/obj/**&quot;
+          ]
+        }
+      ],
+      &quot;dest&quot;: &quot;api&quot;
+    }
+  ]
 </code></pre>
 </blockquote>
 <hr>

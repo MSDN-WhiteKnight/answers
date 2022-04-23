@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1054;&#1089;&#1074;&#1086;&#1073;&#1086;&#1076;&#1080;&#1090;&#1100; &#1092;&#1072;&#1081;&#1083; &#1086;&#1090; &#1087;&#1088;&#1086;&#1094;&#1077;&#1089;&#1089;&#1072; - &#1082;&#1072;&#1082; &#1091;&#1089;&#1086;&#1074;&#1077;&#1088;&#1096;&#1077;&#1085;&#1089;&#1090;&#1074;&#1086;&#1074;&#1072;&#1090;&#1100; &#1101;&#1090;&#1086;&#1090; &#1082;&#1086;&#1076;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;System.Data.SqlClient.SqlException &#1087;&#1088;&#1080; &#1076;&#1086;&#1073;&#1072;&#1074;&#1083;&#1077;&#1085;&#1080;&#1080; FLOAT &#1079;&#1085;&#1072;&#1095;&#1077;&#1085;&#1080;&#1103; &#1089; &#1076;&#1088;&#1086;&#1073;&#1085;&#1086;&#1081; &#1095;&#1072;&#1089;&#1090;&#1100;&#1102;&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1054;&#1089;&#1074;&#1086;&#1073;&#1086;&#1076;&#1080;&#1090;&#1100; &#1092;&#1072;&#1081;&#1083; &#1086;&#1090; &#1087;&#1088;&#1086;&#1094;&#1077;&#1089;&#1089;&#1072; - &#1082;&#1072;&#1082; &#1091;&#1089;&#1086;&#1074;&#1077;&#1088;&#1096;&#1077;&#1085;&#1089;&#1090;&#1074;&#1086;&#1074;&#1072;&#1090;&#1100; &#1101;&#1090;&#1086;&#1090; &#1082;&#1086;&#1076;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;System.Data.SqlClient.SqlException &#1087;&#1088;&#1080; &#1076;&#1086;&#1073;&#1072;&#1074;&#1083;&#1077;&#1085;&#1080;&#1080; FLOAT &#1079;&#1085;&#1072;&#1095;&#1077;&#1085;&#1080;&#1103; &#1089; &#1076;&#1088;&#1086;&#1073;&#1085;&#1086;&#1081; &#1095;&#1072;&#1089;&#1090;&#1100;&#1102;&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,67 +69,17 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Освободить файл от процесса - как усовершенствовать этот код?"</h1>
-<h2>Answer 1225636</h2>
-<p><a href="https://ru.stackoverflow.com/a/1225636/">Link</a></p>
+<h1>Ответ на "System.Data.SqlClient.SqlException при добавлении FLOAT значения с дробной частью"</h1>
+<h2>Answer 1328622</h2>
+<p><a href="https://ru.stackoverflow.com/a/1328622/">Link</a></p>
 <blockquote>
-<p>Не глядя натравливать TerminateProcess на любой процесс, который держит файл, весьма сомнительная идея. Помимо обычного приложения, файл может быть открыт системной службой. Например, если файл лежит в общей сетевой папке и открыт с другого компьютера, ваш код прибьет службу общих файлов. Собственно, Restart Manager для того и создан, чтобы корректно обрабатывать подобные ситуации. Вместо TerminateProcess используйте RmShutdown и RmRestart:</p>
-<pre><code>void FreeProcess(const WCHAR* file)
-{
-    DWORD hSess = 0;
-    WCHAR key[50] = L&quot;MySession&quot;;
-    DWORD res;
+<p>Это типичная ошибка, вызванная использованием String.Format для вставки переменных в запрос. Код типа <code>$&quot;{a}&quot;</code> скомпилируется в <code>String.Format(&quot;{0}&quot;,a.ToString())</code>. Как правильно догадался Akina, преобразование float в string по умолчанию использует разделитель текущей локализации, поэтому на русской системе, где разделитель - запятая, он выдаст ошибку. Для правильной работы с переменными нужно использовать <a href="https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/configuring-parameters-and-parameter-data-types" rel="nofollow noreferrer">механизм параметров</a>:</p>
+<pre><code>myCommand = new SqlCommand(&quot;INSERT INTO mytable (a,b) VALUES (@a,@b)&quot;, conn);
+myCommand.Parameters.AddWithValue(&quot;a&quot;,a);
+myCommand.Parameters.AddWithValue(&quot;b&quot;,b);
 
-    res = RmStartSession(&amp;hSess, 0, key);
-
-    if (res != 0)
-    {
-        // Cannot start session
-        return;
-    }
-
-    LPCWSTR filenames[] = { file };
-    res = RmRegisterResources(hSess, 1, filenames, 0, NULL, 0, NULL);
-
-    if (res != 0)
-    {
-        // Cannot register resource
-        RmEndSession(hSess);
-        return;
-    }
-
-    UINT procInfoNeeded;
-    UINT procInfo = 10;
-    DWORD rebootReasons;
-    RM_PROCESS_INFO info[10];
-    res = RmGetList(hSess, &amp;procInfoNeeded, &amp;procInfo, info, &amp;rebootReasons);
-
-    if (res != 0)
-    {
-        // Cannot get list of processes
-        RmEndSession(hSess);
-        return;
-    }
-
-    for (int i = 0; i &lt; procInfo; i++)
-        wprintf(L&quot;%u: %s\n&quot;, info[i].Process.dwProcessId, info[i].strAppName);
-
-    res=RmShutdown(hSess, RmForceShutdown, NULL); //останавливаем процесс
-
-    if (res != 0)
-    {
-        fputws(L&quot;RmShutdown failed&quot;,stdout);
-        RmEndSession(hSess);
-        return;
-    }
-
-    //выполняем необходимые операции с файлом...
-
-    RmRestart(hSess, 0, NULL); //перезапускаем процесс, если это поддерживается
-
-    RmEndSession(hSess);
-}
 </code></pre>
+<p>Помимо независимости от локализации, такой подход устраняет излишние операции соединения строк и преобразования чисел в строку на клиенте (ибо на сервере для вставки в базу все равно все должно быть разобрано до чисел).</p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>
