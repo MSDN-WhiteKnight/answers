@@ -304,7 +304,8 @@ namespace StackOverflowAnswers
             }
             else if (args.Length >= 1 && args[0] == "generate")
             {                
-                Archive.Generate("ru.stackoverflow.com", "posts", "Posts");
+                Archive.Generate("ru.stackoverflow.com", "posts", "Posts (RU)");
+                Archive.Generate("stackoverflow.com", "posts", "Posts (EN)");
                 Console.WriteLine("Done");
             }            
             else
