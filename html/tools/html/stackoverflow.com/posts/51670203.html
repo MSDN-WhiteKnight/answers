@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;Connect and Insert data into a MS Access table using C++&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;Connect and Insert data into a MS Access table using C++&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,12 +69,80 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Зачем нужна папка &quot;\\\\.\\ &quot;?"</h1>
-<h2>Answer 811951</h2>
-<p><a href="https://ru.stackoverflow.com/a/811951/">Link</a></p>
+<h1>Ответ на "Connect and Insert data into a MS Access table using C++"</h1>
+<h2>Answer 51670203</h2>
+<p><a href="https://stackoverflow.com/a/51670203/">Link</a></p>
 <blockquote>
-<p>Никакой папки <code>\\\\.\\ </code> не существует. Существует префикс <code>\\.\</code> (при записи в строковых константах в Си-подобных языках обратная косая черта удваивается), который используется для передачи в функцию <em>CreateFile</em> имени устройства вместо имени файла. Например <code>\\.\PhysicalDrive0</code> соответствует диску, <code>\\.\COM1</code> - последовательному порту и т.п.</p>
-<p>Подробнее см. в <a href="https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#win32-device-namespaces" rel="noreferrer">Win32 Device Namespaces</a></p>
+<p>Use <a href="https://learn.microsoft.com/en-us/sql/odbc/microsoft-open-database-connectivity-odbc?view=sql-server-2017" rel="nofollow noreferrer">ODBC</a>. Example of connecting to database and executing INSERT query:</p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;tchar.h&gt;
+#include &lt;Windows.h&gt;
+#include &lt;sqlext.h&gt;
+
+WCHAR szDSN[] = "Driver={Microsoft Access Driver (*.mdb, *.accdb)};DSN='';DBQ=C:\\users.mdb";
+
+int _tmain(int argc, _TCHAR* argv[])
+{    
+
+HENV    hEnv;
+HDBC    hDbc;
+
+/* ODBC API return status */
+RETCODE rc;
+
+int     iConnStrLength2Ptr;
+WCHAR    szConnStrOut[256];
+
+WCHAR* query = L"INSERT INTO [Users] (name,surname) VALUES ('John','Smith');";
+
+HSTMT           hStmt;
+
+/* Allocate an environment handle */
+rc = SQLAllocEnv(&amp;hEnv);
+/* Allocate a connection handle */
+rc = SQLAllocConnect(hEnv, &amp;hDbc);
+
+/* Connect to the database */
+rc = SQLDriverConnect(hDbc, NULL, (WCHAR*)szDSN, 
+    SQL_NTS, (WCHAR*)szConnStrOut, 
+    255, (SQLSMALLINT*)&amp;iConnStrLength2Ptr, SQL_DRIVER_NOPROMPT);
+if (SQL_SUCCEEDED(rc)) 
+{
+
+    wprintf(L"Successfully connected to database. Data source name: \n  %s\n", 
+        szConnStrOut);  
+
+    /* Prepare SQL query */
+    wprintf(L"SQL query:\n  %s\n", query);
+
+    rc = SQLAllocStmt(hDbc,&amp;hStmt);
+    rc = SQLPrepare(hStmt, query, SQL_NTS);   
+
+    /* Excecute the query */
+    rc = SQLExecute(hStmt); 
+    if (SQL_SUCCEEDED(rc)) 
+    {
+        wprintf(L"SQL Success\n");
+    }
+    else{
+        wprintf(L"SQL Failed\n");
+    }
+}
+else
+{
+    wprintf(L"Couldn't connect to %s.\n",szDSN);
+}
+
+/* Disconnect and free up allocated handles */
+SQLDisconnect(hDbc);
+SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+
+getchar();
+return 0;
+}
+</code></pre>
+<p>Source: <a href="https://learn.microsoft.com/en-us/previous-versions/office/developer/office-2007/cc811599(v=office.12)" rel="nofollow noreferrer">https://learn.microsoft.com/en-us/previous-versions/office/developer/office-2007/cc811599(v=office.12)</a></p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

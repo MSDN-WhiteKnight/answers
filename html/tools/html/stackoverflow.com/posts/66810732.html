@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;C++ Database get array of rows from a table using SQL ODBC&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;C++ Database get array of rows from a table using SQL ODBC&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,12 +69,145 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Зачем нужна папка &quot;\\\\.\\ &quot;?"</h1>
-<h2>Answer 811951</h2>
-<p><a href="https://ru.stackoverflow.com/a/811951/">Link</a></p>
+<h1>Ответ на "C++ Database get array of rows from a table using SQL ODBC"</h1>
+<h2>Answer 66810732</h2>
+<p><a href="https://stackoverflow.com/a/66810732/">Link</a></p>
 <blockquote>
-<p>Никакой папки <code>\\\\.\\ </code> не существует. Существует префикс <code>\\.\</code> (при записи в строковых константах в Си-подобных языках обратная косая черта удваивается), который используется для передачи в функцию <em>CreateFile</em> имени устройства вместо имени файла. Например <code>\\.\PhysicalDrive0</code> соответствует диску, <code>\\.\COM1</code> - последовательному порту и т.п.</p>
-<p>Подробнее см. в <a href="https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#win32-device-namespaces" rel="noreferrer">Win32 Device Namespaces</a></p>
+<p>You need to use <a href="https://learn.microsoft.com/en-us/sql/odbc/reference/syntax/sqlgetdata-function?view=sql-server-ver15" rel="nofollow noreferrer">SQLGetData</a>, passing SQL_C_WCHAR type, for example, if your column is text. Here's example how to get values of the single text column and put them to vector:</p>
+<pre><code>#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;Windows.h&gt;
+#include &lt;sqlext.h&gt;
+
+WCHAR szDSN[] = L&quot;Driver={Microsoft Access Driver (*.mdb, *.accdb)};DSN='';DBQ=C:\\Test\\users.accdb&quot;;
+
+void DisplayError(SQLSMALLINT t, SQLHSTMT h) {
+    SQLWCHAR       SqlState[6], Msg[SQL_MAX_MESSAGE_LENGTH];
+    SQLINTEGER    NativeError;
+    SQLSMALLINT   i, MsgLen;
+    SQLRETURN     rc;
+
+    SQLLEN numRecs = 0;
+    SQLGetDiagField(t, h, 0, SQL_DIAG_NUMBER, &amp;numRecs, 0, 0);
+
+    // Get the status records.
+    i = 1;
+    while (i &lt;= numRecs &amp;&amp; (rc = SQLGetDiagRec(t, h, i, SqlState, &amp;NativeError,
+        Msg, sizeof(Msg), &amp;MsgLen)) != SQL_NO_DATA) {
+        wprintf(L&quot;Error %d: %s\n&quot;, NativeError, Msg);
+        i++;
+    }
+
+}
+
+std::vector&lt;std::wstring&gt; ExecuteSql(const WCHAR* sql) {
+
+    std::vector&lt;std::wstring&gt; results = {};
+    HENV    hEnv = NULL;
+    HDBC    hDbc = NULL;
+    HSTMT hStmt = NULL;
+    int iConnStrLength2Ptr;
+    WCHAR szConnStrOut[256];
+    SQLINTEGER rowCount = 0;
+    SQLSMALLINT fieldCount = 0;
+    SQLWCHAR buf[128];
+    SQLINTEGER ret;
+
+    /* ODBC API return status */
+    RETCODE rc;
+
+    /* Allocate an environment handle */
+    rc = SQLAllocEnv(&amp;hEnv);
+    /* Allocate a connection handle */
+    rc = SQLAllocConnect(hEnv, &amp;hDbc);
+
+    /* Connect to the database */
+    rc = SQLDriverConnect(hDbc, NULL, (WCHAR*)szDSN,
+        SQL_NTS, (WCHAR*)szConnStrOut,
+        255, (SQLSMALLINT*)&amp;iConnStrLength2Ptr, SQL_DRIVER_NOPROMPT);
+
+    if (SQL_SUCCEEDED(rc))
+    {
+        /* Prepare SQL query */
+        rc = SQLAllocStmt(hDbc, &amp;hStmt);
+        rc = SQLPrepare(hStmt, (SQLWCHAR*)sql, SQL_NTS);
+
+        /* Excecute the query */
+        rc = SQLExecute(hStmt);
+        if (SQL_SUCCEEDED(rc))
+        {
+            SQLNumResultCols(hStmt, &amp;fieldCount);
+
+            if (fieldCount &gt; 0)
+            {
+                /* Loop through the rows in the result set */
+
+                rc = SQLFetch(hStmt);
+
+                while (SQL_SUCCEEDED(rc))
+                {                   
+                    //get data
+                    rc = SQLGetData(hStmt, 1, SQL_C_WCHAR, buf, sizeof(buf), &amp;ret);
+                    
+                    if (SQL_SUCCEEDED(rc) == FALSE) {
+                        wprintf(L&quot;SQLGetData failed\n&quot;);
+                        continue;
+                    }
+
+                    //convert data to string
+                    std::wstring str;
+                    if (ret &lt;= 0) {
+                        str = std::wstring(L&quot;(null&quot;);
+                    }
+                    else {
+                        str = std::wstring(buf);
+                    }
+                    
+                    results.push_back(str);
+                    rc = SQLFetch(hStmt);
+                    rowCount++;
+                };
+
+                rc = SQLFreeStmt(hStmt, SQL_DROP);
+
+            }
+            else
+            {
+                wprintf(L&quot;Error: Number of fields in the result set is 0.\n&quot;);
+            }
+
+        }
+        else {
+            wprintf(L&quot;SQL Failed\n&quot;);
+            DisplayError(SQL_HANDLE_STMT, hStmt);
+        }
+    }
+    else
+    {
+        wprintf(L&quot;Couldn't connect to %s\n&quot;, szDSN);
+        DisplayError(SQL_HANDLE_DBC, hDbc);
+    }
+
+    /* Disconnect and free up allocated handles */
+    SQLDisconnect(hDbc);
+    SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+    SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+    return results;
+}
+
+int main()
+{
+    auto results = ExecuteSql(L&quot;SELECT name FROM Users&quot;);
+
+    for (auto x : results) {
+        std::wcout &lt;&lt; x &lt;&lt; std::endl;
+    }
+
+    getchar();
+    return 0;
+}
+</code></pre>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

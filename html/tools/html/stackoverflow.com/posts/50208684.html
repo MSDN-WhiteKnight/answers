@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1072;&#1082; &#1085;&#1072;&#1087;&#1077;&#1095;&#1072;&#1090;&#1072;&#1090;&#1100; &#1089;&#1090;&#1077;&#1082; &#1074;&#1099;&#1079;&#1086;&#1074;&#1086;&#1074; &#1074; &#1086;&#1073;&#1088;&#1072;&#1073;&#1086;&#1090;&#1095;&#1080;&#1082;&#1077; &#1080;&#1089;&#1082;&#1083;&#1102;&#1095;&#1077;&#1085;&#1080;&#1103;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;How can you use CaptureStackBackTrace to capture the exception stack, not the calling stack?&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1050;&#1072;&#1082; &#1085;&#1072;&#1087;&#1077;&#1095;&#1072;&#1090;&#1072;&#1090;&#1100; &#1089;&#1090;&#1077;&#1082; &#1074;&#1099;&#1079;&#1086;&#1074;&#1086;&#1074; &#1074; &#1086;&#1073;&#1088;&#1072;&#1073;&#1086;&#1090;&#1095;&#1080;&#1082;&#1077; &#1080;&#1089;&#1082;&#1083;&#1102;&#1095;&#1077;&#1085;&#1080;&#1103;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;How can you use CaptureStackBackTrace to capture the exception stack, not the calling stack?&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,43 +69,52 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Как напечатать стек вызовов в обработчике исключения?"</h1>
-<h2>Answer 809888</h2>
-<p><a href="https://ru.stackoverflow.com/a/809888/">Link</a></p>
+<h1>Ответ на "How can you use CaptureStackBackTrace to capture the exception stack, not the calling stack?"</h1>
+<h2>Answer 50208684</h2>
+<p><a href="https://stackoverflow.com/a/50208684/">Link</a></p>
 <blockquote>
-<p>Стек вызовов проще всего вывести из SEH-фильтра, передавая в функцию <em>StackWalk64</em> указатель на контекст, возвращенный <em>GetExceptionInformation</em>. Как-то так:</p>
+<p>On Windows, unhandled C++ exception automatically generates SEH exception. SEH <em>__except</em> block allows to attach a filter that accepts <em>_EXCEPTION_POINTERS</em> structure as a parameter, which contains the pointer to the processor's context record in the moment exception was thrown. Passing this pointer to <em>StackWalk64</em> function gives the stack trace in the moment of exception. So, this problem can be solved by using SEH-style exception handling instead of C++ style.</p>
+<p>Example code:</p>
 <pre><code>#include &lt;stdlib.h&gt;
 #include &lt;locale.h&gt;
 #include &lt;stdio.h&gt;
+#include &lt;tchar.h&gt;
+
+#include &lt;process.h&gt;
+#include &lt;iostream&gt;
 #include &lt;Windows.h&gt;
-#include &quot;DbgHelp.h&quot;
-#pragma comment(lib, &quot;Dbghelp.lib&quot;)
+#include &quot;dbghelp.h&quot;
+
+using namespace std;
 
 const int MaxNameLen = 256;
+    
+#pragma comment(lib,&quot;Dbghelp.lib&quot;)
 
-//выводит стек вызовов, соответствующий указанному контексту
-void printStack( CONTEXT* ctx )
+void printStack( CONTEXT* ctx ) //Prints stack trace based on context record
 {
     BOOL    result;
     HANDLE  process;
     HANDLE  thread;
     HMODULE hModule;
-            
+
     STACKFRAME64        stack;
     ULONG               frame;    
     DWORD64             displacement;
 
+    DWORD disp;
+    IMAGEHLP_LINE64 *line;
+
     char buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
-    char name[ MaxNameLen ];
+    char name[MaxNameLen];
     char module[MaxNameLen];
     PSYMBOL_INFO pSymbol = (PSYMBOL_INFO)buffer;
 
-    // StackWalk64 модифицирует контекст в 64-битных приложениях,
-    // что может привести к падению. Для предотвращения этого  
-    // создадим копию контекста.
+    // On x64, StackWalk64 modifies the context record, that could
+    // cause crashes, so we create a copy to prevent it
     CONTEXT ctxCopy;
     memcpy(&amp;ctxCopy, ctx, sizeof(CONTEXT));
-    
+
     memset( &amp;stack, 0, sizeof( STACKFRAME64 ) );
 
     process                = GetCurrentProcess();
@@ -120,11 +129,11 @@ void printStack( CONTEXT* ctx )
     stack.AddrFrame.Mode   = AddrModeFlat;
 #endif
 
-    SymInitialize( process, NULL, TRUE ); //загружаем символы
+    SymInitialize( process, NULL, TRUE ); //load symbols
 
     for( frame = 0; ; frame++ )
     {
-        //получаем следующий вызов из стека
+        //get next call from stack
         result = StackWalk64
         (
 #if defined(_M_AMD64)
@@ -145,64 +154,134 @@ void printStack( CONTEXT* ctx )
 
         if( !result ) break;        
 
-        //полчаем имя символа для адреса
+        //get symbol name for address
         pSymbol-&gt;SizeOfStruct = sizeof(SYMBOL_INFO);
         pSymbol-&gt;MaxNameLen = MAX_SYM_NAME;
         SymFromAddr(process, ( ULONG64 )stack.AddrPC.Offset, &amp;displacement, pSymbol);
-                
-        hModule = NULL;
-        lstrcpyA(module,&quot;&quot;);        
-        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, 
-            (LPCTSTR)(stack.AddrPC.Offset), &amp;hModule);
 
-        //получаем имя модуля
-        if(hModule != NULL)GetModuleFileNameA(hModule,module,MaxNameLen);       
+        line = (IMAGEHLP_LINE64 *)malloc(sizeof(IMAGEHLP_LINE64));
+        line-&gt;SizeOfStruct = sizeof(IMAGEHLP_LINE64);       
 
-        printf (&quot;%lu: %s  (in %s)\n&quot;,frame,pSymbol-&gt;Name,module);       
-                
+        //try to get line
+        if (SymGetLineFromAddr64(process, stack.AddrPC.Offset, &amp;disp, line))
+        {
+            printf(&quot;\tat %s in %s: line: %lu: address: 0x%0X\n&quot;, pSymbol-&gt;Name, line-&gt;FileName, line-&gt;LineNumber, pSymbol-&gt;Address);
+        }
+        else
+        { 
+            //failed to get line
+            printf(&quot;\tat %s, address 0x%0X.\n&quot;, pSymbol-&gt;Name, pSymbol-&gt;Address);
+            hModule = NULL;
+            lstrcpyA(module,&quot;&quot;);        
+            GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, 
+                (LPCTSTR)(stack.AddrPC.Offset), &amp;hModule);
+
+            //at least print module name
+            if(hModule != NULL)GetModuleFileNameA(hModule,module,MaxNameLen);       
+
+            printf (&quot;in %s\n&quot;,module);
+        }       
+
+        free(line);
+        line = NULL;
     }
 }
 
+//******************************************************************************
 
-
-void BuggedFunction()
+void function2()
 {
-    int * p = NULL;
-    *p = 5;
+    int a = 0;
+    int b = 0;
+    throw exception();
 }
 
-void bar()
+void function1()
 {
-    BuggedFunction();
+    int a = 0;
+    function2();
 }
 
-void foo()
-{    
-     bar();    
+void function0()
+{
+    function1();
 }
 
 int seh_filter(_EXCEPTION_POINTERS* ex)
 {
-    printf(&quot;Exception 0x%x occured\n&quot;,ex-&gt;ExceptionRecord-&gt;ExceptionCode);  
+    printf(&quot;*** Exception 0x%x occured ***\n\n&quot;,ex-&gt;ExceptionRecord-&gt;ExceptionCode);    
     printStack(ex-&gt;ContextRecord);
-    
+
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
-int main(void)
-{
-    setlocale(LC_ALL,&quot;Russian&quot;);
-    
+static void threadFunction(void *param)
+{    
+
     __try
     {
-        foo();
+         function0();
     }
     __except(seh_filter(GetExceptionInformation()))
     {       
         printf(&quot;Exception \n&quot;);         
     }
-    getchar();
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{   
+    _beginthread(threadFunction, 0, NULL);
+    printf(&quot;Press any key to exit.\n&quot;);
+    cin.get();
     return 0;
+}
+</code></pre>
+<p>Example output (first two entries are noise, but the rest correctly reflects functions that caused exception):</p>
+<pre class="lang-none prettyprint-override"><code>*** Exception 0xe06d7363 occured ***
+
+        at RaiseException, address 0xFD3F9E20.
+in C:\Windows\system32\KERNELBASE.dll
+        at CxxThrowException, address 0xDBB5A520.
+in C:\Windows\system32\MSVCR110D.dll
+        at function2 in c:\work\projects\test\test.cpp: line: 146: address: 0x3F9C6C00
+        at function1 in c:\work\projects\test\test.cpp: line: 153: address: 0x3F9C6CB0
+        at function0 in c:\work\projects\test\test.cpp: line: 158: address: 0x3F9C6CE0
+        at threadFunction in c:\work\projects\test\test.cpp: line: 174: address: 0x3F9C6D70
+        at beginthread, address 0xDBA66C60.
+in C:\Windows\system32\MSVCR110D.dll
+        at endthread, address 0xDBA66E90.
+in C:\Windows\system32\MSVCR110D.dll
+        at BaseThreadInitThunk, address 0x773C6520.
+in C:\Windows\system32\kernel32.dll
+        at RtlUserThreadStart, address 0x775FC520.
+in C:\Windows\SYSTEM32\ntdll.dll
+</code></pre>
+<hr>
+<p>Another option is to create custom exception class that captures context in constructor and use it (or derived classes) to throw exceptions:</p>
+<pre><code>class MyException{
+public:
+    CONTEXT Context;
+
+    MyException(){
+        RtlCaptureContext(&amp;Context);        
+    }
+};
+    
+void function2()
+{    
+    throw MyException();    
+}
+
+//...   
+
+try
+{
+     function0();
+}
+catch (MyException&amp; e)
+{       
+    printf(&quot;Exception \n&quot;);     
+    printStack(&amp;e.Context);                 
 }
 </code></pre>
 </blockquote>

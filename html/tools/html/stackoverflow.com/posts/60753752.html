@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;Inspect Types via MetadataLoadContext fails due to missing assembly (.NET core)&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;Inspect Types via MetadataLoadContext fails due to missing assembly (.NET core)&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,12 +69,63 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Зачем нужна папка &quot;\\\\.\\ &quot;?"</h1>
-<h2>Answer 811951</h2>
-<p><a href="https://ru.stackoverflow.com/a/811951/">Link</a></p>
+<h1>Ответ на "Inspect Types via MetadataLoadContext fails due to missing assembly (.NET core)"</h1>
+<h2>Answer 60753752</h2>
+<p><a href="https://stackoverflow.com/a/60753752/">Link</a></p>
 <blockquote>
-<p>Никакой папки <code>\\\\.\\ </code> не существует. Существует префикс <code>\\.\</code> (при записи в строковых константах в Си-подобных языках обратная косая черта удваивается), который используется для передачи в функцию <em>CreateFile</em> имени устройства вместо имени файла. Например <code>\\.\PhysicalDrive0</code> соответствует диску, <code>\\.\COM1</code> - последовательному порту и т.п.</p>
-<p>Подробнее см. в <a href="https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#win32-device-namespaces" rel="noreferrer">Win32 Device Namespaces</a></p>
+<p>The existing answer didn't worked for me (.NET Core 2.1). It fails with error that System.Runtime is not found. If i hardcode full path to System.Runtime, it fails for other assemblies, like System.Private.CoreLib. Also checking types via IsAssignableFrom seems not working when one type isn't from MetadataLoadContext. </p>
+<p>The possible solution for assembly load errors is to include all BCL assemblies (all .dll files in directory returned by <a href="https://learn.microsoft.com/dotnet/api/system.runtime.interopservices.runtimeenvironment.getruntimedirectory" rel="nofollow noreferrer">RuntimeEnvironment.GetRuntimeDirectory</a>). This feels somewhat dumb, because not all of them are actually managed assemblies, but it seems to work. Here's complete example of searching types that implement interface via MetadataLoadContext:</p>
+<pre><code>using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.InteropServices;
+
+namespace MetadataLoadContextSample
+{
+    class Program
+    {
+        static int Main(string[] args)
+        {
+            string inputFile = @"Plugin.dll";
+
+            string[] runtimeAssemblies = Directory.GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll");                        
+            var paths = new List&lt;string&gt;(runtimeAssemblies);
+            paths.Add(inputFile);            
+            var resolver = new PathAssemblyResolver(paths);
+            var context = new MetadataLoadContext(resolver);
+
+            using (context)
+            {                
+                Assembly assembly = context.LoadFromAssemblyPath(inputFile);
+                AssemblyName name = assembly.GetName();
+
+                foreach (TypeInfo t in assembly.GetTypes())
+                {
+                    try
+                    {
+                        if (t.IsClass &amp;&amp; t.GetInterface("IPlugin") != null)
+                        {
+                            Console.WriteLine(t.Name);
+                        }
+                    }
+                    catch (FileNotFoundException ex)
+                    {                        
+                        Console.WriteLine("FileNotFoundException: " + ex.Message);
+                    }
+                    catch (TypeLoadException ex)
+                    {
+                        Console.WriteLine("TypeLoadException: " + ex.Message);
+                    }
+                }
+            }
+
+            Console.ReadLine();
+            return 0;
+        }
+    }
+}
+</code></pre>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

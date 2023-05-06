@@ -73,7 +73,7 @@
 <h2>Answer 924970</h2>
 <p><a href="https://ru.stackoverflow.com/a/924970/">Link</a></p>
 <blockquote>
-<p>Если отключить в студии режим "Только мой код" в настройках отладчика, можно получить стек, вызывающий данное исключение:</p>
+<p>Если отключить в студии режим &quot;Только мой код&quot; в настройках отладчика, можно получить стек, вызывающий данное исключение:</p>
 <pre><code> PresentationCore.dll!System.Windows.Media.MediaPlayerState.OpenMedia(System.Uri source) + 0x10d bytes  
  PresentationCore.dll!System.Windows.Media.MediaPlayerState.SetSource(System.Uri source) + 0x27 bytes   
  PresentationCore.dll!System.Windows.Media.MediaPlayerState.Open(System.Uri source) + 0x27 bytes    
@@ -87,25 +87,25 @@
  WindowsBase.dll!System.Windows.DependencyObject.SetValue(System.Windows.DependencyProperty dp, object value) + 0x52 bytes  
  WpfApplication1.exe!WpfApplication1.MainWindow.Button_Click_1(object sender, System.Windows.RoutedEventArgs e) Line 31 + 0x42 bytes
 </code></pre>
-<p>Далее, глядя в код метода <a href="https://referencesource.microsoft.com/#PresentationCore/Core/CSharp/System/Windows/Media/MediaPlayerState.cs,0e552532a1915f24" rel="nofollow noreferrer">OpenMedia</a>, видим, что в случае, когда передаваемый URI имеет схему https, .NET пытается получить URI публикации для текущего приложения и далее, если этот URI не https, проделать некие телодвижения с целью проверки "безопасно ли сделать это в данном контексте". Но проблема в том, что URI публикации определен только в двух случаях: для браузерного WPF и для приложений ClickOnce. В остальных случаях этот URI будет иметь значение null, и, так как это не проверяется, имеем NRE.</p>
+<p>Далее, глядя в код метода <a href="https://referencesource.microsoft.com/#PresentationCore/Core/CSharp/System/Windows/Media/MediaPlayerState.cs,0e552532a1915f24" rel="nofollow noreferrer">OpenMedia</a>, видим, что в случае, когда передаваемый URI имеет схему https, .NET пытается получить URI публикации для текущего приложения и далее, если этот URI не https, проделать некие телодвижения с целью проверки &quot;безопасно ли сделать это в данном контексте&quot;. Но проблема в том, что URI публикации определен только в двух случаях: для браузерного WPF и для приложений ClickOnce. В остальных случаях этот URI будет иметь значение null, и, так как это не проверяется, имеем NRE.</p>
 <p>Иными словами, как правильно заметил в комментариях demonplus, это обыкновенный баг в WPF. Как его обойти? Ну, самое простое, это перейти с MediaElement на что-то другое, например на <a href="https://docs.microsoft.com/en-us/dotnet/framework/wpf/advanced/walkthrough-hosting-an-activex-control-in-wpf" rel="nofollow noreferrer">ActiveX-элемент Windows Media Player</a>, который обладает тем же функционалом, но избавлен от этой проблемы. Не то, чтобы MediaElement из WPF обладал какими-то особыми преимуществами. Однако, если вам действительно нужен MediaElement, можете воспользоваться следующим грязным хаком для принудительной установки URI публикации:</p>
 <pre><code>Assembly assPresentationCore = typeof(UIElement).Assembly; //PresentationCore.dll
 Assembly assWindowsBase = typeof(System.Windows.Vector).Assembly; //WindowsBase.dll
 
 //найдем информацию о типах
-Type typeContainer = assPresentationCore.GetType("MS.Internal.AppModel.SiteOfOriginContainer");
-Type typeDS = assWindowsBase.GetType("MS.Internal.SecurityCriticalDataForSet`1").MakeGenericType(typeof(Uri));
+Type typeContainer = assPresentationCore.GetType(&quot;MS.Internal.AppModel.SiteOfOriginContainer&quot;);
+Type typeDS = assWindowsBase.GetType(&quot;MS.Internal.SecurityCriticalDataForSet`1&quot;).MakeGenericType(typeof(Uri));
 Type typeNullable = typeof(Nullable&lt;int&gt;).GetGenericTypeDefinition().MakeGenericType(typeDS);
 
 //найдем информацию о необходимом закрытом поле
-FieldInfo field = typeContainer.GetField("_siteOfOriginForClickOnceApp",
+FieldInfo field = typeContainer.GetField(&quot;_siteOfOriginForClickOnceApp&quot;,
     BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static 
     );
 
 //создадим объект Nullable&lt;MS.Internal.SecurityCriticalDataForSet&lt;Uri&gt;&gt;
 object objDS = Activator.CreateInstance(typeDS,
     BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null,
-    new object[] { new Uri("http://localhost/") },
+    new object[] { new Uri(&quot;http://localhost/&quot;) },
     System.Globalization.CultureInfo.InvariantCulture
     );
 object objNullable = Activator.CreateInstance(typeNullable, objDS);
@@ -113,6 +113,7 @@ object objNullable = Activator.CreateInstance(typeNullable, objDS);
 //установим значение поля
 field.SetValue(null, objNullable);
 </code></pre>
+<p><strong>Обновление:</strong> Данная ошибка была исправлена в WPF для .NET Core 3.1. Метод <a href="https://github.com/dotnet/wpf/blob/release/3.1/src/Microsoft.DotNet.Wpf/src/PresentationCore/System/Windows/Media/MediaPlayerState.cs#L840" rel="nofollow noreferrer">OpenMedia</a> больше не обращается к SecurityHelper.ExtractUriForClickOnceDeployedApp, и MediaElement теперь работает с https://</p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1057;&#1086;&#1079;&#1076;&#1072;&#1085;&#1080;&#1077; &#1082;&#1086;&#1085;&#1089;&#1090;&#1088;&#1091;&#1082;&#1094;&#1080;&#1080; try catch &#1089; &#1087;&#1086;&#1084;&#1086;&#1097;&#1100;&#1102; dnlib&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1057;&#1086;&#1079;&#1076;&#1072;&#1085;&#1080;&#1077; &#1082;&#1086;&#1085;&#1089;&#1090;&#1088;&#1091;&#1082;&#1094;&#1080;&#1080; try catch &#1089; &#1087;&#1086;&#1084;&#1086;&#1097;&#1100;&#1102; dnlib&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,12 +69,45 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Зачем нужна папка &quot;\\\\.\\ &quot;?"</h1>
-<h2>Answer 811951</h2>
-<p><a href="https://ru.stackoverflow.com/a/811951/">Link</a></p>
+<h1>Ответ на "Создание конструкции try catch с помощью dnlib"</h1>
+<h2>Answer 1517973</h2>
+<p><a href="https://ru.stackoverflow.com/a/1517973/">Link</a></p>
 <blockquote>
-<p>Никакой папки <code>\\\\.\\ </code> не существует. Существует префикс <code>\\.\</code> (при записи в строковых константах в Си-подобных языках обратная косая черта удваивается), который используется для передачи в функцию <em>CreateFile</em> имени устройства вместо имени файла. Например <code>\\.\PhysicalDrive0</code> соответствует диску, <code>\\.\COM1</code> - последовательному порту и т.п.</p>
-<p>Подробнее см. в <a href="https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#win32-device-namespaces" rel="noreferrer">Win32 Device Namespaces</a></p>
+<p>Операндом calli является сигнатура функции, поэтому использовать <code>new Instruction(OpCodes.Calli, null)</code> нельзя. Я заменил calli на nop, попробовал прогнать вашу программу через минимальное консольное приложение (&quot;Hello, world&quot;), и вот что выяснил. Вы добавляете блок catch, но не задаете тип исключений, который надо обрабатывать. Проще всего задать тип Object, чтобы ловить все исключения:</p>
+<pre><code>ExceptionHandler item2 = new ExceptionHandler(ExceptionHandlerType.Catch)
+{
+    HandlerStart = method.Body.Instructions[1],
+    HandlerEnd = method.Body.Instructions[method.Body.Instructions.Count - 1],
+    TryEnd = method.Body.Instructions[1],
+    TryStart = method.Body.Instructions[0],
+    CatchType = module.CorLibTypes.Object.TypeRef
+};
+</code></pre>
+<p>Если сделать это изменение, попробовать еще раз и прогнать полученную сборку через <a href="https://learn.microsoft.com/en-us/dotnet/framework/tools/peverify-exe-peverify-tool" rel="nofollow noreferrer">PEVerify</a>, получаем указание на следующую проблему:</p>
+<blockquote>
+<p>[IL]: Ошибка: [D:...\prog.exe___protected.exe : Prog.Program::Main][смещение
+0x0000000C] передача управления в конец блока исключения<br>
+Ошибок при проверке: 1 prog.exe___protected.exe</p>
+</blockquote>
+<p>В конце блока обработки исключения должна всегда быть инструкция выхода наружу. То есть чтобы IL был корректен, он должен выглядеть так:</p>
+<pre><code>.method public hidebysig static void Main() cil managed
+{
+ .maxstack  1
+
+ .try
+ {
+           // Содержимое try        
+           leave.s      IL_0001
+ }
+ catch [mscorlib]System.Exception
+ {
+           // Содержимое catch  
+           leave.s      IL_0001
+ }
+ IL_0001: ret          
+}
+</code></pre>
+<p>Это в самом простом случае, когда метод не имеет возвращаемого значения. Если метод возвращает значение, перед ret еще должна быть инструкция, загружающие это значение на стек. Подробнее об инструкциях и как они работают можно узнать в спецификации <a href="https://www.ecma-international.org/publications-and-standards/standards/ecma-335/" rel="nofollow noreferrer">ECMA-335</a>, третий раздел.</p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;Retrieving a descriptive value for WMI Win32_Processor.Family property instead of an index&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;Retrieving a descriptive value for WMI Win32_Processor.Family property instead of an index&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,12 +69,18 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Зачем нужна папка &quot;\\\\.\\ &quot;?"</h1>
-<h2>Answer 811951</h2>
-<p><a href="https://ru.stackoverflow.com/a/811951/">Link</a></p>
+<h1>Ответ на "Retrieving a descriptive value for WMI Win32_Processor.Family property instead of an index"</h1>
+<h2>Answer 48120257</h2>
+<p><a href="https://stackoverflow.com/a/48120257/">Link</a></p>
 <blockquote>
-<p>Никакой папки <code>\\\\.\\ </code> не существует. Существует префикс <code>\\.\</code> (при записи в строковых константах в Си-подобных языках обратная косая черта удваивается), который используется для передачи в функцию <em>CreateFile</em> имени устройства вместо имени файла. Например <code>\\.\PhysicalDrive0</code> соответствует диску, <code>\\.\COM1</code> - последовательному порту и т.п.</p>
-<p>Подробнее см. в <a href="https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#win32-device-namespaces" rel="noreferrer">Win32 Device Namespaces</a></p>
+<p>The answer is, <code>Values</code>/<code>ValueMap</code> qualifier string table is incomplete and can't be used. You must create such table yourself if you want to map every index into the string value.</p>
+<p>The value of <code>Family</code> property of <code>Win32_Processor</code> class comes from <em>Processor Information</em> <a href="https://www.dmtf.org/standards/smbios" rel="nofollow noreferrer">SMBIOS</a> structure. Values are defined by  <a href="https://www.dmtf.org/sites/default/files/standards/documents/DSP0134_3.1.1.pdf" rel="nofollow noreferrer">specification</a> (latest document as of Jan 2018), the table on 46th page contains needed strings:</p>
+<blockquote>
+<p>198 - Intel® Core™ i7 processor</p>
+<p>72 - AMD A-Series Processor</p>
+</blockquote>
+<p>Using this data you can create string table and maintain it as new processor types will by introduced in new SMBIOS versions.</p>
+<p>Similar data in the form of C++ enum can be found <a href="https://github.com/fpmurphy/UEFI-Utilities/blob/master/showfirmware/SmBios.h" rel="nofollow noreferrer">here</a>.</p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

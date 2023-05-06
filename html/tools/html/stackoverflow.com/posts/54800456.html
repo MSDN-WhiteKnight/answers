@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;How to write data into an Excel file in C++&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;How to write data into an Excel file in C++&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,12 +69,109 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Зачем нужна папка &quot;\\\\.\\ &quot;?"</h1>
-<h2>Answer 811951</h2>
-<p><a href="https://ru.stackoverflow.com/a/811951/">Link</a></p>
+<h1>Ответ на "How to write data into an Excel file in C++"</h1>
+<h2>Answer 54800456</h2>
+<p><a href="https://stackoverflow.com/a/54800456/">Link</a></p>
 <blockquote>
-<p>Никакой папки <code>\\\\.\\ </code> не существует. Существует префикс <code>\\.\</code> (при записи в строковых константах в Си-подобных языках обратная косая черта удваивается), который используется для передачи в функцию <em>CreateFile</em> имени устройства вместо имени файла. Например <code>\\.\PhysicalDrive0</code> соответствует диску, <code>\\.\COM1</code> - последовательному порту и т.п.</p>
-<p>Подробнее см. в <a href="https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#win32-device-namespaces" rel="noreferrer">Win32 Device Namespaces</a></p>
+<p>On Windows you can use <a href="https://learn.microsoft.com/en-us/sql/odbc/microsoft/microsoft-odbc-desktop-database-drivers?view=sql-server-2017" rel="nofollow noreferrer">ODBC</a>, which allow working with Excel sheets as regular database tables. It only deals with data though, not formatting, diagrams etc. Standard ODBC driver supports only xls files; to create xlsx file Microsoft Access 2010+ Database Engine Redistributable must be installed.</p>
+<p>Example:</p>
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;tchar.h&gt;
+#include &lt;locale.h&gt;
+#include &lt;Windows.h&gt;
+#include &lt;sqlext.h&gt;
+
+WCHAR szDSN[] = L"Driver={Microsoft Excel Driver (*.xls)};DSN='';CREATE_DB=\"C:\\test\\newfile.xls\";DBQ=C:\\test\\newfile.xls;READONLY=0;";
+
+BOOL ExecuteSql(HDBC hDbc, LPWSTR query){
+
+    RETCODE rc;
+    HSTMT hStmt;
+    WCHAR bufstate[10]=L"";
+    WCHAR buferr[1024]=L"";
+    SQLINTEGER i;
+    SQLSMALLINT cch;
+    BOOL result;
+
+    wprintf(L"&gt;%s\n", query);
+
+    /* Prepare SQL query */
+    rc = SQLAllocStmt(hDbc,&amp;hStmt);
+
+    if(!SQL_SUCCEEDED(rc)){
+        wprintf(L"SQLAllocStmt failed\n");
+        return FALSE;
+    }
+
+    rc = SQLPrepare(hStmt, query, SQL_NTS);   
+
+    if(!SQL_SUCCEEDED(rc)){
+        wprintf(L"SQLPrepare failed\n");
+        SQLFreeHandle(SQL_HANDLE_STMT,hStmt);
+        return FALSE;
+    }
+
+    /* Excecute the query */
+    rc = SQLExecute(hStmt); 
+
+    if (SQL_SUCCEEDED(rc)) {
+        wprintf(L"SQL Success\n");
+        result = TRUE;
+    }
+    else{       
+        SQLGetDiagRec(SQL_HANDLE_STMT,hStmt,1,bufstate,&amp;i,buferr,sizeof(buferr)/sizeof(buferr[0]),&amp;cch);
+        wprintf(L"SQL Error. Code: %d; Message: %s\n",i,buferr);    
+        result = FALSE;
+    }
+
+    SQLFreeHandle(SQL_HANDLE_STMT,hStmt);
+    return result;
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{    
+setlocale(LC_ALL,"Russian");
+HENV    hEnv;
+HDBC    hDbc;
+
+/* ODBC API return status */
+RETCODE rc;
+
+int     iConnStrLength2Ptr;
+WCHAR    szConnStrOut[256];
+
+/* Allocate an environment handle */
+rc = SQLAllocEnv(&amp;hEnv);
+/* Allocate a connection handle */
+rc = SQLAllocConnect(hEnv, &amp;hDbc);
+
+/* Connect to the database */
+rc = SQLDriverConnect(hDbc, NULL, (WCHAR*)szDSN, 
+    SQL_NTS, (WCHAR*)szConnStrOut, 
+    255, (SQLSMALLINT*)&amp;iConnStrLength2Ptr, SQL_DRIVER_NOPROMPT);
+
+if (SQL_SUCCEEDED(rc)) 
+{
+    wprintf(L"Successfully connected to database. Data source name: \n  %s\n", 
+        szConnStrOut);  
+
+    ExecuteSql(hDbc,L"CREATE TABLE [Test] ([Name] TEXT, [Surname] TEXT)");  
+    ExecuteSql(hDbc,L"INSERT INTO [Test] VALUES ('John','Smith')");    
+}
+else
+{
+    wprintf(L"Couldn't connect to %s.\n",szDSN);
+}
+
+/* Disconnect and free up allocated handles */
+SQLDisconnect(hDbc);
+SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+
+getchar();
+return 0;
+}
+</code></pre>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

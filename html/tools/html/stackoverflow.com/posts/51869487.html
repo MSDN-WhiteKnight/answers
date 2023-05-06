@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;How to execute InitializeComponent without blocking UI thread in WPF?&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;How to execute InitializeComponent without blocking UI thread in WPF?&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,12 +69,57 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Зачем нужна папка &quot;\\\\.\\ &quot;?"</h1>
-<h2>Answer 811951</h2>
-<p><a href="https://ru.stackoverflow.com/a/811951/">Link</a></p>
+<h1>Ответ на "How to execute InitializeComponent without blocking UI thread in WPF?"</h1>
+<h2>Answer 51869487</h2>
+<p><a href="https://stackoverflow.com/a/51869487/">Link</a></p>
 <blockquote>
-<p>Никакой папки <code>\\\\.\\ </code> не существует. Существует префикс <code>\\.\</code> (при записи в строковых константах в Си-подобных языках обратная косая черта удваивается), который используется для передачи в функцию <em>CreateFile</em> имени устройства вместо имени файла. Например <code>\\.\PhysicalDrive0</code> соответствует диску, <code>\\.\COM1</code> - последовательному порту и т.п.</p>
-<p>Подробнее см. в <a href="https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#win32-device-namespaces" rel="noreferrer">Win32 Device Namespaces</a></p>
+<p>You can create window in another thread. The downside is that any access to that window's controls from main thread must be done via Dispatcher.Invoke/BeginInvoke.</p>
+<pre><code>using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.IO;
+using System.Threading;
+using System.Windows.Threading;
+
+namespace WpfApplication1
+{
+    public partial class MainWindow : Window
+    {             
+
+        public MainWindow()
+        {
+            InitializeComponent();            
+        }
+
+        void ThreadProc()
+        {
+            //create second window in background thread
+            Window window2 = new Window2();
+            window2.Show();
+
+            //start WPF message loop
+            DispatcherFrame frame = new DispatcherFrame();            
+            Dispatcher.PushFrame(frame);
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            //start background thread
+            Thread thread2;
+            thread2 = new Thread(ThreadProc);
+            thread2.IsBackground = true;
+            thread2.SetApartmentState(ApartmentState.STA);
+            thread2.Start();
+        }  
+
+    // To access Window2 from MainWindow, do like that:
+    //window2.Dispatcher.Invoke(() =&gt; { window2.Title = "Hello, world"; });    
+
+    }    
+}
+</code></pre>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

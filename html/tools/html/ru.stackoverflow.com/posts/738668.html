@@ -86,15 +86,16 @@
     {
         doc = new mshtml.HTMLDocument();//инициализация IE
         d2 = (mshtml.IHTMLDocument2)doc;
+        d2.designMode = &quot;On&quot;;
         d2.write(html);
 
         d = (mshtml.IHTMLDocument3)doc;
-        var coll = d.getElementsByTagName("a");//получить коллекцию элементов по имени тега
+        var coll = d.getElementsByTagName(&quot;a&quot;);//получить коллекцию элементов по имени тега
         object val;
 
         foreach (mshtml.IHTMLElement el in coll)//извлечь атрибут href из всех элементов
         {
-            val=el.getAttribute("href");
+            val=el.getAttribute(&quot;href&quot;);
             if (val == null) continue;
             res.Add(val.ToString());
         }

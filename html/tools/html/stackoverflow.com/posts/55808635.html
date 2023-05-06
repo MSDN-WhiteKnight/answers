@@ -1,0 +1,264 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;How to detect and manage disk/registry/network activity performed by a loaded DLL?&quot; | Stack Overflow answers </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;How to detect and manage disk/registry/network activity performed by a loaded DLL?&quot; | Stack Overflow answers ">
+    <meta name="generator" content="docfx 2.40.12.0">
+    
+    <link rel="shortcut icon" href="../../../../favicon.ico">
+    <link rel="stylesheet" href="../../../../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../../../../styles/docfx.css">
+    <link rel="stylesheet" href="../../../../styles/main.css">
+    <meta property="docfx:navrel" content="../../../../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../../../../index.html">
+                <img id="logo" class="svg" src="../../../../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+
+<p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
+<h1>Ответ на "How to detect and manage disk/registry/network activity performed by a loaded DLL?"</h1>
+<h2>Answer 55808635</h2>
+<p><a href="https://stackoverflow.com/a/55808635/">Link</a></p>
+<blockquote>
+<p>Some control can be achieved using AppDomains and Code Access Security. You can create sandboxed AppDomain and grant it permissions to directories you want your plugin to access. If plugin attempts to acess file outside of them, you get SecurityException. </p>
+<p>For example, if we have following ClassLib.dll plugin:</p>
+<pre><code>namespace ClassLib
+{
+    public class Class1
+    {
+        public static string DoWork(string path)
+        {
+            return System.IO.File.ReadAllText(path);
+        }
+    }
+}
+</code></pre>
+<p>We can invoke it with restricted permissions like that:</p>
+<pre><code>using System;
+using System.Collections;
+using System.Reflection;
+using System.Security;
+using System.Security.Policy;
+using System.Security.Permissions;
+
+namespace ConsoleApplication1
+{
+    class Program
+    {
+        //Path to plugin library
+        public static string libname = @"C:\PROJECTS\ConsoleApp1\bin\Debug\ClassLib.dll";
+
+        //Invokes plugin library in restricted AppDomain
+        //Grants access to the directory specified by allowedPath parameter
+        static void InvokeLibrary(string allowedPath="")
+        {
+            var path = new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath;
+
+            //create restricted permission set
+            Evidence evidence = new Evidence();
+            evidence.AddHostEvidence(new Zone(SecurityZone.Internet));
+            PermissionSet permissionSet = SecurityManager.GetStandardSandbox(evidence);
+
+            //grant read access to plugin library file, so it can at least load successfully
+            permissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, libname));
+            permissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.PathDiscovery, libname));
+
+            //grant read access to
+            if (allowedPath != "")
+            {
+                permissionSet.AddPermission(new FileIOPermission(FileIOPermissionAccess.Read, allowedPath));
+            }            
+
+            AppDomainSetup appDomainSetup = new AppDomainSetup();
+            appDomainSetup.ApplicationBase = System.IO.Path.GetDirectoryName(path);
+
+            //create AppDomain with specified permissions
+            AppDomain domain = AppDomain.CreateDomain(
+                "MyDomain",
+                evidence,
+                appDomainSetup,
+                permissionSet
+                );
+
+            //create remoting wrapper
+            Type type = typeof(Wrapper);
+            Wrapper wrapper = (Wrapper)domain.CreateInstanceAndUnwrap(
+                type.Assembly.FullName,
+                type.FullName);
+
+            //invoke method          
+            InvokeResult res = wrapper.Invoke(libname,"c:\\dir\\file.txt");
+
+            if (res.Success) Console.WriteLine("Invoke result: " + res.Result);
+            else {
+                Console.WriteLine("Invoke error: " + res.Error.GetType().ToString());
+                if (res.Error is SecurityException)
+                {
+                    Console.WriteLine("Demanded permissions:\n" + (res.Error as SecurityException).Demanded);
+                }
+            }                    
+
+            AppDomain.Unload(domain);
+        }
+
+        static void Main(string[] args)
+        {
+            //invoke plugin without explicit permissions
+            Console.WriteLine("First attempt...");
+            InvokeLibrary();
+
+            //invoke plugin with specified directory access
+            Console.WriteLine("Second attempt...");
+            InvokeLibrary("c:\\dir\\");   
+
+            Console.ReadKey();
+        }
+
+    }
+
+    //Object to pass between app domains
+    public class InvokeResult : MarshalByRefObject
+    {
+        public bool Success = false;
+        public string Result="";
+        public Exception Error =null;
+    }
+
+    //Wrapper for remoting
+    public class Wrapper : MarshalByRefObject
+    {
+        public Exception lasterror;
+
+        public InvokeResult Invoke(string lib, string arg)
+        {
+            InvokeResult res = new InvokeResult();
+
+            try
+            {
+                //load plugin                
+                Assembly ass = Assembly.LoadFile(lib);
+                Type t = ass.GetType("ClassLib.Class1");
+                MethodInfo mi = t.GetMethod("DoWork", BindingFlags.Static | BindingFlags.Public);
+
+                //invoke plugin method
+                res.Result = (string)mi.Invoke(null, new object[] { arg });
+                res.Success = true;
+
+            }
+            catch (TargetInvocationException ex)
+            {
+                res.Success = false;
+                if (ex.InnerException != null) res.Error = ex.InnerException;
+                else res.Error = ex;
+            }
+            return res;
+        }
+    }
+}
+
+/* Output:
+
+First attempt...
+Invoke error: System.Security.SecurityException
+Demanded permissions:
+&lt;IPermission class="System.Security.Permissions.FileIOPermission, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+version="1"
+Read="c:\dir\file.txt"/&gt;
+
+Second attempt...
+Invoke result: The content of file.txt 
+*/
+</code></pre>
+</blockquote>
+<hr>
+<p><i>Content is retrieved from StackExchange API. </i></p>
+<p><i>Auto-generated by ruso-archive tools. </i></p>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            <span>Stack Overflow answers (published from sources in <a href="https://github.com/MSDN-WhiteKnight/answers">GitHub repository</a>). Copyright (c) 2020, MSDN.WhiteKnight. Content licensed under <a href="https://github.com/MSDN-WhiteKnight/answers/blob/master/LICENSE">BSD 3-Clause License</a>.<br>Generated by <strong>DocFX</strong></span><script type="text/javascript">(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");ym(65150713, "init", {clickmap:true,trackLinks:true,accurateTrackBounce:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/65150713" style="position:absolute; left:-9999px;" alt=""></div></noscript>
+            
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../../../../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../../../../styles/docfx.js"></script>
+    <script type="text/javascript" src="../../../../styles/main.js"></script>
+  </body>
+</html>

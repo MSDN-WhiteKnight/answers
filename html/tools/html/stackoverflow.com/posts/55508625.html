@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;When and why do I need the supportedRuntime element and sku attribute?&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;When and why do I need the supportedRuntime element and sku attribute?&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,12 +69,22 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Зачем нужна папка &quot;\\\\.\\ &quot;?"</h1>
-<h2>Answer 811951</h2>
-<p><a href="https://ru.stackoverflow.com/a/811951/">Link</a></p>
+<h1>Ответ на "When and why do I need the supportedRuntime element and sku attribute?"</h1>
+<h2>Answer 55508625</h2>
+<p><a href="https://stackoverflow.com/a/55508625/">Link</a></p>
 <blockquote>
-<p>Никакой папки <code>\\\\.\\ </code> не существует. Существует префикс <code>\\.\</code> (при записи в строковых константах в Си-подобных языках обратная косая черта удваивается), который используется для передачи в функцию <em>CreateFile</em> имени устройства вместо имени файла. Например <code>\\.\PhysicalDrive0</code> соответствует диску, <code>\\.\COM1</code> - последовательному порту и т.п.</p>
-<p>Подробнее см. в <a href="https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#win32-device-namespaces" rel="noreferrer">Win32 Device Namespaces</a></p>
+<p>It's needed to declare which framework versions your application is actually compatible with. Suppose, we have an application that targets .NET Framework 4.7.2 and try to run it on the machine that have only .NET Framework 4.5 installed. If we add this app.config</p>
+<pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;configuration&gt;
+&lt;startup&gt;&lt;supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.7.2"/&gt;&lt;/startup&gt;&lt;/configuration&gt;
+</code></pre>
+<p>Windows will show a nice error message that asks to install needed framework version:</p>
+<p><a href="https://i.stack.imgur.com/YRqQQ.png" rel="nofollow noreferrer"><img src="https://i.stack.imgur.com/YRqQQ.png" alt="error message"></a></p>
+<p>If we omit the app.config, Windows will try to run it and then application will crash first time it hits a feature specific to .NET Framework 4.7.2 and absent in installed framework version. </p>
+<p>Note that documentation is misleading in saying that "<em>This element should be used by all applications built with version 1.1 or later of the .NET Framework</em>". It might be interpreted as "<em>This element is required for application to run on .NET 1.1+</em>", while in reality it only means that .NET 1.1 changed a syntax from previosly used in .NET 1.0 <code>requiredRuntime</code> syntax. More often then not <code>supportedRuntime</code> is NOT required for application to run, it's just for prettiness.</p>
+<p>One common scenario when <code>supportedRuntime</code> is <strong>really</strong> needed for application to run is when we have application targeting .NET 2.x-3.x and try to run it on machine that have only 4.x (for example, Windows 10 have 4.6+ but does not have .NET 2.x-3.x installed by default). In this case, without <code>supportedRuntime</code> in app.config the application won't run at all, even though 4.x is mostly compatible with previous versions. Adding <code>&lt;supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.0" /&gt;</code> will fix the issue.</p>
+<hr>
+<p>So, to sum up, it does not duplicate the information in assembly metadata, but rather give Windows additional information on how to connect application with framework version it is compatible with, and what version to ask user to install if it's not present on target machine.</p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

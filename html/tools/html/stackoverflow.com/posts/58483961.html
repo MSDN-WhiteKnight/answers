@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;Does IAsyncDisposable Have a Reference Implementation?&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;Does IAsyncDisposable Have a Reference Implementation?&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,12 +69,91 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Зачем нужна папка &quot;\\\\.\\ &quot;?"</h1>
-<h2>Answer 811951</h2>
-<p><a href="https://ru.stackoverflow.com/a/811951/">Link</a></p>
+<h1>Ответ на "Does IAsyncDisposable Have a Reference Implementation?"</h1>
+<h2>Answer 58483961</h2>
+<p><a href="https://stackoverflow.com/a/58483961/">Link</a></p>
 <blockquote>
-<p>Никакой папки <code>\\\\.\\ </code> не существует. Существует префикс <code>\\.\</code> (при записи в строковых константах в Си-подобных языках обратная косая черта удваивается), который используется для передачи в функцию <em>CreateFile</em> имени устройства вместо имени файла. Например <code>\\.\PhysicalDrive0</code> соответствует диску, <code>\\.\COM1</code> - последовательному порту и т.п.</p>
-<p>Подробнее см. в <a href="https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#win32-device-namespaces" rel="noreferrer">Win32 Device Namespaces</a></p>
+<p><strong>Update:</strong> .NET Documentation now has an article <a href="https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/implementing-disposeasync" rel="nofollow noreferrer">Implement a DisposeAsync method</a> that describes recommended IAsyncDisposable implementation for non-sealed class that needs to support both synchronous and asynchronous disposal. It recommends adding separate virtual DisposeAsyncCore method:</p>
+<pre><code>using System;
+using System.Text.Json;
+using System.Threading.Tasks;
+
+public class ExampleAsyncDisposable : IAsyncDisposable, IDisposable
+{
+    // To detect redundant calls
+    private bool _disposed = false;
+
+    // Created in .ctor, omitted for brevity.
+    private Utf8JsonWriter _jsonWriter;
+
+    public async ValueTask DisposeAsync()
+    {
+        await DisposeAsyncCore();
+
+        Dispose(false);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual async ValueTask DisposeAsyncCore()
+    {
+        // Cascade async dispose calls
+        if (_jsonWriter != null)
+        {
+            await _jsonWriter.DisposeAsync();
+            _jsonWriter = null;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            _jsonWriter?.Dispose();
+            // TODO: dispose managed state (managed objects).
+        }
+
+        // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+        // TODO: set large fields to null.
+
+        _disposed = true;
+    }
+}
+</code></pre>
+<p>The example assumes that only indirectly owned unmanaged resources can be disposed asynchronously. Directly owned managed resources are always disposed synchronously in <code>protected virtual void Dispose</code> method.</p>
+<hr>
+<p><strong>Old answer:</strong> The <a href="https://learn.microsoft.com/en-us/dotnet/api/system.iasyncdisposable.disposeasync" rel="nofollow noreferrer">DisposeAsync</a> method, unlike regular <code>Dispose</code>, should not be called from finalizer. Finalizers already run in dedicated thread and don't block anything, so there's no need. Therefore, <code>DisposeAsync</code> can always dispose both unmanaged and managed resources, and you don't need to implement a separate <code>DisposeAsync(bool disposing)</code> method.</p>
+<p>The example of <code>IAsyncDisposable</code> implementation can be found in the sources of the new .NET Core type, <a href="https://github.com/dotnet/runtime/blob/81bf79fd9aa75305e55abe2f7e9ef3f60624a3a1/src/libraries/System.Text.Json/src/System/Text/Json/Writer/Utf8JsonWriter.cs#L364" rel="nofollow noreferrer">Utf8JsonWriter</a> (it is a sealed class and therefore don't use virtual method):</p>
+<pre><code>public async ValueTask DisposeAsync()
+{
+    if (_stream == null)
+    {
+        // The conditions are ordered with stream first as that would be the most common mode
+        if (_output == null)
+        {
+            return;
+        }
+    }
+
+    await FlushAsync().ConfigureAwait(false);
+    ResetHelper();
+
+    _stream = null;
+    _arrayBufferWriter = null;
+    _output = null;
+}
+</code></pre>
+<p>Basically, it should do the same things as <code>Dispose(true)</code> in regular Disposable pattern, but asynchronously, if possible. If it's not possible to do disposal asynchronously, but you still need to implement this interface for some reason, you can fall back to synchronous disposal and return completed ValueTask after that, as done in <a href="https://github.com/dotnet/runtime/blob/81bf79fd9aa75305e55abe2f7e9ef3f60624a3a1/src/libraries/System.Private.CoreLib/src/System/IO/Stream.cs#L311" rel="nofollow noreferrer">System.IO.Stream</a>.</p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>

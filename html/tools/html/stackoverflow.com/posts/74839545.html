@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers </title>
+    <title>&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;How to determine whether a DLL is a managed assembly or native (prevent loading a native dll)?&quot; | Stack Overflow answers </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;&#1047;&#1072;&#1095;&#1077;&#1084; &#1085;&#1091;&#1078;&#1085;&#1072; &#1087;&#1072;&#1087;&#1082;&#1072; &quot;\\\\.\\ &quot;?&quot; | Stack Overflow answers ">
+    <meta name="title" content="&#1054;&#1090;&#1074;&#1077;&#1090; &#1085;&#1072; &quot;How to determine whether a DLL is a managed assembly or native (prevent loading a native dll)?&quot; | Stack Overflow answers ">
     <meta name="generator" content="docfx 2.40.12.0">
     
     <link rel="shortcut icon" href="../../../../favicon.ico">
@@ -69,12 +69,37 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <p><i><a href="https://github.com/MSDN-WhiteKnight/answers/">MSDN.WhiteKnight - Stack Overflow answers</a></i></p>
-<h1>Ответ на "Зачем нужна папка &quot;\\\\.\\ &quot;?"</h1>
-<h2>Answer 811951</h2>
-<p><a href="https://ru.stackoverflow.com/a/811951/">Link</a></p>
+<h1>Ответ на "How to determine whether a DLL is a managed assembly or native (prevent loading a native dll)?"</h1>
+<h2>Answer 74839545</h2>
+<p><a href="https://stackoverflow.com/a/74839545/">Link</a></p>
 <blockquote>
-<p>Никакой папки <code>\\\\.\\ </code> не существует. Существует префикс <code>\\.\</code> (при записи в строковых константах в Си-подобных языках обратная косая черта удваивается), который используется для передачи в функцию <em>CreateFile</em> имени устройства вместо имени файла. Например <code>\\.\PhysicalDrive0</code> соответствует диску, <code>\\.\COM1</code> - последовательному порту и т.п.</p>
-<p>Подробнее см. в <a href="https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file#win32-device-namespaces" rel="noreferrer">Win32 Device Namespaces</a></p>
+<p>Modern way using System.Reflection.Metadata (included in .NET Core and .NET 5+, or installed as a NuGet package on .NET Framework):</p>
+<pre><code>using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
+
+//...
+
+static bool IsAssembly(string path)
+{
+    using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+    // Try to read CLI metadata from the PE file.
+    using var peReader = new PEReader(fs);
+
+    if (!peReader.HasMetadata)
+    {
+        return false; // File does not have CLI metadata.
+    }
+
+    // Check that file has an assembly manifest.
+    MetadataReader reader = peReader.GetMetadataReader();
+    return reader.IsAssembly;
+}
+</code></pre>
+<p>Source: <a href="https://learn.microsoft.com/en-us/dotnet/standard/assembly/identify#using-the-pereader-class" rel="nofollow noreferrer">https://learn.microsoft.com/en-us/dotnet/standard/assembly/identify#using-the-pereader-class</a></p>
 </blockquote>
 <hr>
 <p><i>Content is retrieved from StackExchange API. </i></p>
