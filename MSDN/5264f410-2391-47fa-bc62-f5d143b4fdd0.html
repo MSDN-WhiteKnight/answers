@@ -1,0 +1,19 @@
+<h2>Message 113</h2>
+<p>Date: 16.09.2020 3:31:38</p>
+<div>
+<p>Добавьте обработку ошибок, чтобы &#1084;ожно было понять, что и&#1084;енно не работает</p>
+<pre class="prettyprint">BOOL bSend = HttpSendRequestExW(hRequest, &amp;bufferIn, NULL, HSR_INITIATE, 0);
+if (bSend) {
+	//...
+}
+
+else {
+
+     printf(&quot;HttpSendRequestExW failed: %u&quot;,GetLastError());
+
+}</pre>
+<br/>
+<p><br/>
+</p>
+<p></p>
+</div>

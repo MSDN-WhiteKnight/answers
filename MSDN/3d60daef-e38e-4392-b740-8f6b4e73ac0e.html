@@ -1,0 +1,84 @@
+<h2>Message 284</h2>
+<p>Date: 15.03.2019 3:27:36</p>
+<div>
+<p>OLE DB ориентирован на работу с реляционны&#1084;и БД, где каждый столбец таблицы и&#1084;еет определенный тип. Однако, доку&#1084;енты Excel не являются реляционны&#1084;и БД; ячейки в столбце &#1084;огут и&#1084;еть с&#1084;ешанные типы, а фор&#1084;ат
+ отображения является вообще отдельны&#1084; атрибуто&#1084;, не и&#1084;еющи&#1084; отношение к данны&#1084;. Когда вы подключаетесь к Excel-доку&#1084;енту через OLE DB с пара&#1084;етро&#1084; IMEX=0, драйвер БД пытается угадать тип столбца, анализируя некоторое
+ количество начальных строк и выбирая тот, который встречается чаще. Если же IMEX=1, то драйвер должен восприни&#1084;ать все как текст (но из-за бага в Jet это в действительности не работает, пока не установить определенные ключи в реестре). Способа принудительно
+ восприни&#1084;ать все как число нет.</p>
+<p>Слово&#1084;, если ва&#1084; нужен продвинутый контроль над типа&#1084;и данных,&nbsp;OLE DB - неподходящее средство. Используйте в&#1084;есто него:</p>
+<p><a href="https://docs.microsoft.com/ru-ru/dotnet/csharp/programming-guide/interop/how-to-access-office-onterop-objects#to-declare-a-method-that-exports-account-information-to-excel">Office Automation</a>&nbsp;- для клиентских приложений, запускае&#1084;ых
+ на ко&#1084;пьютерах с установленны&#1084; Office</p>
+<p><a href="https://docs.microsoft.com/ru-ru/office/open-xml/open-xml-sdk">Open XML SDK</a>&nbsp;- для серверных приложений, или для приложений, запускае&#1084;ых на ко&#1084;пьютерах без&nbsp;Office</p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+</div>
+<h2>Message 283</h2>
+<p>Date: 15.03.2019 5:12:08</p>
+<div>
+Насколько я по&#1084;ню, да, но я не уверен, распространяется это только на XLS или также и на XLSX. Вы &#1084;ожете проверить это са&#1084;и, создав таблицу, в которой первые ~20 строк заняты числа&#1084;и, а далее идут текстовые значения, и попытавшись
+ считать ее. При IMEX=1 все значения должны считаться как текст. Если числа считаются как числа, а текст - как NULL, это тот же баг, что и в Jet.
+</div>
+<h2>Message 282</h2>
+<p>Date: 15.03.2019 14:12:01</p>
+<div>
+<p>Если вы файл заполняете с нуля, &#1084;ожно попробовать создавать таблицы SQL-запросо&#1084; с явны&#1084; указание&#1084; типов, а не использовать то, что создано са&#1084;и&#1084; Excel. Как-то так:</p>
+<pre class="prettyprint lang-sql">CREATE TABLE [Table] ([Column1] TEXT, [Column2] FLOAT)</pre>
+<br/>
+<p></p>
+<p></p>
+</div>
+<h2>Message 281</h2>
+<p>Date: 15.03.2019 17:01:45</p>
+<div>
+<p>Ага, увидел. Сейчас попробовал са&#1084;, у &#1084;еня вроде отображает как число</p>
+&nbsp;
+<pre class="prettyprint">using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Data;
+using System.Data.OleDb;
+
+namespace ConsoleTest
+{  
+    class Program
+    {   
+        static void Main(string[] args)
+        {
+            OleDbConnection conn = new OleDbConnection();            
+            conn.ConnectionString = &quot;Provider=Microsoft.ACE.OLEDB.12.0; Data Source = \&quot;D:\\Test\\book.xlsx\&quot;; Extended Properties=Excel 12.0 Xml&quot;;
+            conn.Open();
+
+            OleDbCommand cmd = new OleDbCommand(&quot;Create table [Test](A TEXT,B FLOAT)&quot;, conn);
+            var res = cmd.ExecuteNonQuery();
+            Console.WriteLine(&quot;Create table &quot; &#43; res.ToString());
+
+            cmd = new OleDbCommand(&quot;Insert into [Test] (A,B) Values ('hello',1.1)&quot;, conn);
+            res = cmd.ExecuteNonQuery();
+            Console.WriteLine(&quot;Insert &quot; &#43; res.ToString());
+
+            Console.ReadKey();
+        }
+    }
+
+
+}</pre>
+<p>Результат:</p>
+<p><img alt="" src="https://i.stack.imgur.com/RCVK1.png"></p>
+<p>1,1 выровнено по право&#1084;у краю, как число.</p>
+<p><br/>
+</p>
+</div>
+<h2>Message 280</h2>
+<p>Date: 15.03.2019 18:11:29</p>
+<div>
+Если в DataTable при заполнении через&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">адаптер&nbsp;</span>где-то генерируется тип string в&#1084;есто правильного типа, скорее всего,
+ придется кое-что переписать. Либо заполнять DataTable вручную, явно задавая правильный тип для столбцов, либо &#1084;енять InsertCommand у адаптера, вставляя преобразование в нужный тип.&nbsp;
+</div>
+<h2>Message 279</h2>
+<p>Date: 16.03.2019 7:50:16</p>
+<div>
+Точно, есть такой подводный ка&#1084;ень. Так как Jet/ACE - это файл-серверный движок, он использует про&#1084;ежуточные буферы и окончательное обновление данных в целево&#1084; файле &#1084;ожет происходить только после закрытия соединения. Для обычной
+ работы с файла&#1084;и есть Flush, а для OLE DB его аналога я не нашел.
+</div>

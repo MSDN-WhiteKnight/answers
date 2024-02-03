@@ -1,0 +1,28 @@
+<h2>Message 833</h2>
+<p>Date: 25.04.2017 14:19:25</p>
+<div>
+<p>если запрос всегда возвращает одну строку &#1084;ожно сделать так:</p>
+<pre class="prettyprint"> int a = comboBox1.SelectedIndex; // выбранный логин
+this.userTableAdapter.FillPass(this.inventDataSet.user, Convert.ToInt32(comboBox1.SelectedValue));
+string txt;
+if(this.inventDataSet.user.Rows.Count==0)
+{
+	MessageBox.Show(&quot;Пользователь не найден&quot;, &quot;Ошибка&quot;);
+	return;
+}
+     txt=this.inventDataSet.user.Rows[0].ItemArray[2].ToString();
+
+ this.userTableAdapter.Fill(this.inventDataSet.user); // загрузка combobox
+ comboBox1.SelectedIndex = a; // выбор ранее выбранных данных
+
+ if(textbox1.text ==txt)
+ {
+               
+ }
+else
+ {
+      MessageBox.Show(&quot;Пароль введен не верно&quot;, &quot;Вни&#1084;ание&quot;, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+  }</pre>
+<br/>
+<p></p>
+</div>

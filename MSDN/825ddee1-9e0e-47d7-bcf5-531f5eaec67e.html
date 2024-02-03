@@ -1,0 +1,156 @@
+<h2>Message 474</h2>
+<p>Date: 05.05.2018 14:45:51</p>
+<div>
+<p>Используя эле&#1084;ент Viewport3D. Почитайте здесь: <a href="https://docs.microsoft.com/en-us/dotnet/framework/wpf/graphics-multimedia/3-d-graphics-overview">
+https://docs.microsoft.com/en-us/dotnet/framework/wpf/graphics-multimedia/3-d-graphics-overview</a></p>
+<p>Напри&#1084;ер, следующий код позволяет отобразить трех&#1084;ерную фигуру и управлять положение&#1084; ка&#1084;еры с по&#1084;ощью &#1084;ыши (из&#1084;еняет направление взгляда при движении &#1084;ыши и приближает/отдаляет при нажатии кнопок &#1084;ыши):</p>
+<pre class="prettyprint">&lt;Window x:Class=&quot;Wpf3d.MainWindow&quot;
+        xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
+        xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+        Title=&quot;MainWindow&quot; Height=&quot;350&quot; Width=&quot;525&quot;
+         WindowState=&quot;Maximized&quot; MouseMove=&quot;Window_MouseMove&quot; MouseDown=&quot;Window_MouseDown&quot; MouseLeave=&quot;Window_MouseLeave&quot;&gt;
+    &lt;Grid HorizontalAlignment=&quot;Stretch&quot; VerticalAlignment=&quot;Stretch&quot;
+          &gt;
+        &lt;Viewport3D Name=&quot;myViewport&quot; HorizontalAlignment=&quot;Stretch&quot;
+                    VerticalAlignment=&quot;Stretch&quot;&gt;
+
+            &lt;!-- Add a camera. --&gt;
+            &lt;Viewport3D.Camera&gt;
+                &lt;PerspectiveCamera 
+						FarPlaneDistance=&quot;20&quot; 
+						LookDirection=&quot;0,0,1&quot; 
+						UpDirection=&quot;0,1,0&quot; 
+						NearPlaneDistance=&quot;1&quot; 
+						Position=&quot;0,0,-6&quot; 
+						FieldOfView=&quot;45&quot; /&gt;
+            &lt;/Viewport3D.Camera&gt;
+
+            &lt;!-- Add models. --&gt;
+            &lt;Viewport3D.Children&gt;
+
+                &lt;ModelVisual3D&gt;
+                    &lt;ModelVisual3D.Content&gt;
+
+                        &lt;Model3DGroup &gt;
+                            &lt;Model3DGroup.Children&gt;
+
+                                &lt;!-- Lights, MeshGeometry3D and DiffuseMaterial objects are added to the ModelVisual3D. --&gt;
+                                &lt;DirectionalLight Color=&quot;#FFFFFFFF&quot; Direction=&quot;3,-4,5&quot; /&gt;
+
+                                &lt;!-- Define a red cone. --&gt;
+                                &lt;GeometryModel3D&gt;
+
+                                    &lt;GeometryModel3D.Geometry&gt;
+
+                                        
+
+                                        &lt;MeshGeometry3D 
+    Positions=&quot;0.293893 -0.5 0.404509  0.475528 -0.5 0.154509  0 0.5 0  0.475528 -0.5 0.154509  0 0.5 0  0 0.5 0  0.475528 -0.5 0.154509  0.475528 -0.5 -0.154509  0 0.5 0  0.475528 -0.5 -0.154509  0 0.5 0  0 0.5 0  0.475528 -0.5 -0.154509  0.293893 -0.5 -0.404509  0 0.5 0  0.293893 -0.5 -0.404509  0 0.5 0  0 0.5 0  0.293893 -0.5 -0.404509  0 -0.5 -0.5  0 0.5 0  0 -0.5 -0.5  0 0.5 0  0 0.5 0  0 -0.5 -0.5  -0.293893 -0.5 -0.404509  0 0.5 0  -0.293893 -0.5 -0.404509  0 0.5 0  0 0.5 0  -0.293893 -0.5 -0.404509  -0.475528 -0.5 -0.154509  0 0.5 0  -0.475528 -0.5 -0.154509  0 0.5 0  0 0.5 0  -0.475528 -0.5 -0.154509  -0.475528 -0.5 0.154509  0 0.5 0  -0.475528 -0.5 0.154509  0 0.5 0  0 0.5 0  -0.475528 -0.5 0.154509  -0.293892 -0.5 0.404509  0 0.5 0  -0.293892 -0.5 0.404509  0 0.5 0  0 0.5 0  -0.293892 -0.5 0.404509  0 -0.5 0.5  0 0.5 0  0 -0.5 0.5  0 0.5 0  0 0.5 0  0 -0.5 0.5  0.293893 -0.5 0.404509  0 0.5 0  0.293893 -0.5 0.404509  0 0.5 0  0 0.5 0  &quot; 
+    Normals=&quot;0.7236065,0.4472139,0.5257313  0.2763934,0.4472138,0.8506507  0.5308242,0.4294462,0.7306172  0.2763934,0.4472138,0.8506507  0,0.4294458,0.9030925  0.5308242,0.4294462,0.7306172  0.2763934,0.4472138,0.8506507  -0.2763934,0.4472138,0.8506507  0,0.4294458,0.9030925  -0.2763934,0.4472138,0.8506507  -0.5308242,0.4294462,0.7306172  0,0.4294458,0.9030925  -0.2763934,0.4472138,0.8506507  -0.7236065,0.4472139,0.5257313  -0.5308242,0.4294462,0.7306172  -0.7236065,0.4472139,0.5257313  -0.858892,0.429446,0.279071  -0.5308242,0.4294462,0.7306172  -0.7236065,0.4472139,0.5257313  -0.8944269,0.4472139,0  -0.858892,0.429446,0.279071  -0.8944269,0.4472139,0  -0.858892,0.429446,-0.279071  -0.858892,0.429446,0.279071  -0.8944269,0.4472139,0  -0.7236065,0.4472139,-0.5257313  -0.858892,0.429446,-0.279071  -0.7236065,0.4472139,-0.5257313  -0.5308242,0.4294462,-0.7306172  -0.858892,0.429446,-0.279071  -0.7236065,0.4472139,-0.5257313  -0.2763934,0.4472138,-0.8506507  -0.5308242,0.4294462,-0.7306172  -0.2763934,0.4472138,-0.8506507  0,0.4294458,-0.9030925  -0.5308242,0.4294462,-0.7306172  -0.2763934,0.4472138,-0.8506507  0.2763934,0.4472138,-0.8506507  0,0.4294458,-0.9030925  0.2763934,0.4472138,-0.8506507  0.5308249,0.4294459,-0.7306169  0,0.4294458,-0.9030925  0.2763934,0.4472138,-0.8506507  0.7236068,0.4472141,-0.5257306  0.5308249,0.4294459,-0.7306169  0.7236068,0.4472141,-0.5257306  0.8588922,0.4294461,-0.27907  0.5308249,0.4294459,-0.7306169  0.7236068,0.4472141,-0.5257306  0.8944269,0.4472139,0  0.8588922,0.4294461,-0.27907  0.8944269,0.4472139,0  0.858892,0.429446,0.279071  0.8588922,0.4294461,-0.27907  0.8944269,0.4472139,0  0.7236065,0.4472139,0.5257313  0.858892,0.429446,0.279071  0.7236065,0.4472139,0.5257313  0.5308242,0.4294462,0.7306172  0.858892,0.429446,0.279071  &quot;                   TriangleIndices=&quot;0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 &quot; /&gt;
+                                    &lt;/GeometryModel3D.Geometry&gt;
+
+                                    &lt;GeometryModel3D.Material&gt;
+                                        &lt;DiffuseMaterial&gt;
+                                            &lt;DiffuseMaterial.Brush&gt;
+                                                &lt;SolidColorBrush 
+                            Color=&quot;Red&quot; 
+                            Opacity=&quot;1.0&quot;/&gt;
+                                            &lt;/DiffuseMaterial.Brush&gt;
+                                        &lt;/DiffuseMaterial&gt;
+                                    &lt;/GeometryModel3D.Material&gt;
+
+                                &lt;/GeometryModel3D&gt;
+
+                            &lt;/Model3DGroup.Children&gt;
+                        &lt;/Model3DGroup&gt;
+
+                    &lt;/ModelVisual3D.Content&gt;
+
+                &lt;/ModelVisual3D&gt;
+
+            &lt;/Viewport3D.Children&gt;
+
+        &lt;/Viewport3D&gt;
+    &lt;/Grid&gt;
+&lt;/Window&gt;</pre>
+<p>Код c#:</p>
+<pre class="prettyprint">using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Media3D;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace Wpf3d
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            cam = myViewport.Camera as PerspectiveCamera;
+        }
+
+        Point pos;//предыдущее положение &#1084;ыши
+        bool HasPos = false;
+        PerspectiveCamera cam;        
+
+        private void Window_MouseMove(object sender, MouseEventArgs e)
+        {
+            Point pos2 = e.GetPosition(myViewport);//получае&#1084; положение &#1084;ыши
+            if (!HasPos)
+            {
+                pos = pos2;//если нет предыдущего положения, сохрани&#1084; его и выйде&#1084;
+                HasPos = true;
+                return;
+            }
+
+            //найде&#1084; разницу &#1084;ежду текущи&#1084; и предыдущи&#1084; положение&#1084;
+            double dx = pos2.X - pos.X;
+            double dy = pos2.Y - pos.Y;
+            pos = pos2;
+
+            //с&#1084;ени&#1084; направление ка&#1084;еры
+            var direct = cam.LookDirection;
+            direct.X &#43;= 0.001 * dx;
+            direct.Y &#43;= 0.001 * dy;
+            if (direct.X &gt; 0.4) direct.X = 0.4;
+            if (direct.X &lt; -0.4) direct.X = -0.4;
+            if (direct.Y &gt; 0.4) direct.Y = 0.4;
+            if (direct.Y &lt; -0.4) direct.Y = -0.4;
+            cam.LookDirection = direct;
+        }
+
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            //приближение/отдаление ка&#1084;еры при щелчке &#1084;ыши
+            var p = cam.Position;
+            if (e.ChangedButton == MouseButton.Left) p.Z &#43;= 0.2;
+            else p.Z -= 0.2;
+            cam.Position = p;
+        }
+
+        private void Window_MouseLeave(object sender, MouseEventArgs e)
+        {
+            //сброс положения &#1084;ыши при покидании окна
+            this.HasPos = false;
+            var direct = cam.LookDirection;
+            direct.X = 0;
+            direct.Y = 0;
+            cam.LookDirection = direct;
+        }
+    }
+}</pre>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<br/>
+</div>

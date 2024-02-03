@@ -1,0 +1,35 @@
+<h2>Message 496</h2>
+<p>Date: 30.03.2018 19:12:34</p>
+<div>
+<p>Опишите ситуацию чуть более четко. Про 5 &#1084;ониторов и загрузку ЦП вообще ничего не понятно.
+</p>
+<p>Пробле&#1084;а возникает только с видео определенного типа, или со все&#1084;и видео? При воспроизведении того же видео в другой програ&#1084;&#1084;е этого не происходит? Исключение где и&#1084;енно кидает, трассировка стека есть? С носителе&#1084;, на
+ которо&#1084; лежит файл, все в порядке?</p>
+</div>
+<h2>Message 495</h2>
+<p>Date: 31.03.2018 9:28:40</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Что такое трасировка стека?</em>&quot;</span></p>
+<p>В обработчик события MediaFailed передается аргу&#1084;ент <a href="https://msdn.microsoft.com/ru-ru/library/system.windows.media.exceptioneventargs_members(v=vs.90).aspx">
+ExceptionEventArgs</a>, у которого есть свойство ErrorException. Вызово&#1084;&nbsp;ErrorException.ToString() &#1084;ожно получить трассировку стека - перечень функций, вызванных в &#1084;о&#1084;ент возникновения исключения (сделайте, чтобы его записывало
+ в файл, так как оно будет длинны&#1084;)&nbsp;</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>С носителе&#1084; тоже затрудняюсь сказать как это выявить? А так по факту на жоский не грешу пока что не дал ни каких на это
+ поводов.</em>&quot;</span></p>
+<p>Ну, жесткие диски считаются одни&#1084; из са&#1084;ых ненадежных эле&#1084;ентов ко&#1084;пьютера сейчас. Почти расходны&#1084; &#1084;атериало&#1084;. И возникновение неожиданных ошибок типа &quot;файл не найден&quot;&nbsp; весь&#1084;а вероятно &#1084;ожет
+ быть связано с аппаратной пробле&#1084;ой. Проверить жесткий диск средства&#1084;и ОС или специальны&#1084;и утилита&#1084;и изготовителя было бы не лишни&#1084;. Можно хотя бы считать SMART-показатели прогой типа Crystal Disk Info, если перезагрузить для
+ полной проверки затруднительно.</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>пока что 3 видео все mp4.</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">MediaElement в WPF внутренне использует Windows Media Player, который, насколько я знаю, из коробки не поддерживает этот фор&#1084;ат.
+ Так что источнико&#1084; пробле&#1084;ы также &#1084;ожет быть сторонний кодек, который он использует.</span></p>
+<p></p>
+<p></p>
+<p></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+</div>
+<h2>Message 490</h2>
+<p>Date: 10.04.2018 17:20:21</p>
+<div>
+<p>Х&#1084;, не густо. Единственное что из этих данных &#1084;ожно извлечь, то что ошибка происходит действительно от Windows Media Player (оба HRESULT относятся к не&#1084;у). А в&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">ErrorException.StackTrace</span>
+ то же са&#1084;ое? InnerException есть? Хотя, скорее всего без присоединенного специального отладчика с настроенны&#1084;и си&#1084;вола&#1084;и здесь ничего инфор&#1084;ативного не получить.</p>
+<p>В обще&#1084;, ответ тот же, &#1084;ожет быть что угодно, от сбоя носителя до бага в кодеке. Если проявляется только при длительной работе, &#1084;ожет быть и утечка каких-то ресурсов в какой-то програ&#1084;&#1084;е или службе.&nbsp;</p>
+</div>

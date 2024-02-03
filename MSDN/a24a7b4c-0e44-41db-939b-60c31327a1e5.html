@@ -1,0 +1,34 @@
+<h2>Message 110</h2>
+<p>Date: 21.10.2020 9:54:40</p>
+<div>
+<p>Секрет сборки lib-файлов тут, насколько я понял, в следующе&#1084;. Проект WebRTC.NET и&#1084;еет копии скриптов сборки WebRTC, в которых директивы&nbsp;rtc_library за&#1084;енены на директивы&nbsp;rtc_static_library. Сравните оригинальный (<a href="https://chromium.googlesource.com/external/webrtc.git/&#43;/refs/heads/master/api/BUILD.gn">https://chromium.googlesource.com/external/webrtc.git/&#43;/refs/heads/master/api/BUILD.gn</a>)
+ и&nbsp;WebRTC.NET (<a href="https://github.com/radioman/WebRtc.NET/blob/master/WebRtc.NET/gn/webrtc/api/BUILD.gn">https://github.com/radioman/WebRtc.NET/blob/master/WebRtc.NET/gn/webrtc/api/BUILD.gn</a>). Поэто&#1084;у в&#1084;есто dll файлов получаются lib.&nbsp;</p>
+<p>Как работает са&#1084;а сборка через систе&#1084;ы gn/ninja, описано в доку&#1084;ентации к репозиторию WebRTC:
+<a href="https://webrtc.googlesource.com/src/&#43;/refs/heads/master/docs/native-code/index.md">
+https://webrtc.googlesource.com/src/&#43;/refs/heads/master/docs/native-code/index.md</a>&nbsp;&nbsp;Создавать с нуля тут нечего и незаче&#1084;, нужно лишь воспользоваться и&#1084;еющи&#1084;ся инстру&#1084;ентарие&#1084;. И обновлять са&#1084;остоятельно
+ тоже ничего не надо, это должна ко&#1084;анда gclient sync вот здесь:&nbsp;<a href="https://github.com/radioman/WebRtc.NET/blob/master/WebRtc.NET/cmd/syncWebRtc.bat">https://github.com/radioman/WebRtc.NET/blob/master/WebRtc.NET/cmd/syncWebRtc.bat</a></p>
+</div>
+<h2>Message 109</h2>
+<p>Date: 21.10.2020 17:12:02</p>
+<div>
+<p>Пробле&#1084;а в то&#1084;, что это совсе&#1084; не то же са&#1084;ое, что &quot;привет &#1084;ир&quot;. Скорее это похоже на гибрид ужа с ежо&#1084;, или что-то в это&#1084; роде. По ссылке - руководство, как создать проект DLL в обычно&#1084; Visual C&#43;&#43;/MSBuild.
+ WebRTC же использует, как я уже сказал, хитровывернутую связку систе&#1084; сборки от Google, GN &#43; ninja. Одно с други&#1084; не соединяется, это вообще вещи разного порядка. Проект для MSBuild, конечно, &#1084;ожно сгенерировать в GN, просто он будет
+ только для красоты, никто не гарантирует, что он будет собираться. Об это&#1084; явно написано в доку&#1084;ентации:&nbsp;<a href="https://webrtc.googlesource.com/src/&#43;/refs/heads/master/docs/native-code/development/index.md#using-another-build-system">https://webrtc.googlesource.com/src/&#43;/refs/heads/master/docs/native-code/development/index.md#using-another-build-system</a></p>
+<h2 style="margin:1.236em 0px 0.618em; padding:0px; font-weight:normal; font-family:'Open Sans',sans-serif">
+Using Another Build System</h2>
+<p style="padding-right:0px; font-size:14px">Other build systems are&nbsp;<strong style="margin:0px; padding:0px; color:inherit">not supported</strong>&nbsp;(and may fail), such as Visual Studio on Windows or Xcode on OSX. GN supports a hybrid approach of using&nbsp;<a href="https://ninja-build.org/" style="margin:0px; padding:0px; color:#7759ae">Ninja</a>&nbsp;for
+ building, but Visual Studio/Xcode for editing and driving compilation.</p>
+<p style="padding-right:0px; font-size:14px">To generate IDE project files, pass the&nbsp;<code style="margin:0px; padding:2px 4px; background-color:#f5f5f5; border:transparent; font-family:'Source Code Pro',monospace">--ide</code>&nbsp;flag to the&nbsp;<a href="https://gn.googlesource.com/gn/&#43;/master/README.md" style="margin:0px; padding:0px; color:#7759ae">GN</a>&nbsp;command.
+ See the&nbsp;<a href="https://gn.googlesource.com/gn/&#43;/master/docs/reference.md#IDE-options" style="margin:0px; padding:0px; color:#7759ae">GN reference</a>&nbsp;for more details on the supported IDEs.</p>
+<p>Сделать, чтобы проект от другой систе&#1084;ы сборки вот так в лоб собирался в MSBuild, это совсе&#1084; не уровня &quot;привет &#1084;ир&quot;. Разработчики WebRTC.NET приду&#1084;али хороший обходной способ, через подключение статических библиотек в один
+ большой проект. Что тут &#1084;ожно сделать лучше, я даже не представляю.</p>
+<p></p>
+<p></p>
+</div>
+<h2>Message 108</h2>
+<p>Date: 21.10.2020 19:02:18</p>
+<div>
+Реализовать то же са&#1084;ое, но други&#1084; способо&#1084;, без статических библиотек? Ну, &#1084;ожет это и интересная задача, но у &#1084;еня тут нет идей, как подступиться. Если так уж это интересует, &#1084;ожно начать с того, чтобы таки попробовать
+ собрать проект Visual C&#43;&#43; WebRTC, сгенерированный GN, и пос&#1084;отреть, соберется ли он. Если соберется, будет ли работать, если не соберется, то с каки&#1084;и ошибка&#1084;и. Так &#1084;ожет что-нибудь выйдет, или по крайней &#1084;ере в процессе
+ познако&#1084;итесь с систе&#1084;а&#1084;и сборки.
+</div>

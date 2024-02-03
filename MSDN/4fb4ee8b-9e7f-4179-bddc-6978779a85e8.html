@@ -1,0 +1,141 @@
+<h2>Message 353</h2>
+<p>Date: 02.11.2018 5:23:50</p>
+<div>
+<p>Excel по&#1084;ещает данные в буфер об&#1084;ена в нескольких фор&#1084;атах. Проще всего, наверное, прочитать HTML:</p>
+<pre class="prettyprint">using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Text;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+
+namespace WindowsFormsApp1
+{
+	public partial class Form1 : Form
+	{
+		public Form1()
+		{
+			InitializeComponent();            
+        }
+
+        //Добавить ссылку: COM / Microsoft HTML Objects Library
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var data = Clipboard.GetDataObject();               
+
+            string html = (string)data.GetData(&quot;HTML Format&quot;);
+            if (html==null)
+            {
+                MessageBox.Show(&quot;В буфере об&#1084;ена нет подходящих данных&quot;);
+                return;
+            }
+
+            mshtml.HTMLDocument doc = null;
+            mshtml.IHTMLDocument2 d2 = null;
+            mshtml.IHTMLDocument3 d = null;
+            mshtml.IHTMLElementCollection tables = null;
+            mshtml.IHTMLElement table = null;
+            mshtml.IHTMLElementCollection rows = null;
+            mshtml.IHTMLElementCollection cells = null;
+            mshtml.IHTMLElement rowelem = null;
+            mshtml.IHTMLElement cellelem = null;
+
+            DataTable dt = new DataTable();
+
+            try
+            {
+                //грузи&#1084; доку&#1084;ент в парсер
+                doc = new mshtml.HTMLDocument();
+                d2 = (mshtml.IHTMLDocument2)doc;
+                d2.write(html);
+
+                //находи&#1084; table
+                d = (mshtml.IHTMLDocument3)doc;
+                tables = d.getElementsByTagName(&quot;table&quot;);
+                if (tables.length == 0)
+                {
+                    MessageBox.Show(&quot;В буфере об&#1084;ена нет таблицы&quot;);
+                    return;
+                }
+
+                table = tables.item(0);                    
+
+                rows = (table as mshtml.IHTMLElement2).getElementsByTagName(&quot;tr&quot;);
+                for (int n = 0; n &lt; rows.length; n&#43;&#43;)                    
+                {
+                    if (rowelem != null)
+                    {
+                        Marshal.ReleaseComObject(rowelem);
+                        rowelem = null;
+                    }
+
+                    if (cells != null)
+                    {
+                        Marshal.ReleaseComObject(cells);
+                        cells = null;
+                    }
+
+                    rowelem = rows.item(n);
+
+                    //получае&#1084; значения ячеек
+                    List&lt;string&gt; values = new List&lt;string&gt;();
+                    cells = (rowelem as mshtml.IHTMLElement2).getElementsByTagName(&quot;td&quot;);
+                    for (int i=0;i&lt; cells.length; i&#43;&#43;)
+                    {
+                        if (cellelem != null)
+                        {
+                            Marshal.ReleaseComObject(cellelem);
+                            cellelem = null;
+                        }
+
+                        cellelem = cells.item(i);
+                        values.Add(cellelem.innerText);                        
+                    }
+
+                    //добави&#1084; недостающие столбцы в DataTable
+                    if (dt.Columns.Count &lt; values.Count)
+                    {
+                        int cols = values.Count - dt.Columns.Count;
+                        for (int k = 0; k &lt; cols; k&#43;&#43;) {                            
+                            dt.Columns.Add();
+                        }
+                    }
+
+                    //установи&#1084; значения ячеек в DataTable
+                    DataRow row = dt.NewRow();
+                    for(int j = 0; j &lt; values.Count; j&#43;&#43;)
+                    {
+                        row[j] = values[j];
+                    }
+                    dt.Rows.Add(row);
+
+                }
+
+                dataGridView1.AutoGenerateColumns = true;
+                dataGridView1.DataSource = dt;
+                
+            }
+            finally
+            {
+                //освобождение ресурсов
+                if (doc != null) Marshal.ReleaseComObject(doc);
+                if (d2 != null) Marshal.ReleaseComObject(d2);
+                if (d != null) Marshal.ReleaseComObject(d);
+                if (tables != null) Marshal.ReleaseComObject(tables);
+                if (table != null) Marshal.ReleaseComObject(table);
+                if (rows != null) Marshal.ReleaseComObject(rows);
+                if (cells != null) Marshal.ReleaseComObject(cells);
+                if (rowelem != null) Marshal.ReleaseComObject(rowelem);
+                if (cellelem != null) Marshal.ReleaseComObject(cellelem);
+            }
+
+        }
+    }
+}
+</pre>
+<br/>
+<p></p>
+<p></p>
+</div>

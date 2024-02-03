@@ -1,0 +1,38 @@
+<h2>Размер шрифта в Windows Forms</h2>
+<p>Date: 28.01.2017 11:59:53</p>
+<div>
+<p>Windows Forms определенно поддерживает переноси&#1084;ость приложений на систе&#1084;ы с разны&#1084;и раз&#1084;ера&#1084;и шрифтов. Для этого, нужно установить свойство
+<a href="https://msdn.microsoft.com/en-us/library/system.windows.forms.containercontrol.autoscalemode.aspx">
+AutoScaleMode</a> фор&#1084;ы в значение Font, а для вложенных контейнеров - Inherit. Если вы добавляете эле&#1084;енты в&nbsp;фор&#1084;у во вре&#1084;я выполнения, делайте это
+<strong>до</strong> загрузки фор&#1084;ы (пото&#1084;у что пересчет координат делается и&#1084;енно при загрузке фор&#1084;ы). Подробную инфор&#1084;ацию по &#1084;еханике авто&#1084;атического&nbsp;из&#1084;енения раз&#1084;еров &#1084;ожно прочитать здесь:</p>
+<p><a href="https://msdn.microsoft.com/en-us/library/ms229605.aspx">https://msdn.microsoft.com/en-us/library/ms229605.aspx</a></p>
+<p><a href="http://stackoverflow.com/questions/1850915/winforms-different-dpi-layouts">http://stackoverflow.com/questions/1850915/winforms-different-dpi-layouts</a></p>
+<p><a href="http://stackoverflow.com/questions/1850915/winforms-different-dpi-layouts"></a><a href="https://msdn.microsoft.com/en-us/library/ms229605.aspx"></a></p>
+<p></p>
+<p></p>
+<br/>
+</div>
+<h2>Message 963</h2>
+<p>Date: 01.02.2017 12:09:11</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>В первой ссылке пишется</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Это про NET Framwork 1.0. В последующих версиях ContainerControl поддерживает AutoScaling</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Я не нашел у используе&#1084;ых контейнеров TabControl и SplitContainer&nbsp; свойства AutoScaleMode.</em>&quot;</span></p>
+<p><a href="https://msdn.microsoft.com/en-us/library/system.windows.forms.containercontrol.autoscalemode(v=vs.110).aspx">https://msdn.microsoft.com/en-us/library/system.windows.forms.containercontrol.autoscalemode(v=vs.110).aspx</a></p>
+<pre style="padding:5px; word-wrap:normal; font-size:13px; font-family:Consolas,Courier,monospace!important"><p>суслика не видно, но он есть... <br/></p><p>если свойство не отображается в конструкторе, попробуйте установить в напря&#1084;ую в коде</p></pre>
+<p><a href="https://msdn.microsoft.com/en-us/library/system.windows.forms.containercontrol.autoscalemode(v=vs.110).aspx"></a><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Также &#1084;ожно
+ поэкспери&#1084;ентировать со свойство&#1084;&nbsp;<a href="https://msdn.microsoft.com/en-us/library/system.windows.forms.control.scalechildren.aspx">ScaleChildren</a></span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+</div>
+<h2>Message 961</h2>
+<p>Date: 03.02.2017 8:04:46</p>
+<div>
+Можно попробовать AutoScaleMode.Dpi. Если не сработает, &#1084;ожно просто пересчитывать позицию разделителя так, чтобы все эле&#1084;енты у&#1084;естились. Грубо говоря, пройтись по все&#1084; эле&#1084;ента&#1084; левой панели и найти &#1084;акси&#1084;у&#1084;
+ свойства Right. Да, ду&#1084;аю в загрузке фор&#1084;ы &#1084;ожно по&#1084;естить пересчет.
+</div>
+<h2>Message 952</h2>
+<p>Date: 06.02.2017 7:45:17</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Встает задача найти куда &#1084;ожно поставить програ&#1084;&#1084;ное пере&#1084;ещение границы панелей после завершения загрузки,
+ но до показа фор&#1084;ы пользователю</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&#1084;ожет использовать событие Shown</span></p>
+</div>

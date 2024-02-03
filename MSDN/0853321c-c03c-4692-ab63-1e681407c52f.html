@@ -1,0 +1,54 @@
+<h2>Message 300</h2>
+<p>Date: 03.02.2019 17:08:45</p>
+<div>
+<p>Для того, чтобы подключиться к уже запущенно&#1084;у экзе&#1084;пляру Excel, используйте Marshal.GetActiveObject:</p>
+<pre class="prettyprint" style="">Excel.Application app = (Excel.Application) Marshal.GetActiveObject(&quot;Excel.Application&quot;);</pre>
+Если результат null, значит Excel не открыт. В противно&#1084; случае, проходите по Workbooks и с&#1084;отрите, есть ли та&#1084; то, что нужно ва&#1084; (по свойству Name или Path).&nbsp;&nbsp;<br/>
+<p></p>
+<p></p>
+<br/>
+</div>
+<h2>Message 297</h2>
+<p>Date: 07.02.2019 9:59:39</p>
+<div>
+<p>Совре&#1084;енные версии Excel открывают все доку&#1084;енты в одно&#1084; процессе, если их явно не попросить об обратно&#1084;.&nbsp;</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>та&#1084; по-любо&#1084;у нужно пробежаться цикло&#1084; foreach по какой-то коллекции, наверное, и по свойству Name отрубить
+ его.</em> &quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Да, я же написал:</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>В противно&#1084; случае, проходите по Workbooks и с&#1084;отрите, есть ли та&#1084; то, что нужно ва&#1084; (по свойству Name
+ или Path)</em>.&quot;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+<p>Name - и&#1084;я файла, Path - каталог. FullName, вроде, содержит полный путь к файлу.</p>
+</div>
+<h2>Message 296</h2>
+<p>Date: 07.02.2019 10:52:58</p>
+<div>
+<p>И не должно. Вызов GetActiveObject должен быть до создания нового экзе&#1084;пляра Excel. Иначе он вернет этот же ва&#1084;и созданный экзе&#1084;пляр...</p>
+<pre class="prettyprint">Excel.Application app=null;           
+
+try
+{
+    app = (Excel.Application)Marshal.GetActiveObject(&quot;Excel.Application&quot;);
+}
+catch (COMException) { app = null; }
+
+if (app != null)
+{
+    foreach (Excel.Workbook x in app.Workbooks)
+    {
+	if (x.FullName == path &#43; @&quot;\file.xlsx&quot;)
+        {
+            x.Save();
+            x.Close(true);
+            break;
+        }
+    }
+}
+
+app = new Excel.Application();
+
+//работа с Excel...
+
+System.Diagnostics.Process.Start(Directory.GetCurrentDirectory() &#43; @&quot;\file.xlsx&quot;);</pre>
+<br/>
+<p></p>
+</div>

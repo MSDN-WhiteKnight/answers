@@ -1,0 +1,156 @@
+<h2>Message 878</h2>
+<p>Date: 23.03.2017 3:21:45</p>
+<div>
+<p>Visual Studio 2012, опти&#1084;изация включена: вычисляется 2 раза</p>
+<pre class="prettyprint">private void Form1_Paint(object sender, PaintEventArgs e)
+{
+    e.Graphics.DrawLine(Pens.Black, 0, this.captionTextHeight &#43; this.captionLineWidth / 2, this.Width, this.captionTextHeight &#43; this.captionLineWidth / 2);
+}
+
+// Code size       67 (0x43)
+  .maxstack  8
+  IL_0000:  ldarg.2
+  IL_0001:  callvirt   instance class [System.Drawing]System.Drawing.Graphics [System.Windows.Forms]System.Windows.Forms.PaintEventArgs::get_Graphics()
+  IL_0006:  call       class [System.Drawing]System.Drawing.Pen [System.Drawing]System.Drawing.Pens::get_Black()
+  IL_000b:  ldc.r4     0.0
+  IL_0010:  ldarg.0
+  IL_0011:  ldfld      float32 WindowsFormsApplication1.Form1::captionTextHeight
+  IL_0016:  ldarg.0
+  IL_0017:  ldfld      float32 WindowsFormsApplication1.Form1::captionLineWidth
+  IL_001c:  ldc.r4     2.
+  IL_0021:  div
+  IL_0022:  add
+  IL_0023:  ldarg.0
+  IL_0024:  call       instance int32 [System.Windows.Forms]System.Windows.Forms.Control::get_Width()
+  IL_0029:  conv.r4
+  IL_002a:  ldarg.0
+  IL_002b:  ldfld      float32 WindowsFormsApplication1.Form1::captionTextHeight
+  IL_0030:  ldarg.0
+  IL_0031:  ldfld      float32 WindowsFormsApplication1.Form1::captionLineWidth
+  IL_0036:  ldc.r4     2.
+  IL_003b:  div
+  IL_003c:  add
+  IL_003d:  callvirt   instance void [System.Drawing]System.Drawing.Graphics::DrawLine(class [System.Drawing]System.Drawing.Pen,
+                                                                                       float32,
+                                                                                       float32,
+                                                                                       float32,
+                                                                                       float32)</pre>
+<strong>Поправка:</strong> вывод неверный, так как JIT дополнительно опти&#1084;изирует при выполнении, значение вычисляется один раз (с&#1084;. ниже)<br/>
+<p></p>
+<br/>
+<br/>
+</div>
+<h2>Message 876</h2>
+<p>Date: 23.03.2017 14:37:19</p>
+<div>
+<p>А, ну да. Я забыл, что в CLR JIT зани&#1084;ается опти&#1084;изацией. Действительно, введение про&#1084;ежуточной пере&#1084;енной не дает выигрыша.</p>
+<p>Те&#1084; не &#1084;енее, использование у&#1084;ножения в&#1084;есто степени, по &#1084;ои&#1084; из&#1084;ерения&#1084;, дает существенный выигрыш</p>
+<pre class="prettyprint"> class Program
+    {
+        const int N = 10000000;
+        static Random r=new Random();
+
+        static double Magic(double x, double y)
+        {
+            return 5.1 * r.NextDouble() * x &#43; 6.6 * r.NextDouble() * y;
+        }
+
+        static void Main(string[] args)
+        {
+            Stopwatch s;
+            Random rnd;
+            int i,k,m;
+            double x, y,z,t;
+
+            s = new Stopwatch();
+            rnd = new Random();
+            Console.WriteLine(&quot;Вычисление степени с по&#1084;ощью Math.Pow...&quot;);
+            s.Start();
+            for (i = 0; i &lt; N; i&#43;&#43;)
+            {
+                x = rnd.NextDouble() * 10.0;
+                y = Math.Pow(x, 2);
+                if (y == 100.0) Console.WriteLine(&quot;Bingo!&quot;);
+            }
+            s.Stop();
+            Console.WriteLine(&quot;t=&quot; &#43; s.ElapsedMilliseconds.ToString());
+
+            s = new Stopwatch();
+            rnd = new Random();
+            Console.WriteLine(&quot;Вычисление степени с по&#1084;ощью у&#1084;ножения...&quot;);
+            s.Start();
+            for (i = 0; i &lt; N; i&#43;&#43;)
+            {
+                x = rnd.NextDouble() * 10.0;
+                y = x * x;
+                if (y == 100.0) Console.WriteLine(&quot;Bingo!&quot;);
+            }
+            s.Stop();
+            Console.WriteLine(&quot;t=&quot; &#43; s.ElapsedMilliseconds.ToString());
+            /* ------------------------------------------------------------------*/
+
+            s = new Stopwatch();
+            rnd = new Random();
+            Console.WriteLine(&quot;Вычисление частного деление&#1084;...&quot;);
+            s.Start();
+            for (i = 0; i &lt; N; i&#43;&#43;)
+            {
+                k = rnd.Next();
+                m = k / 2;
+                if (m == 12345) Console.WriteLine(&quot;JackPot!&quot;);
+            }
+            s.Stop();
+            Console.WriteLine(&quot;t=&quot; &#43; s.ElapsedMilliseconds.ToString());
+
+            s = new Stopwatch();
+            rnd = new Random();
+            Console.WriteLine(&quot;Вычисление частного сдвиго&#1084;...&quot;);
+            s.Start();
+            for (i = 0; i &lt; N; i&#43;&#43;)
+            {
+                k = rnd.Next();
+                m = k &gt;&gt; 1;
+                if (m == 12345) Console.WriteLine(&quot;JackPot!&quot;);
+            }
+            s.Stop();
+            Console.WriteLine(&quot;t=&quot; &#43; s.ElapsedMilliseconds.ToString());
+
+            /* ------------------------------------------------------------------*/
+
+            s = new Stopwatch();
+            rnd = new Random();
+            Console.WriteLine(&quot;Расчет без про&#1084;ежуточной пере&#1084;енной...&quot;);
+            s.Start();
+            for (i = 0; i &lt; N; i&#43;&#43;)
+            {
+                x = rnd.NextDouble() * 10.0;
+                y = rnd.NextDouble() * 5.0;
+                z = Magic(x &#43; y, x &#43; y);
+                if (z == 1111.11) Console.WriteLine(&quot;Magic!&quot;);
+            }
+            s.Stop();
+            Console.WriteLine(&quot;t=&quot; &#43; s.ElapsedMilliseconds.ToString());
+
+            s = new Stopwatch();
+            rnd = new Random();
+            Console.WriteLine(&quot;Расчет с про&#1084;ежуточной пере&#1084;енной...&quot;);
+            s.Start();
+            for (i = 0; i &lt; N; i&#43;&#43;)
+            {
+                x = rnd.NextDouble() * 10.0;
+                y = rnd.NextDouble() * 5.0;
+                t=x &#43; y;
+                z = Magic(t, t);
+                if (z == 1111.11) Console.WriteLine(&quot;Magic!&quot;);
+            }
+            s.Stop();
+            Console.WriteLine(&quot;t=&quot; &#43; s.ElapsedMilliseconds.ToString());
+
+            Console.ReadKey();
+        }
+    }  
+</pre>
+<img alt="" src="http://vadim--111.narod.ru/files/optimize.png"><br/>
+<p></p>
+<p></p>
+</div>

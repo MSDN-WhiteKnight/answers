@@ -1,0 +1,32 @@
+<h2>Message 370</h2>
+<p>Date: 02.10.2018 11:54:47</p>
+<div>
+Покажите вывод Exception.ToString()
+</div>
+<h2>Message 369</h2>
+<p>Date: 02.10.2018 12:01:03</p>
+<div>
+У вас это &quot;необрабатывае&#1084;ое исключение&quot; как выглядит? Как окно с красны&#1084; кресто&#1084; и кучей текста? Если да, то просто покажите этот текст.
+</div>
+<h2>Message 368</h2>
+<p>Date: 02.10.2018 18:04:43</p>
+<div>
+Изображение не отображалось, когда я в первый раз открывал те&#1084;у. Ну а так, в сообщении написано довольно четко, в че&#1084; пробле&#1084;а: файл занят други&#1084; процессо&#1084;. Найдите каки&#1084; и&#1084;енно (openfiles, Resource Monitor, Process
+ Monitor и т.п.) и все станет ясно. С высокой вероятностью либо ваш собственный зависший процесс, либо антивирус или что-то в это&#1084; роде.<br/>
+</div>
+<h2>Message 367</h2>
+<p>Date: 02.10.2018 18:42:51</p>
+<div>
+<p>&quot;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>Поче&#1084;у не отработал TRY</em></span>&quot;</p>
+<p>Не знаю. По той инфор&#1084;ации, которую вы привели, сложно сказать что-то определенное. Напри&#1084;ер, исключение &#1084;ожет возникать в фоново&#1084; потоке, который библиотека создает внутри себя, поэто&#1084;у оно и не попадает в ваши try.
+</p>
+<p>Строго говоря, не нужно увешивать все блока&#1084;и try, &#1084;ожно в&#1084;есто этого установить обработчики
+<code style="border:0px; font-weight:inherit; font-style:inherit; font-family:Consolas,Menlo,Monaco,'Lucida Console','Liberation Mono','DejaVu Sans Mono','Bitstream Vera Sans Mono','Courier New',monospace,sans-serif; margin:0px; outline:0px; padding:1px 5px; font-variant:inherit; line-height:inherit; font-size:13px; vertical-align:baseline; color:#005999; background-color:#eff0f1; white-space:pre-wrap">
+<a href="https://msdn.microsoft.com/ru-ru/library/system.appdomain.unhandledexception(v=vs.110).aspx" style="border:0px; font-weight:inherit; font-style:inherit; font-family:Arial,'Helvetica Neue',Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#005999; list-style-type:none; line-height:inherit; font-size:15px; vertical-align:baseline">AppDomain.UnhandledException</a></code><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&nbsp;и&nbsp;</span><a href="https://msdn.microsoft.com/ru-ru/library/system.windows.forms.application.threadexception(v=vs.110).aspx" style="border:0px; font-family:Arial,'Helvetica Neue',Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#005999; list-style-type:none; line-height:inherit; font-size:15px; vertical-align:baseline"><code style="border:0px; font-weight:inherit; font-style:inherit; font-family:Consolas,Menlo,Monaco,'Lucida Console','Liberation Mono','DejaVu Sans Mono','Bitstream Vera Sans Mono','Courier New',monospace,sans-serif; margin:0px; outline:0px; padding:1px 5px; font-variant:inherit; line-height:inherit; font-size:13px; vertical-align:baseline; background-color:#eff0f1; white-space:pre-wrap">Application.ThreadException</code></a>.</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&nbsp;&quot;<em>Поче&#1084;у убрав фраг&#1084;ент кода</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">опять же, пользуясь хрустальны&#1084; шаро&#1084; &#1084;огу предположить, что без этого кода файл SystemInfo.txt получается гораздо &#1084;еньше
+ раз&#1084;еро&#1084;, поэто&#1084;у антивирус его проверяет быстрее и вы не натыкаетесь на ошибку. Са&#1084;о по себе получение инфор&#1084;ации о дисках точно никак не &#1084;ожет заблокировать какой-то отдельный текстовый файл.</span></p>
+<br/>
+<br/>
+<br/>
+</div>

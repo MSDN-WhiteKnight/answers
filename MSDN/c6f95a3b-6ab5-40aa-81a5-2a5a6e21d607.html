@@ -1,0 +1,34 @@
+<h2>Message 838</h2>
+<p>Date: 23.04.2017 18:33:32</p>
+<div>
+<p>Да тут все просто. Нужно перетащить на фор&#1084;у userTableAdapter (если его еще та&#1084; нету), в нужно&#1084; &#1084;есте кода вызвать у него &#1084;етод FillPass, и построить строку на основе содержи&#1084;ого DataTable. Как-то так:</p>
+<pre class="prettyprint">this.userTableAdapter.FillPass(this.myDataSet.userTable,userid);
+
+StringBuilder sb=new StringBuilder(300);
+foreach (DataRow row in this.myDataSet.userTable.Rows)
+{
+    foreach (object item in row.ItemArray)
+    {
+        sb.Append(item.ToString()&#43;&quot;; &quot;); 
+    }
+    sb.AppendLine();
+}
+textBox1.Text = sb.ToString();</pre>
+<br/>
+<p></p>
+</div>
+<h2>Message 837</h2>
+<p>Date: 23.04.2017 19:22:04</p>
+<div>
+<p>Я же просто для при&#1084;ера привел. Если нужен только второй столбец, возь&#1084;ите только его</p>
+<pre class="prettyprint">this.userTableAdapter.FillPass(this.myDataSet.userTable,userid);
+
+StringBuilder sb=new StringBuilder(300);
+foreach (DataRow row in this.myDataSet.userTable.Rows)
+{    
+    sb.AppendLine(row.ItemArray[1].ToString());     
+}
+textBox1.Text = sb.ToString();</pre>
+<br/>
+<p></p>
+</div>

@@ -1,0 +1,388 @@
+<h2>Message 200</h2>
+<p>Date: 26.08.2019 12:14:49</p>
+<div>
+<p>Напри&#1084;ер так:</p>
+<pre class="prettyprint">using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using System.Net;
+
+namespace WpfApplication1
+{
+    public partial class MainWindow : Window
+    {
+        const string prefix = &quot;MyComputer&quot;;
+        const int port = 8080;
+        ShellItemsHttpListener listener;
+        public static Guid FOLDERID_ComputerFolder = new Guid(&quot;0AC0837C-BBF8-452A-850D-79D08E667CA7&quot;);        
+
+        public MainWindow()
+        {         
+            InitializeComponent();
+            List&lt;ShellItem&gt; items = GetItems(FOLDERID_ComputerFolder); //получае&#1084; список эле&#1084;ентов каталога
+            listener = new ShellItemsHttpListener(items, prefix, port);
+            listener.Start(); //запускае&#1084; HTTP-сервер
+            webbrowser.Navigate(&quot;http://localhost:&quot; &#43; port.ToString() &#43; &quot;/&quot; &#43; prefix &#43; &quot;/&quot;); //открывае&#1084; страницу в WebBrowser
+            webbrowser.Navigating &#43;= webbrowser_Navigating;
+        }
+
+        void webbrowser_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
+        {
+            //обработка перенаправлений URL с http:// на file://
+            Uri uri = listener.ProcessRedirect(e.Uri.AbsoluteUri);
+            if (uri != null) { webbrowser.Navigate(uri); e.Cancel = true; }            
+        }
+
+        private void bHome_Click(object sender, RoutedEventArgs e)
+        {            
+            webbrowser.Navigate(&quot;http://localhost:&quot; &#43; port.ToString() &#43; &quot;/&quot; &#43; prefix &#43; &quot;/&quot;);    
+        }
+
+        public static List&lt;ShellItem&gt; GetItems(Guid FolderID) //Получает список эле&#1084;ентов каталога по GUID
+        {            
+            IntPtr p = IntPtr.Zero;
+            IShellFolder pFolder = null;
+            IEnumIDList pEnum = null;
+            IntPtr pItem = IntPtr.Zero;                      
+            IntPtr lpStr = IntPtr.Zero;
+            STRRET strret;
+            Guid guid = typeof(IShellFolder).GUID;
+            List&lt;ShellItem&gt; items = new List&lt;ShellItem&gt;();
+            ShellItem si;          
+
+            try
+            {
+                int hr = SHGetKnownFolderIDList(ref FolderID, 0, IntPtr.Zero, out p);
+                if (hr != 0) throw Marshal.GetExceptionForHR(hr);
+
+                hr = SHBindToObject(null, p, null, ref guid, out pFolder);
+                if (hr != 0) throw Marshal.GetExceptionForHR(hr);
+                                
+                pFolder.EnumObjects(IntPtr.Zero, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, out pEnum); 
+
+                while (true)
+                {
+                    pItem = IntPtr.Zero; 
+                    uint res = pEnum.Next(1, out pItem, IntPtr.Zero);
+                    if (res != 0) break;
+                    si = new ShellItem();
+
+                    //display name
+                    lpStr = IntPtr.Zero;
+                    strret = new STRRET();
+                    pFolder.GetDisplayNameOf(pItem, SHGDN_NORMAL, out strret); 
+                    hr = StrRetToStr(ref strret, pItem, out lpStr);
+                    if (hr != 0) throw Marshal.GetExceptionForHR(hr);
+                    string s = Marshal.PtrToStringUni(lpStr);
+                    si.DisplayName = s;
+                    CoTaskMemFree(lpStr);
+
+                    //path
+                    lpStr = IntPtr.Zero;
+                    strret = new STRRET();
+                    pFolder.GetDisplayNameOf(pItem, SHGDN_FORPARSING, out strret);
+                    hr = StrRetToStr(ref strret, pItem, out lpStr);
+                    if (hr != 0) throw Marshal.GetExceptionForHR(hr);
+                    s = Marshal.PtrToStringUni(lpStr);
+                    try { si.Path = new Uri(s); }
+                    catch (UriFormatException) { si.Path = new Uri(&quot;file://localhost/&quot;); }
+                    CoTaskMemFree(lpStr);
+
+                    //icon
+                    Guid iid_IIExtractIcon = typeof(IExtractIcon).GUID;
+                    IExtractIcon pExtract;
+                    pFolder.GetUIObjectOf(IntPtr.Zero, 1, new IntPtr[] { pItem }, ref iid_IIExtractIcon, 0, out pExtract);
+                    
+                    StringBuilder sbIcon = new StringBuilder(260);
+                    int index=0;
+                    uint flags; 
+                    hr = pExtract.GetIconLocation(GIL_FORSHELL, sbIcon, 260, out index, out flags);
+                    if (hr == 0)
+                    {
+                        IntPtr hIconSmall = IntPtr.Zero, hIconLarge = IntPtr.Zero;
+                        hr = pExtract.Extract(sbIcon.ToString(), (uint)index, out hIconLarge, out hIconSmall, 0x00140014);
+                        if (hr == 0 &amp;&amp; hIconSmall != IntPtr.Zero)
+                        {
+                            var icon = System.Drawing.Icon.FromHandle(hIconSmall);
+                            var bitmap = icon.ToBitmap();
+
+                            using (bitmap)
+                            {
+                                MemoryStream ms = new MemoryStream();
+                                bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                                si.Image = ms.ToArray();
+                            }
+
+                            DestroyIcon(hIconSmall);
+                            DestroyIcon(hIconLarge);
+                        }
+                        else { si.Image = new byte[0]; }                       
+                    }
+                    else
+                    {
+                        si.Image = new byte[0];
+                    }
+                    items.Add(si);
+                    CoTaskMemFree(pItem);
+                }
+
+                return items;
+            }
+            finally
+            {
+                if (p != IntPtr.Zero) CoTaskMemFree(p);
+                if (pFolder != null) Marshal.ReleaseComObject(pFolder);
+                if (pEnum != null) Marshal.ReleaseComObject(pEnum);
+            }
+
+        }                     
+
+        public const uint SHGFI_DISPLAYNAME = 0x000000200;
+        public const uint SHGFI_ICON = 0x000000100;
+        public const uint SHGFI_PIDL = 0x000000008;
+        public const uint GIL_FORSHELL = 0x0002;
+        public const int SHGDN_NORMAL = 0x0000;
+        public const int SHGDN_FORPARSING = 0x8000;
+        public const int SHCONTF_FOLDERS = 0x0020;
+        public const int SHCONTF_NONFOLDERS = 0x0040;                
+
+        [DllImport(&quot;shell32.dll&quot;)]
+        public static extern int SHGetKnownFolderIDList(ref Guid rfid, int dwFlags, IntPtr hToken, out IntPtr ppidl);
+        
+        [DllImport(&quot;ole32.dll&quot;)]
+        static extern void CoTaskMemFree(IntPtr pv);
+        
+        [DllImport(&quot;shell32.dll&quot;)]        
+        static extern int SHBindToObject(
+            IShellFolder psf,
+            IntPtr pidl,
+            [MarshalAs(UnmanagedType.IUnknown)] object pbc,
+            ref Guid riid,
+            out IShellFolder ppv);
+
+        [DllImport(&quot;Shlwapi.dll&quot;, CharSet = CharSet.Unicode)]
+        static extern int StrRetToStr( ref STRRET pstr,  IntPtr pidl, out IntPtr ppsz);
+        
+        [DllImport(&quot;user32.dll&quot;)]
+        static extern bool DestroyIcon(IntPtr hIcon);
+    }
+
+    public struct ShellItem
+    {
+        public string DisplayName { get; set; }
+        public Uri Path { get; set; }
+        public byte[] Image { get; set; }
+    }
+
+    public class ShellItemsHttpListener //возвращает содержи&#1084;ое каталога в виде веб-страницы
+    {
+        Dictionary&lt;string, byte[]&gt; images; //таблица изображений
+        Dictionary&lt;string, Uri&gt; redirects; //таблица редиректов
+        string html;
+        string urlprefix;
+        int httpport;
+        HttpListener listener;        
+
+        public ShellItemsHttpListener(List&lt;ShellItem&gt; items, string prefix, int port)
+        {
+            StringBuilder sb = new StringBuilder();
+            int n = 1;
+
+            //генерируе&#1084; веб-страницу...
+            //устанавливае&#1084; режи&#1084; IE8, чтобы работали стили
+            sb.Append(&quot;&lt;html&gt;&lt;head&gt;&lt;meta charset=\&quot;utf-8\&quot;&gt;&lt;meta http-equiv=\&quot;X-UA-Compatible\&quot; content=\&quot;IE=8\&quot; /&gt;&lt;style&gt;&quot;);
+
+            //устанавливае&#1084; стили, и&#1084;итирующий внешний вид проводника (в режи&#1084;е прос&#1084;отра &quot;Список&quot;)
+            sb.Append(&quot;a { color: black; text-decoration: none;  } a:hover { color: black; text-decoration: underline;} &quot;);
+            sb.Append(&quot;tr:hover { background-color: lightblue;} img {border:none;}&quot;);
+            sb.Append(&quot;&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&quot;);
+
+            //фор&#1084;ируе&#1084; список эле&#1084;ентов
+            sb.Append(&quot;&lt;table cellspacing=\&quot;0\&quot; border=\&quot;0\&quot;&gt;&quot;);
+            images = new Dictionary&lt;string, byte[]&gt;();
+            redirects = new Dictionary&lt;string, Uri&gt;();
+            
+            foreach (ShellItem item in items)
+            {                
+                sb.Append(&quot;&lt;tr&gt;&lt;td&gt;&lt;a href=\&quot;&quot; &#43; n.ToString() &#43; &quot;.html\&quot; &gt;&quot;);
+                sb.Append(&quot;&lt;img width=\&quot;20\&quot; height=\&quot;20\&quot; src=\&quot;&quot; &#43; n.ToString() &#43; &quot;.png\&quot;/&gt;&lt;/a&gt;&lt;/td&gt;&quot;);  
+                sb.Append(&quot;&lt;td&gt;&lt;a href=\&quot;&quot; &#43; n.ToString() &#43; &quot;.html\&quot; &gt;&quot;);
+                sb.Append(item.DisplayName &#43; &quot;&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;&quot;);
+                images[n.ToString() &#43; &quot;.png&quot;] = item.Image;
+                redirects[n.ToString() &#43; &quot;.html&quot;] = item.Path;
+                n&#43;&#43;;
+            }
+            sb.Append(&quot;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;&quot;);
+            html = sb.ToString();
+
+            //инициализация HttpListener...
+            listener = new HttpListener();            
+            listener.Prefixes.Add(&quot;http://localhost:&quot;&#43;port.ToString()&#43;&quot;/&quot; &#43; prefix&#43;&quot;/&quot;);
+            urlprefix = prefix;
+            httpport = port;
+        }
+
+        public void Start() //запускает HTTP-сервер     
+        {           
+            Task.Run(() =&gt;
+            {
+                try
+                {
+                    listener.Start();
+                    while (true)
+                    {                        
+                        HttpListenerContext context = listener.GetContext(); //ожидае&#1084; запроса
+                        HttpListenerRequest request = context.Request;
+                        HttpListenerResponse response = context.Response;
+
+                        //анализ URL...
+                        byte[] buffer = new byte[0];
+                        string urlbegin = &quot;/&quot; &#43; urlprefix &#43; &quot;/&quot;;
+                        string urlfile = request.RawUrl.Substring(urlbegin.Length);
+                        if (urlfile == &quot;&quot; || urlfile.StartsWith(&quot;index&quot;) || urlfile.StartsWith(&quot;default&quot;))
+                        {
+                            //отдае&#1084; основную страницу
+                            buffer = System.Text.Encoding.UTF8.GetBytes(html);
+                            response.ContentLength64 = buffer.Length;
+                            response.ContentEncoding = Encoding.UTF8;
+                        }
+                        else if (urlfile.EndsWith(&quot;.png&quot;))
+                        {
+                            //отдае&#1084; изображение
+                            buffer = images[urlfile];
+                            response.ContentLength64 = buffer.Length;
+                            response.ContentType = &quot;image/png&quot;;
+                        }
+                        else
+                        {
+                            buffer = System.Text.Encoding.UTF8.GetBytes(&quot;Ошибка: Страница не найдена&quot;);
+                            response.StatusCode = 404;
+                            response.ContentType = &quot;text/plain&quot;;
+                        }
+
+                        //возвращае&#1084; ответ
+                        System.IO.Stream output = response.OutputStream;
+                        output.Write(buffer, 0, buffer.Length);
+                        output.Close();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString(), &quot;HttpListener error&quot;);
+                }
+            });
+        }
+
+        public Uri ProcessRedirect(string inputurl)
+        {
+            //обработка перенаправлений...            
+            string urlbegin = &quot;http://localhost:&quot; &#43; httpport.ToString() &#43; &quot;/&quot; &#43; urlprefix &#43; &quot;/&quot;;
+
+            if (inputurl.StartsWith(urlbegin))
+            {
+                string urlfile = inputurl.Substring(urlbegin.Length);
+                if (!urlfile.EndsWith(&quot;.html&quot;)) return null;
+
+                if (redirects.ContainsKey(urlfile))
+                {
+                    return redirects[urlfile];
+                }
+                else return null;
+            }
+            else return null;
+        }
+    }    
+    
+    /* COM Interfaces */
+
+    [ComImport]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    [Guid(&quot;000214E6-0000-0000-C000-000000000046&quot;)]
+    public interface IShellFolder
+    {
+        void ParseDisplayName(IntPtr hwnd, IntPtr pbc, String pszDisplayName, UInt32 pchEaten, out IntPtr ppidl, UInt32 pdwAttributes);
+        void EnumObjects(IntPtr hwnd, int grfFlags, out IEnumIDList ppenumIDList);
+        void BindToObject(IntPtr pidl, IntPtr pbc, [In]ref Guid riid, out IntPtr ppv);
+        void BindToStorage(IntPtr pidl, IntPtr pbc, [In]ref Guid riid, out IntPtr ppv);
+        [PreserveSig]  Int32 CompareIDs(Int32 lParam, IntPtr pidl1, IntPtr pidl2);
+        void CreateViewObject(IntPtr hwndOwner, [In] ref Guid riid, out IntPtr ppv);
+        void GetAttributesOf(UInt32 cidl, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)]IntPtr[] apidl, ref uint rgfInOut);
+        void GetUIObjectOf(IntPtr hwndOwner, UInt32 cidl, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)]IntPtr[] apidl, 
+            [In] ref Guid riid, UInt32 rgfReserved, out IExtractIcon ppv);
+        void GetDisplayNameOf(IntPtr pidl, int uFlags, out STRRET pName);
+        void SetNameOf(IntPtr hwnd, IntPtr pidl, String pszName, int uFlags, out IntPtr ppidlOut);
+    }   
+    
+    [StructLayout(LayoutKind.Explicit, Size = 520)]
+    public struct STRRETinternal
+    {
+        [FieldOffset(0)] public IntPtr pOleStr;
+
+        [FieldOffset(0)] public IntPtr pStr;  
+
+        [FieldOffset(0)] public uint uOffset;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct STRRET
+    {
+        public uint uType;
+        public STRRETinternal data;
+    }
+
+    [ComImport]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    [Guid(&quot;000214F2-0000-0000-C000-000000000046&quot;)]
+    public interface IEnumIDList
+    {
+        [PreserveSig()] uint Next(uint celt, out IntPtr rgelt, IntPtr pceltFetched);
+        [PreserveSig()] uint Skip(uint celt);
+        [PreserveSig()] uint Reset();
+        [PreserveSig()] uint Clone(out IEnumIDList ppenum);
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    public struct SHFILEINFO
+    {
+        public IntPtr hIcon;
+        public int iIcon;
+        public uint dwAttributes;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+        public string szDisplayName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
+        public string szTypeName;
+    }
+
+    [ComImport()]
+    [Guid(&quot;000214fa-0000-0000-c000-000000000046&quot;)]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IExtractIcon
+    {
+        [PreserveSig] int GetIconLocation(
+            uint uFlags,
+            [Out, MarshalAs(UnmanagedType.LPWStr, SizeParamIndex = 2)] StringBuilder szIconFile,
+            int cchMax,
+            out int piIndex,
+            out uint pwFlags);
+
+
+        [PreserveSig] int Extract(
+            [MarshalAs(UnmanagedType.LPWStr)] string pszFile, uint nIconIndex, out IntPtr phiconLarge,
+            out IntPtr phiconSmall, uint nIconSize);
+    }   
+}
+</pre>
+<p>Источник: <a href="https://devblogs.microsoft.com/oldnewthing/?p=9773">https://devblogs.microsoft.com/oldnewthing/?p=9773</a></p>
+<p>Это, конечно, не настоящий &quot;Мой ко&#1084;пьютер&quot;, но подделано довольно качественно:</p>
+<p><img alt="mycomputer" src="https://social.msdn.microsoft.com/Forums/getfile/1475706"></p>
+<p>Картину только портит багнутый &quot;Мои веб-узлы MSN&quot;, который ведет в никуда и для которого не работает извлечение иконки. Извращения с обработкой&nbsp;webbrowser_Navigating здесь нужны из-за того, что настройки безопасности не позволяют просто так
+ переходить с http://localhost/ на file://localhost/</p>
+<p></p>
+<p></p>
+<p></p>
+</div>

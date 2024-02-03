@@ -1,0 +1,59 @@
+<h2>Message 1028</h2>
+<p>Date: 24.12.2016 9:13:29</p>
+<div>
+<p>Какое исключение генерируется?</p>
+<p>К&nbsp;че&#1084;у тут Variant? Просто <span>SqlParameter</span><span> myPar </span>
+<span>=</span><span> </span><span>new</span><span> </span><span>SqlParameter</span><span>(</span><span>&quot;@List_par&quot;</span><span>,</span><span>
+</span><span></span><span>List_par</span><span>); не работает? </span><br/>
+</p>
+</div>
+<h2>Message 1027</h2>
+<p>Date: 26.12.2016 5:34:08</p>
+<div>
+<p>проще наверно будет сделать вот так:</p>
+<pre class="prettyprint">StringBuilder sb = new StringBuilder();
+SqlParameter myPar;
+for (int i=0; i&lt; List_par.Count; i&#43;&#43;)
+{
+    sb.AppendFormat(&quot;@p{0},&quot;,i);
+	myPar=new SqlParameter(&quot;p&quot;&#43;i.ToString(), List_par[i]);
+    query.Parameters.Add(myPar);
+}
+
+query.CommandText = string.Format(&quot;SELECT f.id, udf.FOR_LIST(f.id,[{0}]) AS funk FROM Items f&quot;, sb.ToString().TrimEnd(','));</pre>
+<br/>
+<br/>
+<p><br/>
+</p>
+<br/>
+<br/>
+</div>
+<h2>Message 1026</h2>
+<p>Date: 26.12.2016 6:39:31</p>
+<div>
+<p>да, в&#1084;есто List_par.Count - List_par.Length</p>
+<p>в&#1084;есто CommandText - QueryText</p>
+<p>но для начала попробуйте так прописать статически запрос (с одинарны&#1084;и кавычка&#1084;и):</p>
+<pre class="prettyprint">query.QueryText=&quot;SELECT f.id, udf.FOR_LIST(f.id, ['auto_1','auto_2']) AS funk FROM Items f&quot;;</pre>
+<br/>
+<p></p>
+</div>
+<h2>Message 1025</h2>
+<p>Date: 26.12.2016 7:47:04</p>
+<div>
+<p>если так работает, то и &#1084;ой предыдущий при&#1084;ер должен работать</p>
+<p>&#1084;ожно еще так попробовать (подключить Newtonsoft.Json.Linq):</p>
+<pre class="prettyprint">string[] arr={ &quot;auto_1&quot;, &quot;auto_2&quot; };
+JArray List_par=new JArray(arr);
+SqlParameter myPar = new SqlParameter(&quot;@List_par&quot;, List_par);
+query.Parameters.Add(myPar);</pre>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;</span><em>через фор&#1084;ирование строки запроса в следующе&#1084; виде...Наверное придется так и делать</em><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Будьте вни&#1084;ательны со сборкой запросов напря&#1084;ую. Если содержи&#1084;ое list_par будет приходить в програ&#1084;&#1084;у из
+ внешнего источника, воз&#1084;ожна SQL-инъекция.&nbsp;</span><br/>
+</p>
+<p></p>
+<p><br/>
+</p>
+<br/>
+</div>

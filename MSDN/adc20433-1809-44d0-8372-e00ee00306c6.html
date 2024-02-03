@@ -1,0 +1,16 @@
+<h2>Message 1168</h2>
+<p>Date: 06.02.2015 3:15:34</p>
+<div>
+<p>Значение&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:20.1620178222656px">eof должно проверяться после операции&nbsp;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:20.1620178222656px">in.get(ch),
+ пото&#1084;у что&nbsp;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:20.1620178222656px">eof устанавливается в true при попытке считать байт за концо&#1084; файла. В
+ это&#1084; случае из потока ничего не считывается и в пере&#1084;енной находится посл. си&#1084;вол. Правильный код:</span></p>
+<pre class="prettyprint">while (true){
+  in.get(ch);
+  if(in.eof())break;
+  cout &lt;&lt; ch;
+ }</pre>
+<br/>
+<p></p>
+<p></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:20.1620178222656px"></span></p>
+</div>

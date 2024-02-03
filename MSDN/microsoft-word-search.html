@@ -1,0 +1,27 @@
+<h2>Поиск текста в Microsoft Word</h2>
+<p>Date: 11.11.2016 9:03:57</p>
+<div>
+<p>как-то так:</p>
+<pre class="prettyprint">object findText = ttt;
+int start=Application.Selection.Start;
+int en=Application.Selection.End;
+            Application.Selection.Find.ClearFormatting();
+            if (Application.Selection.Find.Execute(ref findText,
+                ref missing, ref missing, ref missing, ref missing, ref missing, ref missing,
+                ref missing, ref missing, ref missing, ref missing, ref missing, ref missing,
+                ref missing, ref missing))
+            {
+                MessageBox.Show(&quot;Text found.&quot;);
+            }
+            else
+            {
+                MessageBox.Show(&quot;The text could not be located.&quot;);
+            }
+Application.Selection.Start=start;
+Application.Selection.End=en;</pre>
+<br/>
+<p></p>
+<p></p>
+<br/>
+<br/>
+</div>

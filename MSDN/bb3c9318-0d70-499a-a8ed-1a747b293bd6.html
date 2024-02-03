@@ -1,0 +1,50 @@
+<h2>Message 120</h2>
+<p>Date: 22.06.2020 4:24:43</p>
+<div>
+Контроллер и в обычную библиотеку &#1084;ожно вынести, так как это просто класс. А для cshtml види&#1084;о ва&#1084; нужен Razor Class Library:&nbsp;<a href="https://docs.microsoft.com/ru-ru/aspnet/core/razor-pages/ui-class?view=aspnetcore-3.1&tabs=visual-studio">https://docs.microsoft.com/ru-ru/aspnet/core/razor-pages/ui-class?view=aspnetcore-3.1&amp;tabs=visual-studio</a>
+</div>
+<h2>Message 119</h2>
+<p>Date: 22.06.2020 9:01:31</p>
+<div>
+Ну, в статье написано, в приложении нужно прописать&nbsp;<span style="color:#171717; font-family:SFMono-Regular,Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:14px; white-space:pre; background-color:#fafafa">UseStaticFiles() и</span> статические
+ ресурсы будут доступны по пути <span style="color:#171717; font-family:SFMono-Regular,Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:13.6px; background-color:#f2f2f2">
+_content/{LIBRARY NAME}/</span>.&nbsp;&nbsp;
+</div>
+<h2>Message 118</h2>
+<p>Date: 22.06.2020 11:23:16</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Но добавить к не&#1084;у &quot;.UseStaticWebAssets()&quot; не пони&#1084;аю как</em>&quot;</span></p>
+<p>Попробуйте буквально как написано по ссылке</p>
+<p>startup.cs</p>
+<pre class="prettyprint">public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    ...
+
+    app.UseStaticFiles();
+
+    ...
+}</pre>
+<br/>
+<p></p>
+<p>Program.cs</p>
+<pre class="prettyprint">using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        CreateHostBuilder(args).Build().Run();
+    }
+
+    public static IHostBuilder CreateHostBuilder(string[] args) =&gt;
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =&gt;
+            {
+                webBuilder.UseStaticWebAssets();
+                webBuilder.UseStartup&lt;Startup&gt;();
+            });
+}</pre>
+<br/>
+<p></p>
+</div>

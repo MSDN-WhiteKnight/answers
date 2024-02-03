@@ -1,0 +1,114 @@
+<h2>Работа с буфером обмена</h2>
+<p>Date: 29.01.2017 7:03:28</p>
+<div>
+<p>Используя класс <a href="https://msdn.microsoft.com/ru-ru/library/system.windows.forms.clipboard(v=vs.110).aspx">
+Clipboard</a>:</p>
+<pre class="prettyprint">IDataObject myDataObject=Clipboard.GetDataObject();
+String[] allFormats = myDataObject.GetFormats();
+
+foreach(string s in allFormats)
+{	
+	if(s==DataFormats.UnicodeText)
+	{		
+		string text=myDataObject.GetData(DataFormats.UnicodeText);		
+		MessageBox.Show(&quot;UnicodeText size: &quot;&#43; ((text.Length&#43;1) * 2).ToString());
+	}
+	else
+	{
+		object val=myDataObject.GetData(s);
+		int size=System.Runtime.InteropServices.Marshal.SizeOf(val);
+		MessageBox.Show(s&#43;&quot; size: &quot; &#43; (size).ToString());
+	}
+}</pre>
+<p>С раз&#1084;еро&#1084; не все так просто, он зависит от типа данных... Зная тип и фор&#1084;улу, &#1084;ожно раз&#1084;ер посчитать (в при&#1084;ере раз&#1084;ер Юникод-строки). Для произвольного объекта &#1084;ожно взять раз&#1084;ер неуправляе&#1084;ой
+ па&#1084;яти (Marshal.SizeOf), но не факт что это сработает.</p>
+<p><strong>Добавлено:</strong> да, Marshal.SizeOf бесполезен в это&#1084; случае. С&#1084;. ниже рабочий &#1084;етод.</p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p><a href="https://msdn.microsoft.com/ru-ru/library/system.windows.forms.clipboard(v=vs.110).aspx"></a></p>
+<p><br/>
+</p>
+<br/>
+</div>
+<h2>Message 970</h2>
+<p>Date: 29.01.2017 11:18:44</p>
+<div>
+<p>Вот нашел еще один способ получения раз&#1084;ера произвольного фор&#1084;ата в буфере об&#1084;ена (работает в 80% случаев). Возвращает раз&#1084;ер выделенной па&#1084;яти, который больше или равен раз&#1084;еру са&#1084;их данных, но для некоторых фор&#1084;атов
+ возвращается слишко&#1084; &#1084;аленькое значение или 0:</p>
+<pre class="prettyprint">using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using System.Runtime.InteropServices;
+
+namespace Test
+{
+    public partial class Form1 : Form
+    {
+        [DllImport(&quot;user32.dll&quot;, SetLastError = true)]
+        static extern bool OpenClipboard(IntPtr hWndNewOwner);
+
+        [DllImport(&quot;user32.dll&quot;)]
+        static extern IntPtr GetClipboardData(uint uFormat);
+
+        [DllImport(&quot;kernel32.dll&quot;)]
+        static extern UIntPtr GlobalSize(IntPtr hMem);
+
+        [DllImport(&quot;user32.dll&quot;, SetLastError = true)]
+        static extern bool CloseClipboard();
+
+        public uint GetClipboardDataSize(string fmt)//получение раз&#1084;ера блока па&#1084;яти в буфере об&#1084;ена
+        {
+            DataFormats.Format myFormat;
+            int id;
+            IntPtr hMem;
+            uint size;
+
+            OpenClipboard(IntPtr.Zero);
+
+            myFormat = DataFormats.GetFormat(fmt);
+            id = myFormat.Id;
+            hMem = GetClipboardData((uint)id);
+            size = (uint)GlobalSize(hMem);
+
+            CloseClipboard();
+
+            return size;
+        }
+
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        { 
+            IDataObject myDataObject = Clipboard.GetDataObject();
+            String[] allFormats = myDataObject.GetFormats();//получение списка фор&#1084;атов
+            
+            StringBuilder sb=new StringBuilder(300);  
+            
+            foreach (string s in allFormats)
+            {
+                sb.AppendLine(s &#43; &quot;: &quot; &#43; GetClipboardDataSize(s) &#43; &quot; bytes&quot;);              
+            }            
+
+            MessageBox.Show(sb.ToString());
+        }
+    }
+}</pre>
+Тестирование показало, что Marshal.SizeOf не работает (в с&#1084;ысле, для объектов буфера об&#1084;ена), а также что фор&#1084;ула раз&#1084;ера для Юникод-текста все-таки
+<span class="pun">((</span><span class="pln">text</span><span class="pun">.</span><span class="typ">Length</span><span class="pun">&#43;</span><span class="lit">1</span><span class="pun">)</span><span class="pln">
+</span><span class="pun">*</span><span class="pln"> </span><span class="lit">2</span><span class="pun">) а не
+</span><span class="pun">((</span><span class="pln">text</span><span class="pun">.</span><span class="typ">Length</span><span class="pun">&#43;</span><span class="lit">2</span><span class="pun">)</span><span class="pln">
+</span><span class="pun">*</span><span class="pln"> </span><span class="lit">2</span><span class="pun">)</span><br/>
+<p></p>
+<p></p>
+<p></p>
+</div>

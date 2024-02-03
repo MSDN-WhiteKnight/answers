@@ -1,0 +1,83 @@
+<h2>Message 682</h2>
+<p>Date: 13.09.2017 15:15:40</p>
+<div>
+<p>Не работает, пото&#1084;у что запроса одного кадра недостаточно. Один кадр не обязан содержать всю необходи&#1084;ую инфор&#1084;ацию: он &#1084;ожет содержать только позицию&nbsp;указателя к при&#1084;еру, а са&#1084;о изображение идет в следующе&#1084;
+ кадре. С&#1084;. <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/hh404615(v=vs.85).aspx">
+https://msdn.microsoft.com/en-us/library/windows/desktop/hh404615(v=vs.85).aspx</a></p>
+<p>Поэто&#1084;у нужно в цикле сохранять кадры, а пото&#1084; уже ду&#1084;ать, как из них собрать все что нужно. А чтобы получить следующий кадр без исключения, нужно правильно освобождать ресурсы. Как-то так:</p>
+<pre class="prettyprint">ID3D11Texture2D* AcquiredDesktopImage = nullptr;
+
+IDXGIResource* DesktopResource = nullptr;
+DXGI_OUTDUPL_FRAME_INFO FrameInfo;
+HBITMAP hBmp;
+Int32 num=0;
+
+while(true)
+{
+
+	// If still holding old frame, destroy it.
+	if (AcquiredDesktopImage)
+	{
+		AcquiredDesktopImage-&gt;Release();
+		AcquiredDesktopImage = nullptr;
+	}
+
+	// Get new frame.
+	hr = DeskDupl-&gt;AcquireNextFrame(5000, &amp;FrameInfo, &amp;DesktopResource);
+	if (FAILED(hr))
+    	{
+		if(hr == DXGI_ERROR_ACCESS_LOST)
+		{
+			Console::WriteLine(&quot;DXGI_ERROR_ACCESS_LOST&quot;);
+		}
+		else if(hr==DXGI_ERROR_WAIT_TIMEOUT)
+		{
+			Console::WriteLine(&quot;DXGI_ERROR_WAIT_TIMEOUT&quot;);
+		}
+                else
+                {
+			Console::WriteLine(&quot;Failed to acquire next frame: 0x&quot;&#43;Convert::ToString(hr,16));
+		}
+		Console::ReadKey();
+		continue;
+    	}
+	
+
+	// Query interface for IDXGIResource.
+	hr = DesktopResource-&gt;QueryInterface(__uuidof(ID3D11Texture2D), reinterpret_cast&lt;void**&gt;(&amp;AcquiredDesktopImage));
+	DesktopResource-&gt;Release();
+	DesktopResource = nullptr;
+	EXIT(hr);
+
+	hBmp = (HBITMAP)ExtractBitmap(AcquiredDesktopImage, pDevice);
+
+	///////////////////////////////////////////////////////////////////////////
+	String ^ str=&quot;C:\\Images\\Screenshot&quot;;
+	str&#43;=Convert::ToString(num);
+	str&#43;=&quot;.bmp&quot;;
+	Console::WriteLine(Convert::ToString(num));
+
+	//save image to file
+	System::Drawing::Bitmap ^ bmp;
+	bmp=System::Drawing::Bitmap::FromHbitmap(IntPtr(hBmp));
+	bmp-&gt;Save(str);
+	delete bmp;//no longer need bitmap
+
+	hr = DeskDupl-&gt;ReleaseFrame();//no longer need the frame
+    	if (FAILED(hr))
+    	{
+		Console::WriteLine(&quot;Failed to release frame&quot;);
+        	break;
+    	}
+	
+	num&#43;&#43;;
+	System::Threading::Thread::Sleep(2000);//wait some time for next frame
+		
+}</pre>
+<p></p>
+<p>Только что вы пытаетесь сделать? Для простого сни&#1084;ания скриншотов не обязательно&nbsp;приплетать DirectX. Можно наверно обойтись средства&#1084;и GDI, скаже&#1084; переносо&#1084;&nbsp;BitBlt из одного DC в другой.<br/>
+</p>
+<p></p>
+<p><br/>
+</p>
+</div>

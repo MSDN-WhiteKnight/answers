@@ -1,0 +1,99 @@
+<h2>Message 979</h2>
+<p>Date: 28.01.2017 15:12:04</p>
+<div>
+<p>Так вы определитесь, хотите поле вычисляе&#1084;ое или нет. Если да, сделайте его *в базе* вычисляе&#1084;ы&#1084;. Если нет, просто посчитайте запросо&#1084;<br/>
+</p>
+<p></p>
+<pre class="prettyprint">public void CalculateSum()
+{
+	string queryString = &quot;UPDATE myTable SET Summa = Cena * Kolichestvo&quot;;
+
+	using (OleDbConnection connection = new OleDbConnection(myConnectionString))
+       {
+        OleDbCommand command = new OleDbCommand(queryString, connection);
+        connection.Open();
+        command.ExecuteNonQuery();
+	}	
+	
+}</pre>
+<br/>
+<br/>
+<br/>
+<br/>
+</div>
+<h2>Message 978</h2>
+<p>Date: 28.01.2017 16:00:46</p>
+<div>
+<blockquote>
+<p></p>
+<p>В ваше&#1084; коде выше: <strong>myConnectionString = </strong>строке подключения?
+</p>
+<p>Типо: @&quot;Provider=Microsoft.ACE.OLEDB.12.0;Data Source=&quot; &#43; @&quot;name.accdb&quot;</p>
+<br/>
+<br/>
+</blockquote>
+Да (&#1084;ожно использовать <a href="https://msdn.microsoft.com/ru-ru/library/system.data.oledb.oledbconnectionstringbuilder(v=vs.110).aspx">
+OleDbConnectionStringBuilder</a>)<br/>
+</div>
+<h2>Message 977</h2>
+<p>Date: 28.01.2017 17:13:32</p>
+<div>
+Естественно, после расчета данные нужно снова загрузить в&nbsp;програ&#1084;&#1084;у. У &#1084;еня же нет телепатии понять как вы данные загружаете. Если через TableAdapter, надо вызвать &#1084;етод Fill.&nbsp;
+</div>
+<h2>Message 976</h2>
+<p>Date: 28.01.2017 18:16:32</p>
+<div>
+<p>&quot;<em>Если я Вас правильно понял, то необходи&#1084;о в ту же кнопку добавить строку для заполнения</em>&quot;</p>
+<p>&#43;</p>
+<p>&quot;<em>Обновление DGV происходит только после повторного нажатия кнопки</em>&quot;</p>
+<p>странно... воз&#1084;ожно не срабатывает из-за какого-то кэширования в OleDb</p>
+<p>попробуйте после <span>ExecuteNonQuery </span>вставить connection.Close(); </p>
+<p></p>
+<p></p>
+</div>
+<h2>Message 975</h2>
+<p>Date: 28.01.2017 18:46:15</p>
+<div>
+<p>Если просчитывать без сохранения в базу, тогда надо&nbsp;по друго&#1084;у делать:</p>
+<pre class="prettyprint">DataTable dt=this.appData.GoodsDelivery;
+object val;
+decimal cena,kolichestvo;
+
+foreach(DataRow row in dt){
+
+	val=row[&quot;Цена&quot;];	
+	if(val==DBNull.Value)continue;
+	else cena=(decimal)val;
+	
+	val=row[&quot;Количество&quot;];	
+	if(val==DBNull.Value)continue;
+	else kolichestvo=(decimal)val;
+	
+	row[&quot;Су&#1084;&#1084;а&quot;]=cena*kolichestvo;
+}
+
+dataGridView.Refresh();</pre>
+<br/>
+<p></p>
+</div>
+<h2>Message 974</h2>
+<p>Date: 28.01.2017 19:47:25</p>
+<div>
+<span>foreach</span><span>(</span><span>DataRow</span><span> row </span><span>in</span><span> dt.Rows</span><span>)</span>
+</div>
+<h2>Message 973</h2>
+<p>Date: 28.01.2017 20:03:26</p>
+<div>
+<p>тогда из&#1084;ените decimal&nbsp;на тип который используется в базе, или пропишите
+<strong>cena = Convert.ToDecimal(val);</strong></p>
+<p></p>
+</div>
+<h2>Message 971</h2>
+<p>Date: 29.01.2017 7:21:10</p>
+<div>
+<p>&quot;<em>обновляется су&#1084;&#1084;а на старых данных,&nbsp; на новых нет</em>.&quot;</p>
+<p>Так &#1084;ожет надо просто вызвать dataGridView.EndEdit(); перед обновление&#1084;</p>
+<p>Если dataGridView привязана к BindingSource, также вызвать bindingSource.EndEdit();</p>
+<p></p>
+<p></p>
+</div>

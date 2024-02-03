@@ -1,0 +1,50 @@
+<h2>Message 64</h2>
+<p>Date: 01.03.2021 11:26:33</p>
+<div>
+<p>Поче&#1084;у &quot;экранны&#1084;и&quot;? Значит ли это, что в этой точке будет потенциально окно другого приложения? Или все же только в свое&#1084; окне?</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>Ваш ответ на фору&#1084;е</em></span><br style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>поче&#1084;у-то не отразился.</em></span><br style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>Я его вижу у себя в почте.</em></span></p>
+<p>В другой те&#1084;е вообще половина сообщений за&#1084;енилась на Deleted от MigrationUser. С фору&#1084;о&#1084; явно что-то не так, будьте вни&#1084;ательны. Англоязычные перевели на новую платфор&#1084;у, а национальные похоже просто забросили, так что
+ теперь они работают с перебоя&#1084;и. Делайте резервные копии важных сообщений с фору&#1084;а, если что-то не продублировано в других &#1084;естах.</p>
+</div>
+<h2>Message 63</h2>
+<p>Date: 01.03.2021 16:23:17</p>
+<div>
+<p>Можно создать новую фор&#1084;у, содержащую единственный эле&#1084;ент Label, и задать ее свойство Location</p>
+<pre class="prettyprint">void DisplayMes(string mes, int x, int y) 
+{
+        Form f = new Form();
+        f.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+        f.Text = &quot;Message&quot;;
+        f.StartPosition = FormStartPosition.Manual;
+        f.Location = new System.Drawing.Point(x, y);
+        f.Size = new System.Drawing.Size(200, 75);
+        f.Controls.Add(new Label() { Text = mes });
+        f.Owner = this;
+        f.Show();
+}</pre>
+<br/>
+<p></p>
+</div>
+<h2>Message 62</h2>
+<p>Date: 01.03.2021 17:46:40</p>
+<div>
+Насколько я знаю, нет. Можно получить graphics и вывести строку через graphics.DrawString, &#1084;ожно перехватить создание стандартного MessageBox и из&#1084;енить его положение. Но так или иначе решение получается не проще, че&#1084; создание новой фор&#1084;ы.
+</div>
+<h2>Message 61</h2>
+<p>Date: 02.03.2021 16:11:47</p>
+<div>
+<blockquote>
+<p></p>
+<p><br/>
+</p>
+<p>&nbsp;</p>
+<p></p>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;Приветствую! А как их сделать на данно&#1084; фору&#1084;е? Просто копировать долго.
+<hr>
+<p><br/>
+</p>
+</blockquote>
+В этой те&#1084;е на Technet есть описание способа, как выгрузить все свои сообщения в виде JSON:&nbsp;<a href="https://social.technet.microsoft.com/Forums/ru-RU/56aaea98-32c2-47ff-bad5-42ae8bd6cd8a/1055107710881077108510861089-exchange-forum-eng?forum=adru#51924e67-1641-4665-81c9-c1e269ad2aa2">https://social.technet.microsoft.com/Forums/ru-RU/56aaea98-32c2-47ff-bad5-42ae8bd6cd8a/1055107710881077108510861089-exchange-forum-eng?forum=adru#51924e67-1641-4665-81c9-c1e269ad2aa2</a><br/>
+</div>

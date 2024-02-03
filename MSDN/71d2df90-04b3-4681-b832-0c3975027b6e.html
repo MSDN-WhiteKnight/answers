@@ -1,0 +1,67 @@
+<h2>Message 831</h2>
+<p>Date: 02.05.2017 15:58:26</p>
+<div>
+<p>Оно должно, и оно действительно остается. Но пробле&#1084;а в то&#1084;, что стандартный шаблон кнопки и&#1084;еет свою логику на событие OnMouseOver, которая входит в конфликт с вашей. Поэто&#1084;у его нужно подправить:
+</p>
+<p>- В конструкторе XAML открывает у кнопки свойства.</p>
+<p>- Находи&#1084; свойство Template</p>
+<p>- Правой кнопкой - Извлечь в ресурс</p>
+<p>- Находи&#1084; в шаблоне строку&nbsp;RenderMouseOver=&quot;{TemplateBinding UIElement.IsMouseOver} и выпиливае&#1084; ее.</p>
+<p>Получается как-то так:</p>
+<pre class="prettyprint">&lt;Window x:Class=&quot;StylesTest.MainWindow&quot;
+        xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
+        xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+        Title=&quot;MainWindow&quot; Height=&quot;350&quot; Width=&quot;525&quot; xmlns:my=&quot;clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero&quot;&gt;
+    &lt;Window.Resources&gt;
+        &lt;Style TargetType=&quot;{x:Type Button}&quot;&gt;
+            &lt;Style.Setters&gt;
+                &lt;Setter Property=&quot;Button.Background&quot; Value=&quot;Black&quot; /&gt;
+                &lt;Setter Property=&quot;Button.Foreground&quot; Value=&quot;White&quot; /&gt;
+                &lt;Setter Property=&quot;Button.FontFamily&quot; Value=&quot;Verdana&quot; /&gt;
+                &lt;Setter Property=&quot;Button.Margin&quot; Value=&quot;10&quot; /&gt;
+            &lt;/Style.Setters&gt;
+            &lt;Style.Triggers&gt;
+
+                &lt;Trigger Property=&quot;IsMouseOver&quot; Value=&quot;True&quot;&gt;
+                    &lt;Setter Property=&quot;FontSize&quot; Value=&quot;14&quot; /&gt;
+                    &lt;Setter Property=&quot;Foreground&quot; Value=&quot;Red&quot; /&gt;
+                    &lt;Setter Property=&quot;Background&quot; Value=&quot;Yellow&quot; /&gt;
+                &lt;/Trigger&gt;
+                &lt;Trigger Property=&quot;IsPressed&quot; Value=&quot;true&quot;&gt;
+                    &lt;Setter Property=&quot;FontSize&quot; Value=&quot;14&quot; /&gt;
+                    &lt;Setter Property=&quot;Foreground&quot; Value=&quot;Lime&quot; /&gt;
+                    &lt;Setter Property=&quot;Background&quot; Value=&quot;Yellow&quot; /&gt;
+                &lt;/Trigger&gt;
+            &lt;/Style.Triggers&gt;
+        &lt;/Style&gt;
+        &lt;ControlTemplate x:Key=&quot;Template1&quot; TargetType=&quot;ButtonBase&quot;&gt;
+            &lt;my:ButtonChrome Background=&quot;{TemplateBinding Control.Background}&quot; BorderBrush=&quot;{TemplateBinding Control.BorderBrush}&quot; Name=&quot;Chrome&quot; RenderDefaulted=&quot;{TemplateBinding Button.IsDefaulted}&quot; RenderPressed=&quot;{TemplateBinding ButtonBase.IsPressed}&quot; SnapsToDevicePixels=&quot;True&quot;&gt;
+                &lt;ContentPresenter Content=&quot;{TemplateBinding ContentControl.Content}&quot; ContentStringFormat=&quot;{TemplateBinding ContentControl.ContentStringFormat}&quot; ContentTemplate=&quot;{TemplateBinding ContentControl.ContentTemplate}&quot; HorizontalAlignment=&quot;{TemplateBinding Control.HorizontalContentAlignment}&quot; Margin=&quot;{TemplateBinding Control.Padding}&quot; RecognizesAccessKey=&quot;True&quot; SnapsToDevicePixels=&quot;{TemplateBinding UIElement.SnapsToDevicePixels}&quot; VerticalAlignment=&quot;{TemplateBinding Control.VerticalContentAlignment}&quot; /&gt;
+            &lt;/my:ButtonChrome&gt;
+            &lt;ControlTemplate.Triggers&gt;
+                &lt;Trigger Property=&quot;UIElement.IsKeyboardFocused&quot; Value=&quot;True&quot;&gt;
+                    &lt;Setter Property=&quot;my:ButtonChrome.RenderDefaulted&quot; TargetName=&quot;Chrome&quot; Value=&quot;True&quot; /&gt;
+                &lt;/Trigger&gt;
+                &lt;Trigger Property=&quot;ToggleButton.IsChecked&quot; Value=&quot;True&quot;&gt;
+                    &lt;Setter Property=&quot;my:ButtonChrome.RenderPressed&quot; TargetName=&quot;Chrome&quot; Value=&quot;True&quot; /&gt;
+                &lt;/Trigger&gt;
+                &lt;Trigger Property=&quot;UIElement.IsEnabled&quot; Value=&quot;False&quot;&gt;
+                    &lt;Setter Property=&quot;Control.Foreground&quot; Value=&quot;#FFADADAD&quot; /&gt;
+                &lt;/Trigger&gt;
+            &lt;/ControlTemplate.Triggers&gt;
+        &lt;/ControlTemplate&gt;
+    &lt;/Window.Resources&gt;
+    &lt;StackPanel Background=&quot;Black&quot; &gt;
+        &lt;Button x:Name=&quot;button1&quot; Content=&quot;Кнопка 1&quot; Template=&quot;{StaticResource Template1}&quot; /&gt;
+        &lt;Button x:Name=&quot;button2&quot; Content=&quot;Кнопка 2&quot; /&gt;
+    &lt;/StackPanel&gt;
+&lt;/Window&gt;</pre>
+<p></p>
+<p>Идея взята отсюда: <a href="http://stackoverflow.com/questions/250622/mouseover-highlighting-style-returning-to-default-after-a-second-caused-by-aero">
+http://stackoverflow.com/questions/250622/mouseover-highlighting-style-returning-to-default-after-a-second-caused-by-aero</a><br/>
+</p>
+<p></p>
+<p><br/>
+<br/>
+</p>
+</div>

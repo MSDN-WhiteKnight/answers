@@ -1,0 +1,179 @@
+<h2>Message 201</h2>
+<p>Date: 17.08.2019 16:15:33</p>
+<div>
+<p>Функция <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setparent">
+SetParent</a> работает и с окна&#1084;и других процессов, поэто&#1084;у привязать окно другого приложения к свое&#1084;у, в принципе, воз&#1084;ожно (исключение - если процессы находятся в разных режи&#1084;ах DPI Awareness, в это&#1084; случае один из них
+ упадет). Основная сложность - определить дескриптор окна, которое нужно привязывать и дождаться &#1084;о&#1084;ента его загрузки, ведь приложение &#1084;ожет и&#1084;еть несколько разных окон, которые загружаются не сразу. Вот при&#1084;ер, который вроде работает
+ в большинстве простых случаев:</p>
+<p>XAML</p>
+<pre class="prettyprint">&lt;Window x:Class=&quot;WpfApplication1.MainWindow&quot;
+        xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
+        xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;        
+        Title=&quot;My desktop&quot; Height=&quot;350&quot; Width=&quot;620.522&quot; Closed=&quot;Window_Closed_1&quot;&gt;
+    &lt;Grid  &gt;
+        &lt;ListBox x:Name=&quot;listbox&quot; HorizontalAlignment=&quot;Left&quot;  Margin=&quot;30,55,0,9.8&quot; VerticalAlignment=&quot;Stretch&quot; 
+                 Width=&quot;220&quot; DisplayMemberPath=&quot;ProcessName&quot; MouseDoubleClick=&quot;listbox_MouseDoubleClick&quot;/&gt;
+        &lt;TextBox x:Name=&quot;tbCommand&quot; HorizontalAlignment=&quot;Left&quot; Height=&quot;23&quot; Margin=&quot;30,10,0,0&quot; TextWrapping=&quot;Wrap&quot; 
+                 Text=&quot;notepad&quot; VerticalAlignment=&quot;Top&quot; Width=&quot;220&quot;/&gt;
+        &lt;Button x:Name=&quot;bBrowse&quot; Content=&quot;Обзор&quot; HorizontalAlignment=&quot;Left&quot; Height=&quot;23&quot; Margin=&quot;266,10,0,0&quot; 
+                VerticalAlignment=&quot;Top&quot; Width=&quot;73&quot; Click=&quot;bBrowse_Click&quot; /&gt;
+        &lt;Button x:Name=&quot;bRun&quot; Content=&quot;Выполнить&quot; HorizontalAlignment=&quot;Left&quot; Height=&quot;23&quot; Margin=&quot;367,10,0,0&quot; 
+                VerticalAlignment=&quot;Top&quot; Width=&quot;73&quot; Click=&quot;bRun_Click&quot;/&gt;
+
+    &lt;/Grid&gt;
+&lt;/Window&gt;</pre>
+<br/>
+<p></p>
+<p>C#</p>
+<pre class="prettyprint">using System;
+using System.Collections.ObjectModel;
+using System.Text;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
+using System.Windows;
+using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows.Interop;
+
+namespace WpfApplication1
+{
+    public partial class MainWindow : Window
+    {
+        [DllImport(&quot;user32.dll&quot;)]
+        public static extern int SetParent(IntPtr hWnd, IntPtr NewParent);
+
+        [DllImport(&quot;user32.dll&quot;)]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport(&quot;user32.dll&quot;)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool IsWindowVisible(IntPtr hWnd);
+
+        const int SW_SHOW = 5;
+        const int SW_HIDE = 0;
+
+        ObservableCollection&lt;Process&gt; applist = new ObservableCollection&lt;Process&gt;();       
+        
+        public MainWindow()
+        {
+            InitializeComponent();
+            listbox.ItemsSource = applist;            
+        }
+
+        bool WaitMainWindow(Process pr)
+        {
+            for (int i = 0; i &lt; 5; i&#43;&#43;)
+            {
+                Thread.Sleep(1000);
+                try
+                {
+                    if (pr.MainWindowHandle != IntPtr.Zero)
+                    {
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.ToString());
+                }
+            }
+            return false;
+        }
+
+        private async void bRun_Click(object sender, RoutedEventArgs e)
+        {
+            WindowInteropHelper h = new WindowInteropHelper(this); //получае&#1084; дескриптор этого окна
+            Process pr = Process.Start(tbCommand.Text);//запускае&#1084; процесс
+            if (pr == null)
+            {
+                MessageBox.Show(&quot;Не удалось запустить процесс&quot;);
+                return;
+            }
+                        
+            //ожидае&#1084; запуска цикла обработки сообщений...
+            try
+            {
+                pr.WaitForInputIdle();
+            }
+            catch (InvalidOperationException ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+
+            if (pr.MainWindowHandle != IntPtr.Zero)
+            {                
+                //если главное окно уже доступно, связывае&#1084; с наши&#1084; окно&#1084;
+                SetParent(pr.MainWindowHandle, h.Handle);
+                applist.Add(pr);
+            }
+            else
+            {
+                //ожидае&#1084; загрузки главного окна...
+                bool res = false;
+                await Task.Run(() =&gt;
+                {
+                    res = WaitMainWindow(pr);
+                });
+
+                if (res)
+                {
+                    SetParent(pr.MainWindowHandle, h.Handle);
+                    applist.Add(pr);
+                }
+            }
+        }
+
+        private void listbox_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            Process pr = listbox.SelectedItem as Process;
+            if (pr == null) return;
+
+            //показывае&#1084; или скрывае&#1084; окно
+            if (IsWindowVisible(pr.MainWindowHandle)) ShowWindow(pr.MainWindowHandle, SW_HIDE);
+            else ShowWindow(pr.MainWindowHandle, SW_SHOW);
+        }
+
+        private void bBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog();
+            bool? res = dialog.ShowDialog(this);
+            if (res.HasValue)
+            {
+                if (res.Value)
+                {
+                    tbCommand.Text = dialog.FileName;
+                }
+            }
+        }
+
+        private void Window_Closed_1(object sender, EventArgs e)
+        {
+            //при закрытии окна закрывае&#1084; все связанные окна
+            foreach (Process pr in applist)
+            {
+                try
+                {
+                    if (!pr.HasExited)
+                    {
+                        pr.CloseMainWindow();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.ToString());
+                }
+            }
+        }             
+    }  
+}
+
+
+
+
+
+</pre>
+<p><br/>
+</p>
+</div>

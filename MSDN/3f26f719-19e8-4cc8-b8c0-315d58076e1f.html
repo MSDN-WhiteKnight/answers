@@ -1,0 +1,164 @@
+<h2>Message 112</h2>
+<p>Date: 17.09.2020 4:29:57</p>
+<div>
+<p>По поводу платной поддержки с&#1084;. здесь:&nbsp;<a href="https://social.msdn.microsoft.com/Forums/security/ru-RU/d0bf48b8-4b8a-4fc5-b0f8-953172d269ae/105810771093108710861076107610771088107810821072?forum=msdnfeedbackru">https://social.msdn.microsoft.com/Forums/security/ru-RU/d0bf48b8-4b8a-4fc5-b0f8-953172d269ae/105810771093108710861076107610771088107810821072?forum=msdnfeedbackru</a></p>
+<p>Что касается bigint, тут пробле&#1084;а на нескольких уровнях</p>
+<p>1. Нужен ли здесь вообще bigint? &quot;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">но&#1084;ера сделок и но&#1084;ера ордеров</span>&quot; как бы на&#1084;екает, что поле будет использоваться
+ не для вычислений, а как идентификатор, поэто&#1084;у в&#1084;есто bigint подойдет обычное текстовое поле.</p>
+<p>2. bigint не способен хранить все воз&#1084;ожные 19-значные числа. Напри&#1084;ер,&nbsp;9234556789012345678 уже не входит в диапазон. То есть идея со&#1084;нительная.</p>
+<p>3. В ODBC bigint действительно не пашет, даже подключиться к базе нельзя. И поче&#1084;у - вопрос интересный. Могу подтвердить, что это не глюк Квика, а воспроизводиться и на &#1084;ини&#1084;альной програ&#1084;&#1084;е на С&#43;&#43;. Пробовал запускать
+ следующий код:&nbsp;</p>
+<pre class="prettyprint">#include &lt;stdio.h&gt;
+#include &lt;tchar.h&gt;
+#include &lt;Windows.h&gt;
+#include &lt;sqlext.h&gt;
+#include &lt;locale.h&gt;
+
+WCHAR szDSN[] = L&quot;Driver={Microsoft Access Driver (*.mdb, *.accdb)};DSN='';DBQ=C:\\Test\\Database2016.accdb&quot;;
+WCHAR query[] = L&quot;SELECT * FROM Table1&quot;;
+
+void DisplayError(SQLSMALLINT t, SQLHSTMT h) {
+	SQLWCHAR       SqlState[6], Msg[SQL_MAX_MESSAGE_LENGTH];
+	SQLINTEGER    NativeError;
+	SQLSMALLINT   i, MsgLen;
+	SQLRETURN     rc;
+
+	SQLLEN numRecs = 0;
+	SQLGetDiagField(t, h, 0, SQL_DIAG_NUMBER, &amp;numRecs, 0, 0);
+
+	// Get the status records.
+	i = 1;
+	while (i &lt;= numRecs &amp;&amp; (rc = SQLGetDiagRec(t, h, i, SqlState, &amp;NativeError,
+		Msg, sizeof(Msg), &amp;MsgLen)) != SQL_NO_DATA) {
+		wprintf(L&quot;Error %d: %s\n&quot;, NativeError, Msg);
+		i&#43;&#43;;
+	}
+
+}
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	HENV    hEnv = NULL;
+	HDBC    hDbc = NULL;
+	HSTMT hStmt = NULL;
+	int iConnStrLength2Ptr;
+	WCHAR szConnStrOut[256];
+	SQLINTEGER rowCount = 0;
+	SQLSMALLINT fieldCount = 0, currentField = 0;
+	SQLWCHAR buf[128], colName[128];
+	SQLINTEGER ret;
+
+	/* ODBC API return status */
+	RETCODE rc;
+
+	setlocale(LC_ALL, &quot;Russian&quot;);
+
+	/* Allocate an environment handle */
+	rc = SQLAllocEnv(&amp;hEnv);
+	/* Allocate a connection handle */
+	rc = SQLAllocConnect(hEnv, &amp;hDbc);
+
+	/* Connect to the database */
+	rc = SQLDriverConnect(hDbc, NULL, (WCHAR*)szDSN,
+		SQL_NTS, (WCHAR*)szConnStrOut,
+		255, (SQLSMALLINT*)&amp;iConnStrLength2Ptr, SQL_DRIVER_NOPROMPT);
+
+	if (SQL_SUCCEEDED(rc))
+	{
+		wprintf(L&quot;Successfully connected to database. Data source name: \n  %s\n&quot;,
+			szConnStrOut);
+
+		/* Prepare SQL query */
+		wprintf(L&quot;SQL query:\n  %s\n&quot;, query);
+
+		rc = SQLAllocStmt(hDbc, &amp;hStmt);
+		rc = SQLPrepare(hStmt, (SQLWCHAR*)query, SQL_NTS);
+
+		/* Excecute the query */
+		rc = SQLExecute(hStmt);
+		if (SQL_SUCCEEDED(rc))
+		{
+			wprintf(L&quot;\n- Columns -\n&quot;);
+
+			SQLNumResultCols(hStmt, &amp;fieldCount);
+			if (fieldCount &gt; 0)
+			{
+				for (currentField = 1; currentField &lt;= fieldCount; currentField&#43;&#43;)
+				{
+					SQLDescribeCol(hStmt, currentField,
+						colName, sizeof(colName), 0, 0, 0, 0, 0);
+					wprintf(L&quot;%d: %s\n&quot;, (int)currentField, colName);
+				}
+				wprintf(L&quot;\n&quot;);
+
+				/* Loop through the rows in the result set */
+
+				rc = SQLFetch(hStmt);
+				while (SQL_SUCCEEDED(rc))
+				{
+					wprintf(L&quot;- Record #%d -\n&quot;, (int)rowCount);
+
+					for (currentField = 1; currentField &lt;= fieldCount; currentField&#43;&#43;)
+					{
+						rc = SQLGetData(hStmt, currentField, SQL_C_WCHAR, buf, sizeof(buf), &amp;ret);
+
+						if (SQL_SUCCEEDED(rc) == FALSE) {
+							wprintf(L&quot;%d: SQLGetData failed\n&quot;, (int)currentField);
+							continue;
+						}
+
+						if (ret &lt;= 0) {
+							wprintf(L&quot;%d: (no data)\n&quot;, (int)currentField);
+							continue;
+						}
+
+						wprintf(L&quot;%d: %s\n&quot;, (int)currentField, buf);
+					}
+
+					wprintf(L&quot;\n&quot;);
+					rc = SQLFetch(hStmt);
+					rowCount&#43;&#43;;
+				};
+
+				rc = SQLFreeStmt(hStmt, SQL_DROP);
+
+			}
+			else
+			{
+				wprintf(L&quot;Error: Number of fields in the result set is 0.\n&quot;);
+			}
+
+		}
+		else {
+			wprintf(L&quot;SQL Failed\n&quot;);
+			DisplayError(SQL_HANDLE_STMT, hStmt);
+		}
+	}
+	else
+	{
+		wprintf(L&quot;Couldn't connect to %s\n&quot;, szDSN);
+		DisplayError(SQL_HANDLE_DBC, hDbc);
+	}
+
+	/* Disconnect and free up allocated handles */
+	SQLDisconnect(hDbc);
+	SQLFreeHandle(SQL_HANDLE_DBC, hDbc);
+	SQLFreeHandle(SQL_HANDLE_ENV, hEnv);
+
+	getchar();
+	return 0;
+}</pre>
+<p>Результат:</p>
+Couldn't connect to Driver={Microsoft Access Driver (*.mdb, *.accdb)};DSN='';DBQ=C:\Test\Database2016.accdb<br/>
+Error 63: [Microsoft][ODBC Microsoft Access Driver]General error Unable to open registry key Temporary (volatile) Ace DSN for process 0x26bc Thread 0xbb0 DBC 0x11a7a2c&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Jet'.<br/>
+Error 63: [Microsoft][ODBC Microsoft Access Driver]General error Unable to open registry key Temporary (volatile) Ace DSN for process 0x26bc Thread 0xbb0 DBC 0x11a7a2c&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Jet'.<br/>
+Error -1073: [Microsoft][ODBC Microsoft Access Driver] The database you are trying to open requires a newer version of Microsoft Access.
+<p></p>
+<p>Можете эти данные скинуть в платную поддержку, если будете обращаться.</p>
+<p>Стоит Access Database Engine 2016 (правда у &#1084;еня 32-битный). Более новой версии не нашел. Ну то есть, Access 2019 то &#1084;ожно поставить, но драйвер ODBC то все равно ставиться отдельно (или нет)? Есть у кого купленный Office 2019?</p>
+<p></p>
+<p></p>
+<p></p>
+</div>

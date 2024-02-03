@@ -1,0 +1,9 @@
+<h2>Message 411</h2>
+<p>Date: 16.07.2018 8:50:15</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>полагаю нужно заключить блок чтения/записи в оператор&nbsp;lock(this){}</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Нет, lock тут не по&#1084;ожет. Для каждого запроса будет свой объект Page в свое&#1084; до&#1084;ене приложений (или даже процессе, в
+ зависи&#1084;ости от конфигурации IIS). </span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">В данно&#1084; случае, легкого способа реализовать то что вы хотите на файлах нету. Можно попробовать и&#1084;енованные &#1084;ьютексы.&nbsp;
+ Или используйте СУБД (SQL Server Express, MySQL или SQL Server Compact в зависи&#1084;ости от того, что доступно на хостинге), это на&#1084;ного удобнее.</span></p>
+</div>

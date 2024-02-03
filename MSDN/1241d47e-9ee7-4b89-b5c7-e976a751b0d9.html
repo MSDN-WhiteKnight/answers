@@ -1,0 +1,22 @@
+<h2>Message 442</h2>
+<p>Date: 08.06.2018 8:39:07</p>
+<div>
+<p>У &#1084;еня ноль эффекта. </p>
+<p>Что касается поддерживае&#1084;ых VCP-кодов, &#1084;ожно пос&#1084;отреть с по&#1084;ощью&nbsp;<a href="http://www.nirsoft.net/utils/control_my_monitor.html">ControlMyMonitor</a>, или програ&#1084;&#1084;но:</p>
+<pre class="prettyprint">DWORD len;
+GetCapabilitiesStringLength(hMonitor,&amp;len);
+LPSTR str = (LPSTR)malloc(len&#43;1);
+CapabilitiesRequestAndCapabilitiesReply(hMonitor,str,len);</pre>
+<br/>
+<p>У &#1084;еня результат такой (Acer):</p>
+(prot(monitor)type(lcd)model(P194W)cmds(01 02 03 07 0C 4E E3 F3)vcp(04 05 06 08<br/>
+0E 10 12 14(05 08 0B) 16 18 1A 1E 20 30 3E FA(00 01 02) FB FC FD FE(00 01 02 04)<br/>
+&nbsp;B6 C6 C8 C9 DF)mswhql(1)mccs_ver(2.0)asset_eep(32)mpu_ver(01))
+<p></p>
+</div>
+<h2>Message 438</h2>
+<p>Date: 08.06.2018 15:36:31</p>
+<div>
+<p>На до&#1084;ашне&#1084; ко&#1084;пьютере кстати работает управление питание&#1084; через код&nbsp;D6. Вот полная строка (LG Flatron&nbsp;W2043T):</p>
+<p>prot(monitor)type(lcd)model(W2x43)mccs_ver(2.0)vcp(02 03 04 05 06 08 0B 0C 0E 10 12 14(01 05 06 07 08 0B) 16 18 1A 1E 20 30 3E 60 6C 6E 70 87 AC AE B6 C0 C6 C8 C9 D6(01 04) DF F2(00 01 02) F3(00 01 02 03) FC(00 01 02 03) FD(00 01) FE(00 01 02) )mswhql(1)</p>
+</div>

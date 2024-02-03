@@ -1,0 +1,58 @@
+<h2>Message 57</h2>
+<p>Date: 08.03.2021 17:03:25</p>
+<div>
+На че&#1084; пишете то? Или вы не свою програ&#1084;&#1084;у запускаете планировщико&#1084;? Сделать сбой ду&#1084;аю &#1084;ожно вызово&#1084; функции&nbsp;<a href="https://docs.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-raiseexception">RaiseException</a>&nbsp;с
+ любы&#1084;и пара&#1084;етра&#1084;и.
+</div>
+<h2>Message 56</h2>
+<p>Date: 09.03.2021 3:36:11</p>
+<div>
+<p>Это фору&#1084; для разработчиков програ&#1084;&#1084;. Создайте те&#1084;у на TechNet, если у вас вопрос по планировщику в обще&#1084;.
+</p>
+<p>Можете попробовать еще такой PowerShell скрипт для вызова сбоя:</p>
+<pre class="prettyprint">Add-Type -TypeDefinition @'
+using System;
+public class C
+{
+    public static void ThrowException()
+    {
+        throw new Exception();
+    }    
+}
+'@
+
+[C]::ThrowException()
+</pre>
+<br/>
+<p></p>
+<p></p>
+</div>
+<h2>Message 54</h2>
+<p>Date: 15.03.2021 3:48:05</p>
+<div>
+<p>Да, похоже Powershell не генерирует сбой, когда сценарий бросает исключение. Попробуйте такую програ&#1084;&#1084;у на C#:</p>
+<pre class="prettyprint">using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace ConsoleApp1
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            throw new Exception();
+        }
+    }
+}</pre>
+<p>Сохраните ее в файл Program.cs и соберите ко&#1084;андой</p>
+<p>%WINDIR%\Microsoft.NET\Framework\v4.0.30319\Csc.exe&nbsp; /target:winexe Program.cs</p>
+<p>По &#1084;ои&#1084; теста&#1084;, при сбое действительно задание не перезапускается, либо я не пони&#1084;аю, как эта настройка работает. Воз&#1084;ожно, планировщик распознает только определенные коды исключений.</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&gt;<em>На&nbsp;</em></span><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><em>TechNet
+ пытаюсь создать вопрос, но выводится такое сообщение &quot;</em></span><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#ff0000; font-size:13.4413px"><em>Ваше сообщение
+ получило по&#1084;етку и сейчас дополнительно проверяется. Отправьте сообщение в цепочку&nbsp;</em></span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>ЗДЕСЬ</em></span><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#ff0000; font-size:13.4413px"><em>,
+ если считаете, что это сделано по ошибке</em></span><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><em>&quot;.</em></span></p>
+<p>Вы пытаетесь отправить сообщение со ссылкой или изображение&#1084;? Попробуйте без них, тогда не нужно будет проходить проверку на спа&#1084;.</p>
+<p></p>
+<p></p>
+</div>

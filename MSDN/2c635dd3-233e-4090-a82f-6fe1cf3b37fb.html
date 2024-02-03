@@ -1,0 +1,51 @@
+<h2>Message 324</h2>
+<p>Date: 29.12.2018 9:21:04</p>
+<div>
+Я предлагаю избавиться от User Instance. Во первых, эта технология устарела, во вторых, она вообще на &#1084;ой взгляд не очень полезна. Используйте LocalDB, если ва&#1084; действительно нужен подобный функционал в новых версиях SQL Server.
+</div>
+<h2>Message 323</h2>
+<p>Date: 29.12.2018 14:59:33</p>
+<div>
+<p>Выдать права на доступ к папке учетной записи, под которой работает SQL Server. Ее &#1084;ожно пос&#1084;отреть в Диспетчере конфигурации SQL Server в свойствах службы, по у&#1084;олчанию это вроде Network Service. Если база находится в корне диска, скорее
+ всего, ва&#1084; также придется запускать приложение с повышенны&#1084;и привилегия&#1084;и UAC.</p>
+<p>Кро&#1084;е того, вы используете пара&#1084;етр AttachDbFilename, который открывает файл базы в &#1084;онопольно&#1084; режи&#1084;е. Это значит, что вы не &#1084;ожете одновре&#1084;енно открыть базу и в програ&#1084;&#1084;е, и в SQL Server management
+ Studio. Обычно реко&#1084;ендуется не использовать AttachDbFilename, а присоединять базу вручную через&nbsp;SQL Server management Studio, и подключаться, указывая ее как пара&#1084;етр InitialCatalog</p>
+</div>
+<h2>Message 320</h2>
+<p>Date: 01.01.2019 8:09:01</p>
+<div>
+<p>Строка соединения в обоих случаях точно одинаковая и без User Instance? То, что вы описываете (в обычно&#1084; приложении одно, а в веб-сайте другое) как раз очень похоже на си&#1084;пто&#1084;ы User Instance.&nbsp;</p>
+<p>Никаких диалектов TSQL, насколько я знаю, не существует. Более того, у вас простейший запрос, который почти соответствует стандартно&#1084;у SQL, за исключение&#1084; наличия схе&#1084;ы. Если он завершается с ошибкой, значит в текуще&#1084; контексте не
+ видна либо схе&#1084;а dbo, либо таблица test. Добавление явного указания на базу что нибудь &#1084;еняет? Покажите результат запроса&nbsp;</p>
+<pre class="lang-sql prettyprint prettyprinted" style="padding:5px; border-width:0px; border-style:initial; border-color:initial; line-height:inherit; font-family:Consolas,Menlo,Monaco,'Lucida Console','Liberation Mono','DejaVu Sans Mono','Bitstream Vera Sans Mono','Courier New',monospace,sans-serif; font-size:13px; vertical-align:baseline; width:auto; max-height:600px; background-color:#eff0f1; color:#393318"><code style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:Consolas,Menlo,Monaco,'Lucida Console','Liberation Mono','DejaVu Sans Mono','Bitstream Vera Sans Mono','Courier New',monospace,sans-serif; font-size:13px; vertical-align:baseline; white-space:inherit"><span class="kwd" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#101094">SELECT</span><span class="pln" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#303336"> </span><span class="pun" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#303336">*</span><span class="pln" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#303336"> </span><span class="kwd" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#101094">FROM</span><span class="pln" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#303336"> INFORMATION_SCHEMA</span><span class="pun" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#303336">.</span><span class="pln" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#303336">TABLES </span><span class="kwd" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#101094">WHERE</span><span class="pln" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#303336"> TABLE_TYPE</span><span class="pun" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#303336">=</span><span class="str" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#7d2727">'BASE TABLE'</span></code></pre>
+<p>из-под веб сайта</p>
+<p></p>
+</div>
+<h2>Message 318</h2>
+<p>Date: 02.01.2019 9:51:55</p>
+<div>
+<p>Попробуйте вторую базу тоже присоединить к SQL Server (с други&#1084; и&#1084;ене&#1084;, разу&#1084;еется) и подключаться к ней так же через Initial Catalog. AttachDbFilename все же заточен под User Instance в старых версиях SQL Server Express, как он работает
+ в новых версиях SQL Server, если честно не знаю, воз&#1084;ожно вообще не работает...</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:small">&quot;<em>Вы предложили интересный запрос, но я никак не соображу как реализовать чтение ответа на этот вопрос в C#</em>&quot;</span></p>
+<p>Напри&#1084;ер так:</p>
+<pre class="prettyprint">var dt = new DataTable();
+
+using (var adapter = new System.Data.SqlClient.SqlDataAdapter(&quot;SELECT ...&quot;, connection))
+{
+    adapter.Fill(dt);
+}
+
+StringBuilder sbResult = new StringBuilder();
+
+foreach (DataRow dataRow in dt.Rows)
+{
+  foreach (var item in dataRow.ItemArray)
+  {
+    sbResult.Append(item.ToString()&#43;&quot;; &quot;);
+  }
+  sbResult.AppendLine();
+}</pre>
+Пото&#1084; sbResult.ToString() выводите куда нибудь в HTML, чтобы пос&#1084;отреть его<br/>
+<p></p>
+<p></p>
+</div>

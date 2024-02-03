@@ -1,0 +1,54 @@
+<h2>Message 182</h2>
+<p>Date: 13.10.2019 8:13:23</p>
+<div>
+<p>Попробуйте добавить проверку ошибок fsetpos/fread,&nbsp; как-то так:</p>
+<pre class="prettyprint">#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+
+int main( int argc, char *argv[] )
+{
+	const fpos_t newPos = 1000; 
+	const size_t count = 4096; 
+	char data[count];
+	size_t readcount;
+	int result;
+
+	FILE* handle = fopen(&quot;D:\\Test\\File.txt&quot;,&quot;rb&quot;); 
+
+	result = fsetpos( handle, &amp;newPos  );
+	if(result!=0) printf(&quot;fsetpos failed: %d\n&quot;,result);
+	
+	readcount = fread( data, 1, count, handle ); 
+	if(readcount &lt; count) {
+		result = ferror(handle);
+		if(result!=0) printf(&quot;fread failed: %d\n&quot;,result);
+	}
+	else {
+		printf(&quot;fread success: %d bytes read\n&quot;,(int)readcount);
+		printf(&quot;data: [%.20s]\n&quot;,data);
+	}
+	
+	const fpos_t nextPos = 2000; 
+	const size_t nextCount = 1000; 
+	result = fsetpos( handle, &amp;nextPos );
+	if(result!=0) printf(&quot;fsetpos failed: %d\n&quot;,result);
+
+	readcount = fread( data, 1, nextCount , handle ); 
+	if(readcount &lt; nextCount) {
+		result = ferror(handle);
+		if(result!=0) printf(&quot;fread failed: %d\n&quot;,result);		
+	}
+	else {
+		printf(&quot;fread success: %d bytes read\n&quot;,(int)readcount);
+		printf(&quot;data: [%.20s]\n&quot;,data);
+	}
+	fclose(handle);
+    getchar();
+}</pre>
+<p>И покажите, что выведется у вас.&nbsp;</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&gt;<em>Буду признателен, если вы сообщите: о &#1084;ое&#1084; воз&#1084;ожно неправильно&#1084; использовании библиотеки; когда будет
+ исправлена бага; в какой версии SDK пробле&#1084;ы не наблюдается.</em></span></p>
+<p>Universal CRT - ко&#1084;понент Windows, который обновляется в&#1084;есте с Windows Update, поэто&#1084;у тут скорее важна версия Windows, че&#1084; SDK. SDK предоставляет лишь заголовочные файлы и библиотеки и&#1084;порта. Но я лично со&#1084;неваюсь, что
+ в функции fread&nbsp;Universal CRT &#1084;ожет быть баг - это было бы слишко&#1084; болезненно очевидно, так как &gt;50% програ&#1084;&#1084; зависят от нее и соответственно работали бы работали неправильно.</p>
+<p></p>
+</div>

@@ -1,0 +1,20 @@
+<h2>Message 1122</h2>
+<p>Date: 12.09.2016 11:07:11</p>
+<div>
+_list.ToArray() не подходит? как раз создает копию &#1084;ассив кот. не будет &#1084;еняться при из&#1084;енении исходной коллекции&nbsp;
+</div>
+<h2>Message 1120</h2>
+<p>Date: 12.09.2016 12:10:09</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:20.162px">&quot;<em>нашел, что класс ArrayList и&#1084;еет &#1084;етод FixedSize, который &#1084;ожет получать в качестве пара&#1084;етра
+ или экзе&#1084;пляр ArrayList или IList</em>&quot; - я с&#1084;отрю в доку&#1084;ентацию и вижу, что он прини&#1084;ает только ArrayList. Преобразуйте ваш List в ArrayList и будет ва&#1084; счастье</span></p>
+<p></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:20.162px"></span></p>
+<br/>
+</div>
+<h2>Message 1119</h2>
+<p>Date: 13.09.2016 3:10:07</p>
+<div>
+FixedSize созданный из List будет и&#1084;еть ту же &quot;пробле&#1084;у&quot;, что и&nbsp;ReadOnlyCollection в перво&#1084; сообщении. Из&#1084;енение первоначальной коллекции будет отражаться в&nbsp;FixedSize-коллекции. Надо создавать&nbsp;FixedSize
+ коллекцию на основе &#1084;ассива (<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:20.162px">_list.ToArray()</span>), чтобы получить то что вы хотите
+</div>

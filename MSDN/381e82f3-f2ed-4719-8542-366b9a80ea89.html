@@ -1,0 +1,38 @@
+<h2>Message 545</h2>
+<p>Date: 27.01.2018 18:01:17</p>
+<div>
+<p>Я не Microsoft, но кое-что &#1084;огу написать.</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>Во-первых,
+ верно ли то, что для приложений .NET характерна полная обратная сов&#1084;естность? Т.е. я &#1084;огу ско&#1084;пилировать приложение под .NET 1.0 и оно будет в полной &#1084;ере работать на ко&#1084;пьютере, где установлен .NET Framework 4.7.1?</em></span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>.</em>&quot;</span></p>
+<p>С&#1084;.&nbsp;<a href="https://docs.microsoft.com/ru-ru/dotnet/framework/migration-guide/version-compatibility">https://docs.microsoft.com/ru-ru/dotnet/framework/migration-guide/version-compatibility</a>&nbsp;Если указать SupportedRuntime 4.0 - оно запустится;
+ если нет - скорее всего упадет с ошибкой или предложит установить .NET 1.0. Насчет &quot;в полной &#1084;ере работать&quot; со&#1084;нительно, &#1084;ежду 1.0 и 4.0 разница довольно большая. Только тестирование даст точный ответ.</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>&quot;но не совсе&#1084; ясно поче&#1084;у записано так &#1084;ало версий Windows&quot;</em></span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Не очень понятно, что значит &quot;&#1084;ало&quot;. Версии Windows до XP старее, че&#1084; са&#1084;а .NET Framework, естественно их та&#1084;
+ нету.&nbsp;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>Если
+ версия Windows не указана в списке поддерживае&#1084;ых платфор&#1084;ой .NET Framework, значит ли это, что ни одна версия .NET не будет работать на этой Windows</em></span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;</span></p>
+<p>Нет конечно, &#1084;ожно и на Win9x впихнуть NET. Другое дело, что если какой-то API-функции не будет в этой версии Windows, использующие ее ко&#1084;поненты не будут работать.</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Если нет никаких рисков и ограничений, поче&#1084;у бы Microsoft официально не внести эту версию Windows в список поддерживае&#1084;ых
+ для .NET</em>&quot;</span></p>
+<p>Пото&#1084;у что версии Windows старее висты <strong>вообще</strong> больше не поддерживаются. Соответственно, нет с&#1084;ысла на них поддерживать .NET.</p>
+<p><strong>Вывод</strong> - собирайте под .NET 3.5 и указывайте SupportedRuntime 4.0, если хотите обеспечить поддержку всего спектра &quot;живых&quot; ОС (WinXP - Win10) и работу на Win7 - Win10 из коробки.</p>
+<br/>
+</div>
+<h2>Message 544</h2>
+<p>Date: 28.01.2018 8:21:08</p>
+<div>
+<blockquote>
+<p><br/>
+</p>
+<p>Так пони&#1084;аю, когда пишется &#43; Vista или &#43;7, и&#1084;еется ввиду Vista SP0/SP1/SP2 и Win7 SP0/SP1?</p>
+</blockquote>
+.NET 4.5 и более поздние требуют и&#1084;енно Win7 SP1 или Vista SP2. По крайней &#1084;ере, на странице скачивания так написано.
+</div>
+<h2>Message 543</h2>
+<p>Date: 28.01.2018 9:17:47</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Ну а я говорил про те, где написано &#43;Vista, &#43;7. Если указывается 7 SP1, то ясно, что 7 SP0 не поддерживается.</em>&quot;</span></p>
+<p>Так в сравнительной таблице это не отражено, поэто&#1084;у и пишу. Надо с&#1084;отреть на требования конкретного продукта, а не на сравнительную таблицу.</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>.NET 4.6 поддерживает Windows 10, Windows 8.. Windows Server 2012, 2012 R2, но не указан Server 2016.</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Т.к. Server 2016 уже содержит 4.6.2, которая за&#1084;ещает ее.&nbsp;</span></p>
+</div>

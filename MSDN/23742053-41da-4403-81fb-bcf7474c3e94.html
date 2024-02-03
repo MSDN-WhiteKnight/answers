@@ -1,0 +1,22 @@
+<h2>Message 386</h2>
+<p>Date: 06.09.2018 10:03:02</p>
+<div>
+Привяжите DataGridView к DataTable, и используйте &#1084;етод <a href="https://msdn.microsoft.com/ru-ru/library/system.data.datatable.writexml(v=vs.110).aspx">
+DataTable.WriteXml</a> / ReadXml&nbsp;
+</div>
+<h2>Message 385</h2>
+<p>Date: 07.09.2018 7:55:48</p>
+<div>
+<p>Ду&#1084;аю, нужно просто добавить колонки в таблицу вручную перед ReadXML, если у вас колонки не дина&#1084;ические.
+</p>
+<p>Или при записи включить в XML схе&#1084;у:&nbsp;</p>
+<pre class="x_x_default x_x_prettyprint x_x_prettyprinted" style="padding:5px; border-width:0px; border-style:initial; border-color:initial; line-height:inherit; font-family:Consolas,Menlo,Monaco,'Lucida Console','Liberation Mono','DejaVu Sans Mono','Bitstream Vera Sans Mono','Courier New',monospace,sans-serif; font-size:13px; vertical-align:baseline; width:auto; max-height:600px; background-color:#eff0f1; color:#393318; word-wrap:normal"><code style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:Consolas,Menlo,Monaco,'Lucida Console','Liberation Mono','DejaVu Sans Mono','Bitstream Vera Sans Mono','Courier New',monospace,sans-serif; font-size:13px; vertical-align:baseline; white-space:inherit"><span class="typ" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#2b91af">table</span><span class="pun" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#303336">.</span><span class="typ" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#2b91af">WriteXml</span><span class="pun" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#303336">(</span><span class="typ" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#2b91af">&quot;...&quot;</span><span class="pun" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#303336">,</span><span class="pln" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#303336"> </span><span class="typ" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#2b91af">XmlWriteMode</span><span class="pun" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#303336">.</span><span class="typ" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#2b91af">WriteSchema</span><span class="pun" style="margin:0px; padding:0px; border:0px; font-style:inherit; font-variant:inherit; font-weight:inherit; line-height:inherit; font-family:inherit; vertical-align:baseline; color:#303336">);</span></code></pre>
+<p><br/>
+</p>
+<p></p>
+</div>
+<h2>Message 384</h2>
+<p>Date: 07.09.2018 8:38:34</p>
+<div>
+Конфиг держит не &quot;внутри себя&quot;, а в папке данных текущего пользователя. Создайте новую те&#1084;у, если хотите развернутого обсуждения об это&#1084;. Те&#1084;у 2010 года лучше бы оставить в покое.
+</div>

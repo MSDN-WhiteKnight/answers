@@ -1,0 +1,72 @@
+<h2>Message 223</h2>
+<p>Date: 29.06.2019 14:27:41</p>
+<div>
+Подобный результат &#1084;ожно воспроизвести, напри&#1084;ер, на&nbsp;https://dotnetfiddle.net при выборе .NET Core 2.2. Скорее всего, это просто баг. Какое окружение использует ваш &quot;UnitTest&quot;?
+</div>
+<h2>Message 222</h2>
+<p>Date: 29.06.2019 16:20:22</p>
+<div>
+<p>Тут все упирается в то, как работают Select и LastOrDefault. Возь&#1084;ите следующий код:</p>
+<pre class="prettyprint" style="">using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace ConsoleApplication1
+{
+    class Program
+    {
+        
+        static void Main(string[] args)
+        {
+            var array = new int[] { 1, 2, 3 };
+            var sel = array.Select((x) =&gt; { Console.WriteLine(x.ToString() &#43; &quot; selected&quot;); return x; });
+            var t = sel.GetType();
+
+            Console.WriteLine(&quot;Select iterator type: &quot;&#43;t.ToString()&#43;&quot;\n&quot;);
+
+            Console.WriteLine(&quot;Select iterator interfaces: &quot;);
+            Console.WriteLine(String.Join(&quot;\n&quot;, t.GetInterfaces().Select(x =&gt; x.ToString())));
+            Console.WriteLine(&quot;\nLastOrDefault: &quot;&#43;sel.LastOrDefault());
+            
+
+        }
+    }    
+}</pre>
+<p>При запуске в .NET Framework он даст такой результат:</p>
+Select iterator type: System.Linq.Enumerable&#43;WhereSelectArrayIterator`2[System.Int32,System.Int32]<br/>
+<br/>
+Select iterator interfaces:<br/>
+System.Collections.Generic.IEnumerable`1[System.Int32]<br/>
+System.Collections.IEnumerable<br/>
+System.Collections.Generic.IEnumerator`1[System.Int32]<br/>
+System.IDisposable<br/>
+System.Collections.IEnumerator<br/>
+1 selected<br/>
+2 selected<br/>
+3 selected<br/>
+<br/>
+LastOrDefault: 3
+<p></p>
+<p>При запуске под .NET Core:</p>
+<p><span style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">Select&nbsp;iterator&nbsp;type:&nbsp;System.Linq.Enumerable&#43;SelectArrayIterator`2[System.Int32,System.Int32]</span><br style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">
+<br style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">
+<span style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">Select&nbsp;iterator&nbsp;interfaces:&nbsp;</span><br style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">
+<span style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">System.Collections.Generic.IEnumerable`1[System.Int32]</span><br style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">
+<span style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">System.Collections.IEnumerable</span><br style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">
+<span style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">System.Collections.Generic.IEnumerator`1[System.Int32]</span><br style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">
+<span style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">System.IDisposable</span><br style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">
+<span style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">System.Collections.IEnumerator</span><br style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">
+<span style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">System.Linq.IPartition`1[System.Int32]</span><br style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">
+<span style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">System.Linq.IIListProvider`1[System.Int32]</span><br style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">
+<span style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">3&nbsp;selected</span><br style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">
+<br style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">
+<span style="color:#333333; font-family:monospace; font-size:11.7px; white-space:nowrap; background-color:#fefefe">LastOrDefault:&nbsp;3</span></p>
+<p>Как видно, в .NET Core результато&#1084; Select является совершенно другой тип, который реализует интерфейс IPartition. Метод LastOrDefault содержит
+<a href="https://github.com/dotnet/corefx/blob/master/src/System.Linq/src/System/Linq/Last.cs#L46">
+опти&#1084;изацию</a>, которая заставляет его, если тип итератора реализует&nbsp;IPartition, не вычислять всю последовательность, я сразу брать ее последний эле&#1084;ент (это видно, если в выражение Select по&#1084;естить вывод). Таки&#1084; образо&#1084;,
+ ваш код, который рассчитывал на вычисление всей последовательности, ло&#1084;ается.&nbsp;&nbsp;</p>
+<p></p>
+<p></p>
+<p></p>
+<br/>
+</div>

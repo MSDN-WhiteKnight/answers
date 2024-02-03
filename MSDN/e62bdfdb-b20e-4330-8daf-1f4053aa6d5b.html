@@ -1,0 +1,24 @@
+<h2>Message 626</h2>
+<p>Date: 01.11.2017 11:37:09</p>
+<div>
+Так происходит, пото&#1084;у что у типа object сравнение на равенство определено по ссылке. Очевидно, в качестве ключа для Dictionary нужно использовать не Object, а конкретный тип, для которого реализовано сравнение по значению. Либо использовать нестандартный
+<a href="https://msdn.microsoft.com/ru-ru/library/ms132092(v=vs.110).aspx">Comparer</a>.
+</div>
+<h2>Message 625</h2>
+<p>Date: 01.11.2017 16:23:21</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Что не так?</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Нужно не наследовать от Dictionary, а реализовать интерфейс&nbsp;</span>IEqualityComparer (при&#1084;ер есть
+<a href="https://msdn.microsoft.com/ru-ru/library/ms132151(v=vs.110).aspx">на странице его доку&#1084;ентации</a>), и передать его объект в конструктор Dictionary. Либо как сказали выше, создать свой объект с переопределенны&#1084;и&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">GetHashCode()
+ и Equals(). Т.е. в конечно&#1084; счете все сводится к реализации своих версии этих двух &#1084;етодов.</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Сравнение по хэша&#1084; я сделал только пото&#1084;у, что не знаю как ещё сравнить объекты на эквивалентность</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">В ваше&#1084; случае - просто в цикле сравнение всех эле&#1084;ентов &#1084;ассива, и возврат false на перво&#1084; отличии. А&nbsp;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">GetHashCode
+ надо реализовать так, чтобы он возвращал одно и то же для одинаковых &#1084;ассивов, но при это&#1084; не слишко&#1084; долго считался (в са&#1084;о&#1084; просто&#1084; случае &#1084;ожно взять су&#1084;&#1084;у или XOR от N первых эле&#1084;ентов &#1084;ассива).&nbsp;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+</div>
+<h2>Message 623</h2>
+<p>Date: 02.11.2017 7:50:13</p>
+<div>
+<p>Передать его аргу&#1084;енто&#1084; конструктора</p>
+<p>&nbsp;New Dictionary(Of Object, Long)(MyEqualityComparer)</p>
+</div>

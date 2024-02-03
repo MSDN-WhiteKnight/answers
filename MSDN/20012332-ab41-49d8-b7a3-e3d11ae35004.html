@@ -1,0 +1,22 @@
+<h2>Message 242</h2>
+<p>Date: 28.05.2019 10:20:58</p>
+<div>
+<p>Обсуждалось &#1084;иллионы раз. Совет использовать&nbsp;_setmode(_fileno(stdout), _O_U16TEXT); и широкие си&#1084;волы корректен, это должно решить пробле&#1084;у; хотя разу&#1084;еется, есть и другие варианты. Если это не работает, воз&#1084;ожно у вас
+ в консоли установлен шрифт, не поддерживающий кириллицу. Попробуйте установить <span style="color:#242729; font-family:Arial,'Helvetica Neue',Helvetica,sans-serif; font-size:15px">
+Lucida Console или Consolas. Другой вариант (если речь о литералах) - са&#1084;и исходники в неправильной кодировке; обычно реко&#1084;ендуется UTF8.</span></p>
+<p><span style="color:#242729; font-family:Arial,'Helvetica Neue',Helvetica,sans-serif; font-size:15px">Подробный обзор разных способов работы с кириллицей и воз&#1084;ожных пробле&#1084; с&#1084;. напри&#1084;ер здесь:&nbsp;</span><a href="https://ru.stackoverflow.com/questions/459154/Русский-язык-в-консоли"></a><a href="https://ru.stackoverflow.com/q/459154/240512">https://ru.stackoverflow.com/q/459154/240512</a></p>
+<p></p>
+<br/>
+</div>
+<h2>Message 241</h2>
+<p>Date: 28.05.2019 11:36:20</p>
+<div>
+<p>У вас не хватает включения stdio.h для си&#1084;вола stdout. Также, вызов setlocale в данно&#1084; случае не нужен: режи&#1084; UTF16 не привязан к локаля&#1084;.&nbsp;</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>В настройках проекта (в Character Set'e) у &#1084;еня установлено: Use Unicode Character Set.</em>&quot;</span></p>
+<p><span style="color:#333333"><span style="font-size:14px">Это прекрасно, но не влияет на консольный вывод (это влияет на развертку обобщенных&nbsp;&#1084;акросов типа TCHAR).</span></span></p>
+</div>
+<h2>Message 240</h2>
+<p>Date: 28.05.2019 13:39:00</p>
+<div>
+Если честно - не знаю. Больше похоже на пробле&#1084;у со студией, че&#1084; с ваши&#1084; кодо&#1084;. Тот код, который вы показываете, определенно должен собираться.&nbsp;
+</div>

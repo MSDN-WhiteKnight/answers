@@ -1,0 +1,14 @@
+<h2>Message 234</h2>
+<p>Date: 13.06.2019 10:29:23</p>
+<div>
+<p>Используя функцию <a href="https://docs.microsoft.com/en-us/windows/desktop/api/processthreadsapi/nf-processthreadsapi-createprocessa">
+CreateProcess</a>. При&#1084;ер запуска процесса с перенаправление&#1084; вывода с&#1084;. здесь:&nbsp;<a href="https://docs.microsoft.com/en-us/windows/desktop/ProcThread/creating-a-child-process-with-redirected-input-and-output">https://docs.microsoft.com/en-us/windows/desktop/ProcThread/creating-a-child-process-with-redirected-input-and-output</a>
+ (естественно, ни о како&#1084; запуске в одну строку речь не идет, для этого нужен очень гро&#1084;оздкий код). Воз&#1084;ожно, проще будет использовать не WinAPI, а синтаксис cmd.exe для перенаправления вывода в файл:</p>
+<pre class="prettyprint">cmd.exe /c python ... &gt; output.txt</pre>
+<p><br/>
+</p>
+<p>После этого считать результат из файла output.txt</p>
+<p><span style="color:#242729; font-family:Consolas,Menlo,Monaco,'Lucida Console','Liberation Mono','DejaVu Sans Mono','Bitstream Vera Sans Mono','Courier New',monospace,sans-serif; font-size:13px; white-space:pre-wrap; background-color:#eff0f1"></span></p>
+<br/>
+<br/>
+</div>

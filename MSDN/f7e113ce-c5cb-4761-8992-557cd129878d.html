@@ -1,0 +1,17 @@
+<h2>Message 1035</h2>
+<p>Date: 19.12.2016 8:12:55</p>
+<div>
+<p>как-то так условие делается:</p>
+<pre class="prettyprint lang-sql">IF (select size*8 as SIZE_KB from sys.database_files 
+where type_desc='LOG')&gt; 5*1024*1024
+ PRINT 'MyDB log is too big!'
+ELSE
+ PRINT 'MyDB log is fine'</pre>
+<br/>
+<p></p>
+</div>
+<h2>Message 1034</h2>
+<p>Date: 19.12.2016 10:29:48</p>
+<div>
+EXISTS так не будет работать. а что вы хотите сделать? проверить, существует ли запись в database_files? на практике она всегда будет, такая проверка не нужна
+</div>

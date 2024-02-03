@@ -1,0 +1,31 @@
+<h2>Message 1083</h2>
+<p>Date: 16.11.2016 5:51:53</p>
+<div>
+Насколько я понял, он сохраняет задачи в определенно&#1084; хранилище (напри&#1084;ер, SQL Server) а выполняются они в то&#1084; же процессе, что и приложение, в фоновых потоках. Работа этой библиотеки не привязана к определенной технологии, не важно ASP.NET
+ или обычное приложение.
+</div>
+<h2>Message 1081</h2>
+<p>Date: 18.11.2016 5:05:13</p>
+<div>
+<p>Из доку&#1084;ентации (http://docs.hangfire.io/en/latest/background-methods/calling-methods-in-background.html):</p>
+<p>*******</p>
+<p style="margin-bottom:10px; color:#333333; font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif; font-size:16px">
+&quot;The&nbsp;<code style="font-family:Menlo,Monaco,Consolas,'Courier New',monospace; font-size:13.6px; padding:0.2em 0px; color:#c7254e; margin:0px; font-weight:inherit"><span style="">Enqueue</span></code>&nbsp;method ... it runs the following steps:</p>
+<ol style="color:#333333; font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif; font-size:16px">
+<li style="">Serialize a method information and all its arguments.</li><li style="">Create a new background job based on the serialized information.</li><li style="">Save background job to a persistent storage.</li><li style="">Enqueue background job to its queue.</li></ol>
+<p>...</p>
+<p style="margin-bottom:10px; color:#333333; font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif; font-size:16px">
+Another Hangfire component, called&nbsp;<a href="http://docs.hangfire.io/en/latest/background-processing/processing-background-jobs.html" style="background:0px 0px; color:#428bca; text-decoration:none"><em style="">Hangfire Server</em></a>, checks the persistent
+ storage for enqueued background jobs and performs them in a reliable way.</p>
+<p style="margin-bottom:10px; color:#333333; font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif; font-size:16px">
+Enqueued jobs are handled by a dedicated pool of worker threads.&quot;</p>
+<p>http://docs.hangfire.io/en/latest/index.html<br/>
+</p>
+<p>&quot;<span style="color:#333333; font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif; font-size:16px">Background jobs are processed by&nbsp;</span><a href="http://docs.hangfire.io/en/latest/background-processing/processing-background-jobs.html" style="color:#428bca; text-decoration:none; font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif; font-size:16px"><em style="">Hangfire
+ Server</em></a><span style="color:#333333; font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif; font-size:16px">. It is implemented as a set of dedicated (not thread pool’s) background threads that fetch jobs from a storage and process
+ them.</span>&quot;</p>
+<p>*******</p>
+<p>Насколько я понял, используются обычные фоновые потоки (System.Threading.Thread).&nbsp;</p>
+<p>Серьезные ко&#1084;поненты обычно так и пишутся, поскольку работа с класса&#1084;и &quot;приближенны&#1084;и к стандартно&#1084;у API&quot; дает больший контроль че&#1084; с класса&#1084;и более &quot;высокого уровня&quot; (напри&#1084;ер, ThreadPool).</p>
+<p></p>
+</div>

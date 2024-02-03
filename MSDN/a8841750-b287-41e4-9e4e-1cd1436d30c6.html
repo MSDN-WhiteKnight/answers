@@ -1,0 +1,26 @@
+<h2>Message 422</h2>
+<p>Date: 26.06.2018 3:11:22</p>
+<div>
+Вы пишете, &quot;используется MS SQL CE 4&quot;, но судя по строке соедения, на са&#1084;о&#1084; деле используется LocalDB (файлы SQL CE и&#1084;еют расширение .sdf).
+<p><s><span style="font-size:10.5pt; font-family:'Segoe UI'; color:#333333; background:white">К слову, ни тот ни другой использовать в службах не реко&#1084;ендуется: они предназначены для клиентских приложений. Гораздо лучше использовать обычный SQL Server
+ Express.</span></s></p>
+На са&#1084;о&#1084; деле, SQL Server Compact начиная с версии 4.0 &#1084;ожно использовать в службах.<br/>
+<br/>
+<br/>
+<br/>
+</div>
+<h2>Message 421</h2>
+<p>Date: 27.06.2018 11:45:15</p>
+<div>
+На са&#1084;о&#1084; деле я ошибся, для служб не реко&#1084;ендуется использовать SQL Compact версии 3.5 и ранее. SQL Compact версии 4.0 был усовершенствован, и его &#1084;ожно использовать в службах.&nbsp;
+</div>
+<h2>Message 420</h2>
+<p>Date: 28.06.2018 2:55:35</p>
+<div>
+<p>Правильная строка (&#1084;ини&#1084;альная) должна выглядеть как-то так:</p>
+<pre class="prettyprint">Data Source=arithmetic.sdf;</pre>
+Дополнительные свойства &#1084;ожно пос&#1084;отреть здесь:&nbsp;<a href="https://msdn.microsoft.com/en-us/library/system.data.sqlserverce.sqlceconnectionstringbuilder(v=vs.100).aspx">https://msdn.microsoft.com/en-us/library/system.data.sqlserverce.sqlceconnectionstringbuilder(v=vs.100).aspx</a><br/>
+<p><br/>
+</p>
+<p>И провайдер -&nbsp;<em>System.Data.SqlServerCe.4.0</em>, а не&nbsp;<em>System.Data.SqlClient</em></p>
+</div>

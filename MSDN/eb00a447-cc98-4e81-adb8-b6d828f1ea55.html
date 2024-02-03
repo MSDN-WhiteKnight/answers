@@ -1,0 +1,38 @@
+<h2>Message 417</h2>
+<p>Date: 04.07.2018 19:16:34</p>
+<div>
+<p>Hyperlink сделает лишь то, что вы напишете в обработчике события&nbsp;RequestNavigate. Хотите открывать в WebBrowser - так и сделайте:</p>
+<pre class="prettyprint">&lt;Window x:Class=&quot;WpfApplication1.MainWindow&quot;
+        xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
+        xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+        Title=&quot;MainWindow&quot; Height=&quot;350&quot; Width=&quot;525&quot;&gt;
+    &lt;Grid&gt;
+        &lt;TextBlock&gt;
+		&lt;Hyperlink NavigateUri=&quot;http://yandex.ru/&quot; Name=&quot;hyperLink1&quot; RequestNavigate=&quot;hyperLink_RequestNavigate&quot;&gt;
+			&lt;TextBlock Text=&quot;Yandex&quot;/&gt;
+		&lt;/Hyperlink&gt;
+	&lt;/TextBlock&gt;
+        &lt;WebBrowser x:Name=&quot;webbrowser1&quot; HorizontalAlignment=&quot;Stretch&quot; Height=&quot;250&quot; Margin=&quot;0,60,0,0&quot;  /&gt;
+
+    &lt;/Grid&gt;
+&lt;/Window&gt;
+</pre>
+<pre class="prettyprint">public partial class MainWindow : Window
+{       
+
+        public MainWindow()
+        {
+            InitializeComponent();            
+        }
+
+        private void hyperLink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            webbrowser1.Navigate(e.Uri.ToString());
+        }
+        
+}</pre>
+<br/>
+<br/>
+<p></p>
+<p></p>
+</div>

@@ -1,0 +1,22 @@
+<h2>Message 743</h2>
+<p>Date: 29.06.2017 6:22:52</p>
+<div>
+Я не очень пони&#1084;аю что вы делаете, но попробуйте ShellExecute verb=runas
+</div>
+<h2>Message 742</h2>
+<p>Date: 05.07.2017 7:59:48</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>&quot;А что есть:&nbsp;</em></span><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><em>ShellExecute
+ verb=runas&quot;</em></span></p>
+<p>У ProcessStartInfo установить UseShellExecute=true и Verb=runas. Это ответ на вопрос, как победить ошибку&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Permission denied (операция
+ runas вызовет при запуске диалог UAC и при нажатии &quot;Да&quot; ко&#1084;андная строка будет запущена с повышенны&#1084;и права&#1084;и).</span></p>
+<p><span style="color:#333333"><span style="font-size:14px">Что касается вывода ошибок, то у вас же делается перенаправление вывода в файл
+</span></span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">IntegrityServiceHelper.Db.cs</span><span style="color:#333333"><span style="font-size:14px">. Ошибка в него и должна упасть.&nbsp;</span></span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+</div>
+<h2>Message 741</h2>
+<p>Date: 05.07.2017 10:36:01</p>
+<div>
+Ну да. Нужно использовать свойства&nbsp;<a href="https://msdn.microsoft.com/ru-ru/library/system.diagnostics.processstartinfo.redirectstandardoutput%28v=vs.110%29.aspx?f=255&MSPPError=-2147217396">ProcessStartInfo.RedirectStandartOutput</a>&nbsp;и Process.StandardOutput,
+ а не через стрелку в ко&#1084;анде.
+</div>

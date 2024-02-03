@@ -1,0 +1,31 @@
+<h2>Message 755</h2>
+<p>Date: 20.06.2017 15:46:32</p>
+<div>
+<p>По &#1084;ое&#1084;у, из всего этого гигансткого XAML для решения пробле&#1084;ы нужна только строка&nbsp;</p>
+<pre class="prettyprint prettyprinted" style="font-family:inherit; outline:0px; list-style-type:none; word-wrap:normal; overflow-y:visible; overflow-x:auto; min-height:70px; color:#333333; font-size:14px"><span class="tag" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">&lt;Setter</span><span class="pln" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px"> </span><span class="atn" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">Property</span><span class="pun" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">=</span><span class="atv" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">&quot;HorizontalContentAlignment&quot;</span><span class="pln" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px"> </span><span class="atn" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">Value</span><span class="pun" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">=</span><span class="atv" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">&quot;Stretch&quot;</span><span class="tag" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">/&gt;</span></pre>
+</div>
+<h2>Message 754</h2>
+<p>Date: 20.06.2017 17:36:11</p>
+<div>
+<p>А что прикольного? Свойство ListViewItem не &#1084;ожет задаваться на уровне контрола, так как&nbsp;ListViewItem - дина&#1084;ическая штука, генерируе&#1084;ая на основе шаблонов. Может кто-то хочет это выравнивание сделать пере&#1084;енны&#1084; в разных
+ эле&#1084;ентах списка. Соответственно, логично, что его &#1084;ожно задать только через стиль.</p>
+<p><br/>
+</p>
+</div>
+<h2>Message 753</h2>
+<p>Date: 21.06.2017 2:57:42</p>
+<div>
+Не обязательно глобально, &#1084;ожно запихать внутренний стиль в свойство ListView.ItemContainerStyle
+</div>
+<h2>Message 752</h2>
+<p>Date: 21.06.2017 6:37:15</p>
+<div>
+<p>как-то так</p>
+<pre class="prettyprint">&lt;ListView.ItemContainerStyle&gt;
+   &lt;Style TargetType=&quot;ListViewItem&quot;&gt;
+      &lt;Setter Property=&quot;HorizontalContentAlignment&quot; Value=&quot;Stretch&quot;/&gt;      
+   &lt;/Style&gt;
+&lt;/ListView.ItemContainerStyle&gt;</pre>
+<br/>
+<p></p>
+</div>

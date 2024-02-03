@@ -1,0 +1,21 @@
+<h2>Message 822</h2>
+<p>Date: 11.05.2017 6:32:12</p>
+<div>
+<p>Бросаться переходить на XML ради DataGridView конечно, не нужно. Привязка к DataTable - дельный совет, но если очень хочется без нее, то &#1084;ожно</p>
+<pre class="prettyprint">        private void button2_Click(object sender, EventArgs e)
+        {
+            dataGridView1.ColumnCount = 1;
+            string[] lines = File.ReadAllLines(@&quot;F:/666.txt&quot;, Encoding.Default);
+               
+            
+            dataGridView1.Rows.Clear();
+            for (int i = 0; i &lt; lines.Length; i&#43;&#43;)
+            {
+			dataGridView1.Rows.Add();
+			dataGridView1.Rows[i].Cells[0].Value=lines[i];
+               
+            }
+        }</pre>
+<br/>
+<p></p>
+</div>

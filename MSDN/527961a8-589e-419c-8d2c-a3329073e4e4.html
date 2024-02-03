@@ -1,0 +1,16 @@
+<h2>Message 611</h2>
+<p>Date: 14.11.2017 5:48:24</p>
+<div>
+<p>Насколько я знаю, нет никакой особенности использования <span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+Shell_NotifyIcon </span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">в 64-битных приложениях&nbsp;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">(как
+ и 99% Windows API - он был спроектирован так, чтобы не заботится о платфор&#1084;е). Ищите пробле&#1084;у в друго&#1084; &#1084;есте.
+</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Так как 64-битные приложения отличаются от 32-битных раз&#1084;еро&#1084; указателя, пробле&#1084;у &#1084;ожет вызывать код, &#1084;анипулирующий
+ внутренней структурой указателей и некоторые API-функции, зависящие от этого (напри&#1084;ер, GetClassLong/GetWindowLong при получении дескрипторов).</span></p>
+</div>
+<h2>Message 610</h2>
+<p>Date: 15.11.2017 4:18:43</p>
+<div>
+Угу, под Windows програ&#1084;&#1084;ы лучше собирать с по&#1084;ощью Visual C&#43;&#43; или Intel C&#43;&#43;. Первый &#1084;ожно установить без Visual Studio, и настроить стороннюю IDE на работу с ни&#1084;. Собирать gcc или че&#1084;-то подобны&#1084;
+ бесс&#1084;ысленно, когда програ&#1084;&#1084;а заточена под Windows.
+</div>

@@ -1,0 +1,30 @@
+<h2>Message 73</h2>
+<p>Date: 16.02.2021 16:20:20</p>
+<div>
+<p>При использовании совре&#1084;енного фор&#1084;ата проекта (VS 2017&#43; или .NET Core SDK) ничего особенного делать не нужно. Вы выбираете несколько целевых платфор&#1084;, устанавливаете&nbsp;GeneratePackageOnBuild, и тогда при сборке генерируется пакет
+ с нескольки&#1084;и целевы&#1084;и платфор&#1084;а&#1084;и. Файл проекта должен выглядеть как-то так:</p>
+<pre class="prettyprint">&lt;Project Sdk=&quot;Microsoft.NET.Sdk&quot;&gt;
+
+  &lt;PropertyGroup&gt;
+    &lt;TargetFrameworks&gt;netstandard2.0;net45&lt;/TargetFrameworks&gt;    
+    &lt;GeneratePackageOnBuild&gt;true&lt;/GeneratePackageOnBuild&gt;
+    
+  &lt;/PropertyGroup&gt;
+&lt;/Project&gt;</pre>
+При старо&#1084; типе проекта или если это вовсе не msbuild, да, нужно вручную ко&#1084;поновать dll-ки в несколько подкаталогов в /lib, и пото&#1084; паковать это ко&#1084;андной строкой.<br/>
+<p></p>
+<p></p>
+</div>
+<h2>Message 72</h2>
+<p>Date: 17.02.2021 5:58:46</p>
+<div>
+<p>Для связок зависи&#1084;остей также &#1084;ожно ввести логическое управление на основе платфор&#1084;ы:</p>
+<pre class="prettyprint">&lt;PropertyGroup Condition=&quot;'$(TargetFramework)'=='netstandard2.0'&quot;&gt;
+    &lt;PackageReference Include=&quot;...&quot; Version=&quot;...&quot; /&gt;
+&lt;/PropertyGroup&gt;</pre>
+<p>Что касается <span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+System.Text.Encoding.CodePages,&nbsp;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">System.IO.Ports</span>, насколько я пони&#1084;аю, эти пакеты в net framework не нужны, так как
+ и кодировки, и работа с порта&#1084;и встроены в са&#1084;у стандартную библиотеку.&nbsp;</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&gt;Я так пони&#1084;аю, это только для 2017 студии, для 2019 уже не актуально?</span></p>
+<p>То, что я написал, актуально и для VS 2017, и для VS2019.</p>
+</div>

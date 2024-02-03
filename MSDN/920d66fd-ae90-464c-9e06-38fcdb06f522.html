@@ -1,0 +1,25 @@
+<h2>Message 928</h2>
+<p>Date: 24.02.2017 19:01:31</p>
+<div>
+<p>Что происходит?&nbsp;Да ничего особенного, пос&#1084;отрите са&#1084;и:</p>
+<pre class="prettyprint">static void Main(string[] args)
+        {
+            unchecked
+            {
+                short sh;
+                sh = (short)Int32.MaxValue;
+                Console.WriteLine(sh.ToString());
+            }
+        }</pre>
+<pre class="prettyprint">.maxstack  1
+  .locals init ([0] int16 sh)
+  IL_0000:  ldc.i4.m1 		//Push -1 onto the stack as int32.
+  IL_0001:  stloc.0 		//Pop a value from stack into local variable 0.
+  IL_0002:  ldloca.s   sh 	//Load address of local variable with index indx, short form
+  IL_0004:  call       instance string [mscorlib]System.Int16::ToString()
+  IL_0009:  call       void [mscorlib]System.Console::WriteLine(string)
+  IL_000e:  ret
+</pre>
+Для целочисленных типов без с&#1084;ены знаковости, операция преобразования является просто другой интерпретацией того же участка па&#1084;яти. Специальные операции преобразования есть при преобразовании signed &lt;-&gt; unsigned, или из целых в вещественные.<br/>
+<p></p>
+</div>

@@ -1,0 +1,14 @@
+<h2>Message 374</h2>
+<p>Date: 25.09.2018 6:32:35</p>
+<div>
+<p>Из <a href="https://docs.microsoft.com/en-us/nuget/api/overview">Overview of Nuget API</a>&nbsp;</p>
+<p style="margin-bottom:0cm; margin-bottom:.0001pt; line-height:normal; background:white">
+<span lang="EN-US" style="font-size:12.0pt; font-family:'Segoe UI',sans-serif; color:black; background:silver">The entry point for the API is a JSON document in a well known location. This document is called the&nbsp;<strong>service index</strong>. The location
+ of the service index for nuget.org is&nbsp;</span><span lang="EN-US" style="font-size:10.0pt; font-family:'Courier New'; color:black; border:solid #D3D6DB 1.0pt; padding:2.0pt; background:silver">https://api.nuget.org/v3/index.json</span><span lang="EN-US" style="font-size:12.0pt; font-family:'Segoe UI',sans-serif; color:black; background:silver">.</span></p>
+<p style="margin-bottom:0cm; margin-bottom:.0001pt; line-height:normal; background:white">
+<span lang="EN-US" style="font-size:12.0pt; font-family:'Segoe UI',sans-serif; color:black; background:silver">This JSON document contains a list of&nbsp;<em>resources</em>&nbsp;which provide different functionality and fulfill different use cases.</span></p>
+<p style="margin-bottom:0cm; margin-bottom:.0001pt; line-height:normal; background:white">
+<span lang="EN-US" style="font-size:12.0pt; font-family:'Segoe UI',sans-serif; color:black; background:silver">Clients that support the API should accept one or more of these service index URL as the means of connecting to the respective package sources.</span></p>
+<p></p>
+<p>Это своего рода справочник URL конкретных сервисов. Клиенты должны при инициализации распарсить его и найти по полю &quot;@type&quot; URL нужного и&#1084; сервиса. Описание структуры есть здесь:&nbsp;<a href="https://docs.microsoft.com/en-us/nuget/api/service-index">https://docs.microsoft.com/en-us/nuget/api/service-index</a></p>
+</div>

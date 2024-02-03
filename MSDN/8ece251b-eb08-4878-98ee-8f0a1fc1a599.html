@@ -1,0 +1,46 @@
+<h2>Message 966</h2>
+<p>Date: 31.01.2017 7:44:13</p>
+<div>
+<p>попробуйте так:</p>
+<pre class="prettyprint">public static BitmapImage ArrayToBitmapImage(byte[] byteArray)
+{
+        
+    using (var stream = new InMemoryRandomAccessStream())
+    {
+        stream.WriteAsync(byteArray.AsBuffer()).GetResults();                           
+        var image = new BitmapImage();
+        stream.Seek(0);
+        image.SetSource(stream);
+        return image;
+    }   
+}</pre>
+<br/>
+<p></p>
+</div>
+<h2>Message 965</h2>
+<p>Date: 01.02.2017 7:33:57</p>
+<div>
+<p>Совет все равно дельный. Надо позаботиться, чтобы поток не уничтожался. Может, попробовать просто убрать using.</p>
+<p></p>
+</div>
+<h2>Message 962</h2>
+<p>Date: 03.02.2017 7:46:22</p>
+<div>
+<p>&#1084;ожно еще так попробовать:</p>
+<pre class="prettyprint">static InMemoryRandomAccessStream stream;
+
+public static BitmapImage ArrayToBitmapImage(byte[] byteArray)
+{
+        
+    stream = new InMemoryRandomAccessStream();
+    
+    stream.WriteAsync(byteArray.AsBuffer()).GetResults();                           
+    var image = new BitmapImage();
+    stream.Seek(0);
+    await image.SetSourceAsync(stream);
+    return image;
+       
+}</pre>
+<br/>
+<p></p>
+</div>

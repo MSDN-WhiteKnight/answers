@@ -1,0 +1,33 @@
+<h2>Message 866</h2>
+<p>Date: 30.03.2017 16:19:26</p>
+<div>
+<p>Во первых, использовать класс&nbsp;<a href="https://msdn.microsoft.com/ru-ru/library/system.data.oledb.oledbconnectionstringbuilder(v=vs.110).aspx">OleDbConnectionStringBuilder</a></p>
+<pre class="prettyprint">OleDbConnectionStringBuilder builder = new OleDbConnectionStringBuilder();
+builder.ConnectionString = Properties.Settings.Default.fioConnectionString;
+builder[&quot;Data Source&quot;] = filebrous;
+
+Properties.Settings.Default.fioConnectionString = builder.ConnectionString</pre>
+Во вторых, пара&#1084;етр в настройках должен и&#1084;еть область <em>Пользователь</em>, а не
+<em>Приложение</em>, иначе не работает.<br/>
+<pre style="padding:5px; word-wrap:normal; font-size:13px; font-family:Consolas,Courier,monospace!important"><br/></pre>
+<pre style="padding:5px; word-wrap:normal; font-size:13px; font-family:Consolas,Courier,monospace!important"><p></p></pre>
+<pre style="padding:5px; word-wrap:normal; font-size:13px; font-family:Consolas,Courier,monospace!important"><br/></pre>
+<p></p>
+<p><a href="https://msdn.microsoft.com/ru-ru/library/system.data.oledb.oledbconnectionstringbuilder(v=vs.110).aspx"></a></p>
+</div>
+<h2>Message 855</h2>
+<p>Date: 05.04.2017 7:35:16</p>
+<div>
+<blockquote>А тип данных должен быть string?&nbsp;</blockquote>
+Да
+</div>
+<h2>Message 841</h2>
+<p>Date: 20.04.2017 17:15:49</p>
+<div>
+<p>Ну раз так, значит это свойство ConnectionString надо оставить, чтобы студия успокоилась. Просто создайте рядо&#1084; другое string-свойство &nbsp;fioConnectionStringReal (с областью види&#1084;ости &quot;Пользователь&quot;), и его &#1084;одифицируйте. А
+ когда нужно исполнять запросы, перед вызово&#1084; TableAdapter.Fill или Update установите свойство Connection</p>
+<pre class="prettyprint">this.myTableAdapter.Connection = new OleDbConnection(Properties.Settings.Default.fioConnectionStringReal);
+this.myTableAdapter.Fill(this.databaseDataSet.myTable);</pre>
+<br/>
+<p></p>
+</div>

@@ -1,0 +1,16 @@
+<h2>Message 231</h2>
+<p>Date: 25.06.2019 9:06:08</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Буду признателен работающе&#1084;у коду</em>&quot;</span></p>
+<p>А какой и&#1084;енно код вы ожидаете? У &#1084;еня в DGV с пара&#1084;етра&#1084;и по у&#1084;олчанию ничего не скачет. Воз&#1084;ожно, у вас из&#1084;енен пара&#1084;етр&nbsp;<a href="https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.datagridview.autosizecolumnsmode?view=netcore-3.0#System_Windows_Forms_DataGridView_AutoSizeColumnsMode">AutoSizeColumnsMode</a>&nbsp;(или
+ аналогичный на уровне отдельных столбцов) и ва&#1084; просто нужно установить его в None.&nbsp;</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>В че&#1084; &#1084;ожет быть пробле&#1084;а ? каки&#1084; образо&#1084; &#1084;огла из&#1084;ениться коллекция ?</em>&quot;</span></p>
+<p>Коллекция в ваше&#1084; случае - словарь ColumnsFillWeights. Строка &quot;ColumnsFillWeights[colName] =...&quot;&nbsp; из&#1084;еняет словарь, делая итератор ColumnsFillWeights.Keys, по которо&#1084;у идет foreach, недействительны&#1084;.&nbsp; Простейший
+ способ исправить это - проходить не по Keys, а по вре&#1084;енной коллекции, созданной из Keys, напри&#1084;ер, вызово&#1084; ToList().</p>
+</div>
+<h2>Message 229</h2>
+<p>Date: 25.06.2019 18:55:14</p>
+<div>
+Да, очищать и заполнять заново тоже подходит. Но вообще, очищать необязательно. Так как у вас ключи - это названия столбцов, достаточно было бы сделать что-то вроде этого:&nbsp;
+<pre class="prettyprint prettyprinted" style="font-family:inherit; outline:0px; list-style-type:none; min-height:70px; color:#333333; font-size:14px"><p>for(int i = 0;i&lt;dataGridView.Columns.Count;i&#43;&#43;){<span class="pln" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px"></span></p><p><span class="pln" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">   colName = </span><span style="color:#333333; font-size:14px; white-space:pre">dataGridView.Columns[i].Name;</span></p><p>   ColumnsFillWeights[colName] = ...</p><p><span style="color:#333333; font-size:14px; white-space:pre">}</span></p></pre>
+</div>

@@ -1,0 +1,102 @@
+<h2>Message 1113</h2>
+<p>Date: 03.10.2016 10:27:50</p>
+<div>
+<p>воз&#1084;ожно, в режи&#1084;е исполнения юзаются стили офор&#1084;ления, а конструктор о них не знает.</p>
+<p>если в файле Program.cs (если пишете на c#), &#1084;етод Main, убрать строку</p>
+<pre class="prettyprint">Application.EnableVisualStyles();</pre>
+<p>что из&#1084;енится?</p>
+<p>P.S. Потестил в Win7, не пашет. Единственное что различается - это внешний вид кнопок. Без стилей они квадратные как в Win98. Ра&#1084;ка окна все равно использует включенную в систе&#1084;е прозрачность. Удалось приблизить вид приложения к &quot;конструкторно&#1084;у&quot;
+ только глобальны&#1084; отключение&#1084; Аэро через&nbsp;DwmEnableComposition(false); из&nbsp;dwmapi.dll (которое поче&#1084;у то еще и вызвало разбалансировку стека :D). Так что совет - не пытайтесь сделать то, что хотите сделать. Пусть пользователь са&#1084;
+ решает, как приложение будет отображаться.&nbsp;</p>
+<p></p>
+<p></p>
+</div>
+<h2>Message 1112</h2>
+<p>Date: 03.10.2016 11:57:16</p>
+<div>
+ну как вариант, проверьте будет ли работать&nbsp;DwmEnableComposition(false) в Win10 если запустить в режи&#1084;е сов&#1084;ести&#1084;ости с Win7. И если да, неки&#1084; образо&#1084; завставлять пользователя всегда запускать приладу в это&#1084; режи&#1084;е
+ (напри&#1084;ер, создать инсталляторо&#1084; ярлык с таки&#1084; режи&#1084;о&#1084;) :D
+</div>
+<h2>Message 1111</h2>
+<p>Date: 03.10.2016 16:09:05</p>
+<div>
+<p>Нашел другое решение, ВЫСОКОЙ степени извращенности,как заставить винду отображать окно как в конструкторе.<br/>
+<br/>
+Я начал ду&#1084;ать, как редактор отображает окно без украшательств. И я понял, что это из-за того, что окно является дочерни&#1084; для другого окна. Украшательства работают только для окон верхнего уровня! Значит надо запихнуть наше окно в окно-обертку у
+ которого нет ни ра&#1084;ки ни заголовка ни рожна, и вообще оно прозрачное. Что приводит &#1084;еня вот к тако&#1084;у коду:</p>
+<p>//Form1.cs<br/>
+using System;<br/>
+using System.ComponentModel;<br/>
+using System.Windows.Forms;<br/>
+using System.Runtime.InteropServices;<br/>
+<br/>
+namespace WindowsForms_test<br/>
+{<br/>
+&nbsp;&nbsp;&nbsp; public partial class Form1 : Form //невиди&#1084;ое окно-обертка<br/>
+&nbsp;&nbsp;&nbsp; {&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [DllImport(&quot;user32.dll&quot;)]<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public static extern int SetParent(IntPtr hWnd, IntPtr NewParent);<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public Form1()<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; InitializeComponent();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; private void Form1_Load(object sender, EventArgs e)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; //создае&#1084; невиди&#1084;ое окно
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; this.WindowState = FormWindowState.Maximized;//окно на весь экран<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; this.TransparencyKey = this.BackColor;//окно все прозрачное<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; this.FormBorderStyle = FormBorderStyle.None;//окно не и&#1084;еет ра&#1084;ки<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FormMain f = new FormMain();//создае&#1084; настоящее окно<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; f.BackColor = SystemColors.ControlLight;//чтобы не совпадало с ключе&#1084; прозрачности окна-обертки<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; IntPtr hwnd=f.Handle;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SetParent(hwnd, this.Handle);//засовывае&#1084; настоящее окно в невиди&#1084;ое окно&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; f.Show();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br/>
+&nbsp;&nbsp;&nbsp; }<br/>
+}<br/>
+<br/>
+//FormMain.cs<br/>
+using System;<br/>
+using System.Windows.Forms;<br/>
+<br/>
+namespace WindowsForms_test<br/>
+{<br/>
+&nbsp;&nbsp;&nbsp; public partial class FormMain : Form<br/>
+&nbsp;&nbsp;&nbsp; {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public FormMain() //реальное главное окно<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; InitializeComponent();<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br/>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; /* Здесь ваши поля, &#1084;етоды, свойства и т.п. */<br/>
+&nbsp;&nbsp;&nbsp; }<br/>
+}<br/>
+</p>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
+</div>
+<h2>Message 1108</h2>
+<p>Date: 05.10.2016 3:02:44</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:20.162px">&quot;Но при закрытии фор&#1084;ы не закрывается главное окно.&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:20.162px">Это легко устранить, но есть одна тонкость. Просто вызов MainForm.Owner.Close() вызывает переполненеие стека :) Так
+ что добавьте в MainForm статическое поле </span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:20.162px">public static Form TopLevelWindow;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:20.162px">В Form1_Load строку:</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:20.162px">MainForm,TopLevelWindow=this;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:20.162px">В MainForm_OnClose строку:</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:20.162px">TopLevelWindow.Close();</span></p>
+<p><br/>
+</p>
+<p><br/>
+</p>
+</div>
+<h2>Message 1107</h2>
+<p>Date: 05.10.2016 17:24:16</p>
+<div>
+Желание разработчика отображать окно без стилей вполне легально. Не обязательно навязывать, это &#1084;ожет быть и как пользовательская настройка, не? Да и процесс убиения стилей обрати&#1084;: вызов SetParent(hwnd, (IntPtr)0); делает вполне то, что ожидалось.
+</div>

@@ -1,0 +1,71 @@
+<h2>Message 221</h2>
+<p>Date: 11.07.2019 8:22:43</p>
+<div>
+<p>Та&#1084; же есть&nbsp;Windows 7 SP1 в поддерживае&#1084;ых ОС.</p>
+<p>Кстати, есть еще вот такой онлайн-сервис для поиска констант:&nbsp;<a href="https://www.magnumdb.com">https://www.magnumdb.com</a></p>
+</div>
+<h2>Message 220</h2>
+<p>Date: 11.07.2019 11:20:54</p>
+<div>
+А каталог&nbsp;C:\Program Files (x86)\Windows Kits\10 у вас есть?
+</div>
+<h2>Message 218</h2>
+<p>Date: 12.07.2019 7:06:33</p>
+<div>
+<p>&quot;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>В этой те&#1084;е предложено решение здесь:&nbsp;VadimTagil1. Но здесь тоже подводные ка&#1084;ни: не известно, кто этот сайт
+ составляет</em></span>&quot;</p>
+<p><a href="https://github.com/smourier">https://github.com/smourier</a>, если это и&#1084;еет значение</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>Остаётся
+ тогда установить Visual Studio и нужно сделать язык C&#43;&#43; по у&#1084;олчанию?</em></span></p>
+<p style="border:none; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; outline:0px; padding-right:0px; color:#333333; font-size:14px">
+<em>Или не обязательно настраивать C&#43;&#43; по у&#1084;олчанию?</em></p>
+<p style="border:none; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; outline:0px; padding-right:0px; color:#333333; font-size:14px">
+<em>Можете описать порядок действий по работе с Visual Studio, чтобы увидеть значения констант Win32 API, при это&#1084; учитывая, что я не програ&#1084;&#1084;ирую на C&#43;&#43;?</em>&quot;</p>
+<p>Для начала установить походящую версию VS. Я реко&#1084;ендую VS 2012 Express For Desktop (<a href="https://visualstudio.microsoft.com/ru/vs/older-downloads/">https://visualstudio.microsoft.com/ru/vs/older-downloads/</a>). Можно конечно и VS2017, но она
+ довольно тяжелая.&nbsp;</p>
+<p>После этого, создайте в ней проект С&#43;&#43; (напри&#1084;ер, консольный), допишите в не&#1084; в начале файла #include &lt;windows.h&gt;, далее напишите и&#1084;я нужной константы, щелкните правой кнопкой и выберите &quot;Перейти к определению&quot;.
+ Как-то так.</p>
+</div>
+<h2>Message 217</h2>
+<p>Date: 12.07.2019 8:37:47</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>То есть нет кода константы</em>.&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Вообще то есть, вы са&#1084;и его только что привели. Не любая константа задается явно число&#1084;, она &#1084;ожет быть производной от
+ других констант. Как я уже написал в другой те&#1084;е, если вы совсе&#1084; не знаете С&#43;&#43;, то вы не разберетесь.&nbsp;</span><br/>
+</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+</div>
+<h2>Message 214</h2>
+<p>Date: 12.07.2019 9:33:53</p>
+<div>
+<p>Навести &#1084;ышью нет, но вы &#1084;ожете использовать простую програ&#1084;&#1084;у для вывода значений констант на экран:</p>
+<pre class="prettyprint">#include &lt;stdio.h&gt;
+#include &lt;Windows.h&gt;
+
+int main(int argc, char* argv[]){
+
+   printf(&quot;%d\n&quot;,(int) CONST_NAME);
+
+   getchar();
+
+}</pre>
+<p>Создаете консольный проект, вставляете в него этот код, за&#1084;еняете&nbsp;CONST_NAME на нужную константу, собираете и запускаете. Значение будет в консоли.</p>
+<p></p>
+</div>
+<h2>Message 212</h2>
+<p>Date: 12.07.2019 16:30:13</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Я ду&#1084;аю, что не все програ&#1084;&#1084;исты знают C&#43;&#43;.</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Я бы сказал больше, &#1084;ногие из тех, кто пишет на С&#43;&#43;, не знают С&#43;&#43;.&nbsp; Совре&#1084;енный С&#43;&#43; - &#1084;ногопарадиг&#1084;енный
+ язык с кучей воз&#1084;ожностей, так что часто люди знают лишь какое-то его под&#1084;ножество, и не знаю другие части языка. Слово&#1084;, это зависит от того, какой и&#1084;енно с&#1084;ысл вкладывать в слово &quot;знать&quot; (с&#1084;. ниже)</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>Да
+ и &#1084;ожно ли знать язык, не програ&#1084;&#1084;ируя на нё&#1084;. Я ду&#1084;аю, что через год уже забудешь его.</em></span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;</span></p>
+<p>Если под &quot;знать&quot; подразу&#1084;евается &quot;знать полностью&quot;, то да, нельзя. Но я ва&#1084; в другой те&#1084;е специально писал -
+<strong>Знать С&#43;&#43; на уровне чтения С&#43;&#43; 03</strong> - в этой фразе каждое слово важно. Для того, чтобы читать код, далеко не обязательно знать язык полностью, те&#1084; более такой обширный по воз&#1084;ожностя&#1084;, как С&#43;&#43;. Windows
+ API и при&#1084;еры к не&#1084;у в доку&#1084;ентации не используют воз&#1084;ожности новых версий языка, поэто&#1084;у их знать необязательно.&nbsp;</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Мне вот приходилось учиться читать Фортран, так как при&#1084;ер реализации нужного &#1084;не алгорит&#1084;а (численное решение сложной
+ систе&#1084;ы дифференциальных уравнений) был только на не&#1084;. </span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Да, конечно, если изучить язык и и&#1084; не пользоваться, он забудется, но в случае С&#43;&#43; это вряд ли будет так. Существует очень
+ большая кодовая база решений разных задач и&#1084;енно на С&#43;&#43;: в виде ответах на фору&#1084;ах и stackoverflow, при&#1084;еров в доку&#1084;ентациях к библиотека&#1084;, open-source ПО и т.п. Знание С&#43;&#43; редко остается невостребованны&#1084;.</span></p>
+<p></p>
+</div>

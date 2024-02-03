@@ -1,0 +1,39 @@
+<h2>Message 146</h2>
+<p>Date: 17.01.2020 3:46:56</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>С горе&#1084; попола&#1084; нахожу та&#1084; Chart.Series.Points,</em></span><br style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>а где IndexOf, Remuve и RemuveAt ?</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Points и&#1084;еет тип DataPointCollection. Методы типа&nbsp;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">IndexOf
+ наследуются от Collection:&nbsp;<a href="https://docs.microsoft.com/ru-ru/dotnet/api/system.collections.objectmodel.collection-1.indexof?view=netframework-4.8#System_Collections_ObjectModel_Collection_1_IndexOf__0_">https://docs.microsoft.com/ru-ru/dotnet/api/system.collections.objectmodel.collection-1.indexof?view=netframework-4.8#System_Collections_ObjectModel_Collection_1_IndexOf__0_</a>
+ В доку&#1084;ентации по Charting их и не должно быть</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&nbsp;&quot;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>С&#1084;отрю
+ дальше, нужна сборка, ищу в интернете,</em></span><br style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>откуда скачать последнюю версию -</em></span><br style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>&quot;System.Windows.Forms.DataVisualization.dll&quot;</em></span><br style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>Появлются какие-то левые страницы, с каки&#1084;и-то версия&#1084;и,</em></span><br style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>но &#1084;не нужна фир&#1084;енная последняя версия -&nbsp;</em></span><br style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>на фир&#1084;енно&#1084; сайте не нашел</em>.</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Эта сборка поставляется в составе .NET Framework, который, в свою очередь, поставляется в составе Windows. Ничего скачивать не надо.</span></p>
+</div>
+<h2>Message 143</h2>
+<p>Date: 17.01.2020 15:01:39</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;Но, главное, поче&#1084;у это не работает.&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Это - то, что зако&#1084;&#1084;ентировано? Работа IndexOf полностью основана на то&#1084;, как работает &#1084;етод Equals у типа эле&#1084;ента
+ коллекции. Если бы он был переопределен, чтобы осуществлять сравнение по значения&#1084; координат, это бы работало. Но, судя по ваше&#1084;у тесту, это
+<strong>не</strong> сделано, и он просто сравнивает по ссылке. Т.е. созданную ва&#1084;и точку (6,6) он считает другой, че&#1084; такая же точка в коллекции. Рабочий способ (один из) вы уже са&#1084;и нашли - поиск с переборо&#1084;. Второй, вероятно -&nbsp;</span><a href="https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.datavisualization.charting.datapointcollection.findbyvalue?view=netframework-4.8#System_Windows_Forms_DataVisualization_Charting_DataPointCollection_FindByValue_System_Double_System_String_">FindByValue(6,&quot;X&quot;);</a>&nbsp;Найденное
+ значение будет уже из коллекции, и его &#1084;ожно скар&#1084;ливать IndexOf.</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+<br/>
+</div>
+<h2>Message 142</h2>
+<p>Date: 17.01.2020 16:57:10</p>
+<div>
+Вероятно, координаты (X;Y) для графика (который линией), а для столбчатой диагра&#1084;&#1084;ы координаты X по сути не нужны, достаточно Y (высоты столбца). Горизонтальная координата подбирается авто&#1084;атически, чтобы столбцы были рядо&#1084; друг
+ с друго&#1084;.&nbsp;
+</div>
+<h2>Message 141</h2>
+<p>Date: 17.01.2020 18:03:13</p>
+<div>
+<pre class="prettyprint">chart.Series[0].Points.AddXY(1,1);</pre>
+</div>

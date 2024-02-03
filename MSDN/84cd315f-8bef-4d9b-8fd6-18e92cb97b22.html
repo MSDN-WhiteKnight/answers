@@ -1,0 +1,187 @@
+<h2>Message 345</h2>
+<p>Date: 11.11.2018 7:15:39</p>
+<div>
+<p>Если это ваше UWP-приложение, вероятно, ва&#1084; нужно выполнить действия, описанные здесь:&nbsp;<a href="https://blogs.windows.com/buildingapps/2017/07/05/command-line-activation-universal-windows-apps/#UaF9ZyFfdF9kYhdY.97"></a><a href="https://blogs.windows.com/buildingapps/2017/07/05/command-line-activation-universal-windows-apps/#UaF9ZyFfdF9kYhdY.97">Command-Line
+ Activation of Universal Windows Apps</a></p>
+<p>После этого вы с&#1084;ожете запускать его как обычную ко&#1084;анду:&nbsp;<em>Process.Start(&quot;cmd.exe&quot;,&quot;...&quot;);</em></p>
+<p>Для запуска произвольных приложений есть вот такой способ (требует наличия App Certification Kit на целевой &#1084;ашине):&nbsp;<a href="http://blogs.microsoft.co.il/shair/2013/02/07/run-windows-store-apps-from-desktop/">Run Windows Store Apps From Desktop</a></p>
+<p></p>
+</div>
+<h2>Message 344</h2>
+<p>Date: 12.11.2018 8:37:15</p>
+<div>
+<p>Предлагаю такой способ. У большинства UWP приложений определен свой протокол URL, через который его &#1084;ожно открывать в проводнике (напри&#1084;ер, Edge &#1084;ожно открыть, набрав &quot;<em>microsoft-edge://</em>&quot;). Эти протоколы &#1084;ожно вытащить
+ из ветки реестра <em>HKEY_CLASSES_ROOT\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\PackageRepository\Packages\(PackageID)\(</em><em>AppUserModelID</em><em>)\windows.protocol</em>. Таки&#1084; образо&#1084;, &#1084;ожно вытащить список
+ AppUserModelID и протоколов для всех приложений, и&#1084;еющих протокол запуска, и запускать приложение передавая в Process.Start протокол.&nbsp;</p>
+<p>XAML:</p>
+<pre class="prettyprint" style="">&lt;Window x:Class=&quot;WpfApp1.MainWindow&quot;
+        xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
+        xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+        xmlns:d=&quot;http://schemas.microsoft.com/expression/blend/2008&quot;
+        xmlns:mc=&quot;http://schemas.openxmlformats.org/markup-compatibility/2006&quot;        
+        mc:Ignorable=&quot;d&quot;
+        Title=&quot;Store Apps&quot; Height=&quot;400&quot; Width=&quot;600&quot;&gt;
+    &lt;Grid HorizontalAlignment=&quot;Stretch&quot; VerticalAlignment=&quot;Stretch&quot; &gt;
+        
+        &lt;ListBox x:Name=&quot;listbox&quot; 
+                 HorizontalAlignment=&quot;Stretch&quot; Margin=&quot;40,40,40,40&quot; 
+                 VerticalAlignment=&quot;Stretch&quot;  MouseDoubleClick=&quot;listbox_MouseDoubleClick&quot;/&gt;
+
+    &lt;/Grid&gt;
+&lt;/Window&gt;</pre>
+<p></p>
+<p>C#:</p>
+<p></p>
+<pre class="prettyprint">using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Windows;
+using System.ComponentModel;
+using System.Windows.Controls;
+using Microsoft.Win32;
+
+namespace WpfApp1
+{
+    public partial class MainWindow : Window
+    {
+        List&lt;StoreApp&gt; applist; //список UWP-приложений
+
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            try
+            {
+                LoadApps();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), &quot;Error&quot;);
+            }
+        }
+
+        //загружает список UWP-приложений
+        void LoadApps()
+        {
+            //словарь для хранения соответствия AppUserModelID и протоколов
+            Dictionary&lt;string, string&gt; protocolsdic = new Dictionary&lt;string, string&gt;();
+            
+            //открывае&#1084; раздел реестра со списко&#1084; пакетов
+            string basepath = &quot;Local Settings\\Software\\Microsoft\\Windows\\CurrentVersion\\AppModel\\PackageRepository\\Packages\\&quot;;
+            RegistryKey key = Registry.ClassesRoot.OpenSubKey(basepath);
+            if (key == null) throw new Exception(&quot;Cannot open 'Packages' registry key!&quot;);
+
+            RegistryKey subkey_package;
+            RegistryKey subkey_app;
+            RegistryKey subkey_protocols;
+
+            using (key)
+            {
+                string[] packages = key.GetSubKeyNames(); //получае&#1084; список пакетов
+
+                foreach (string package in packages)
+                {
+                    subkey_package = key.OpenSubKey(package);
+
+                    using (subkey_package)
+                    {
+                        //получае&#1084; список приложений в пакете
+                        string[] package_apps = subkey_package.GetSubKeyNames(); 
+
+                        foreach (string package_app in package_apps)
+                        {
+                            subkey_app = subkey_package.OpenSubKey(package_app);
+
+                            using (subkey_app)
+                            {
+                                string[] subkeys = subkey_app.GetSubKeyNames();
+
+                                //если у приложения есть протокол, занесе&#1084; его в словарь
+                                if (subkeys.Contains(&quot;windows.protocol&quot;))
+                                {
+                                    subkey_protocols = subkey_app.OpenSubKey(&quot;windows.protocol&quot;);
+                                    using (subkey_protocols)
+                                    {
+                                        string[] protocols = subkey_protocols.GetSubKeyNames();
+
+                                        if (protocols.Length &gt; 0)
+                                        {
+                                            if (!protocolsdic.ContainsKey(package_app))
+                                                protocolsdic.Add(package_app, protocols[0]);
+                                        }
+                                    }
+
+                                }//endif
+                            }
+
+                        }//end foreach
+                    }
+
+
+
+                }//end foreach
+            }
+
+            applist = new List&lt;StoreApp&gt;(protocolsdic.Count);
+
+            foreach (string x in protocolsdic.Keys)
+            {
+                //провери&#1084;, реально ли зарегистрирован такой протокол запуска в систе&#1084;е...
+                RegistryKey classkey = Registry.ClassesRoot.OpenSubKey(protocolsdic[x]);
+                using (classkey)
+                {
+                    if (classkey != null)
+                    {
+                        //если зарегистрирован, добавляе&#1084; эле&#1084;ент в список
+                        applist.Add(new StoreApp { AppUserModelID = x, Protocol = protocolsdic[x] });
+                    }
+                }
+            }
+
+            //задае&#1084; привязки ListBox...
+            listbox.ItemsSource = applist;
+            listbox.DisplayMemberPath = &quot;AppUserModelID&quot;;
+        }
+               
+
+
+        private void listbox_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            //получае&#1084; текущий эле&#1084;ент списка
+            StoreApp app = listbox.SelectedItem as StoreApp;
+
+            if (app != null)
+            {
+                try
+                {
+                    //пытае&#1084;ся запустить протокол через Shell
+                    System.Diagnostics.Process.Start(app.Protocol &#43; &quot;://&quot;);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString(), &quot;Error&quot;);
+                }
+            }
+        }
+    }
+
+    public class StoreApp
+    {
+        public string AppUserModelID { get; set; }
+
+        public string Protocol { get; set; }
+    }
+    
+}
+
+
+</pre>
+<p></p>
+<p>Так это выглядит у &#1084;еня:</p>
+<p><img alt="" src="https://social.msdn.microsoft.com/Forums/getfile/1358206"><br/>
+</p>
+<p></p>
+<p></p>
+<br/>
+</div>

@@ -1,0 +1,34 @@
+<h2>Message 103</h2>
+<p>Date: 09.11.2020 8:04:10</p>
+<div>
+<p>Авто&#1084;асштабирование у TextBox работает, просто оно у&#1084;еет только подстраивать высоту строки под раз&#1084;ер шрифта, если шрифт &#1084;еняется. Оно не у&#1084;еет подстраиваться под количество строк в &#1084;ногострочно&#1084; режи&#1084;е. Это
+ &#1084;ожно реализовать вручную:</p>
+<pre class="prettyprint">Graphics gr = dlgShowExeptions.textBoxExSteck.CreateGraphics();
+SizeF size=new SizeF();
+
+using (gr)
+{
+      //получае&#1084; раз&#1084;ер пря&#1084;оугольника под строку
+      size=gr.MeasureString(
+              EX.StackTrace, 
+              dlgShowExeptions.textBoxExSteck.Font, 
+              dlgShowExeptions.Width);
+}
+
+//устанавливае&#1084; раз&#1084;ер TextBox
+dlgShowExeptions.textBoxExSteck.Size = new Size(
+                    (int)size.Width,                     
+                    (int)size.Height &#43; dlgShowExeptions.textBoxExSteck.Font.Height 
+                    ); //высота с запасо&#1084; в одну строку под верхний и нижний отступ</pre>
+<p>Отправка в почтовую програ&#1084;&#1084;у пользователя - как-то так:</p>
+<pre class="prettyprint">System.Diagnostics.Process.Start(
+      &quot;mailto:admin@example.com&amp;body=&quot;&#43;
+      System.Net.WebUtility.UrlEncode(EX.Message)
+      );</pre>
+Если не работает визуальная настройка эле&#1084;ентов управления, види&#1084;о что-то не так со студией на вашей &#1084;ашине. У &#1084;еня на ваше&#1084; проекте все нор&#1084;ально настраивается через визуальный редактор.<br/>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+</div>

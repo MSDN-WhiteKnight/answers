@@ -1,0 +1,24 @@
+<h2>Message 713</h2>
+<p>Date: 02.08.2017 7:48:46</p>
+<div>
+а что такое&nbsp;STAGE_1?
+</div>
+<h2>Message 712</h2>
+<p>Date: 03.08.2017 3:04:59</p>
+<div>
+<p>Ну да, const в С&#43;&#43; на сколько я знаю - не &quot;константа&quot; а, скорее, &quot;пере&#1084;енная только для чтения&quot;. Конечно, опти&#1084;изирующий ко&#1084;пилятор не выделяет па&#1084;ять под const-пере&#1084;енную, если ее значение известно
+ на этапе ко&#1084;пиляции и &#1084;ы не бере&#1084; на нее указатели. Но в ассе&#1084;блерный код она уходит как пере&#1084;енная, поэто&#1084;у при&#1084;енить mov таки&#1084; образо&#1084; не получится. В&#1084;есто const-пере&#1084;енной нужно использовать
+ enum, эле&#1084;ент перечисления всегда восприни&#1084;аются как &quot;истинная&quot; константа.</p>
+<p>Что касается false (написанного &#1084;аленьки&#1084;и буква&#1084;и), то да, он не работает в ассе&#1084;блере. Но &#1084;ожно использовать FALSE, или просто 0.</p>
+</div>
+<h2>Message 710</h2>
+<p>Date: 03.08.2017 5:48:03</p>
+<div>
+<p>Я проверял только с неи&#1084;енованны&#1084; enum:</p>
+<pre class="prettyprint prettyprinted" style="font-family:inherit; outline:0px; list-style-type:none; word-wrap:normal; overflow-y:visible; overflow-x:auto; min-height:70px; color:#333333; font-size:14px"><span class="kwd" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">typedef</span><span class="pln" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px"> </span><span class="kwd" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">enum</span><span class="pln" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">  </span><span class="pln" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">
+</span><span class="pun" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">{</span><span class="pln" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">
+	STAGE_1 </span><span class="pun" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">=</span><span class="pln" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px"> </span><span class="lit" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">1</span><span class="pln" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">
+</span><span class="pun" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">}</span><span class="pln" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px"> </span><span class="pun" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">;</span></pre>
+<p></p>
+<p>Для enum'ов с и&#1084;ене&#1084; не знаю, как это работает.</p>
+</div>

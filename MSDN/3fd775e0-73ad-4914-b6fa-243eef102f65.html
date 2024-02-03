@@ -1,0 +1,69 @@
+<h2>Message 453</h2>
+<p>Date: 01.06.2018 15:33:17</p>
+<div>
+Так ва&#1084; нужно извлечь ту картинку, которая используется как эскиз для файла в проводнике, или любую которая в него впихнута? Для первого существует интерфейс
+<a href="https://msdn.microsoft.com/ru-ru/library/windows/desktop/bb761848%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396">
+IExtractImage</a> (при&#1084;ер на c#:&nbsp;<a href="https://stackoverflow.com/a/1441520/8674428">https://stackoverflow.com/a/1441520/8674428</a>).
+</div>
+<h2>Message 449</h2>
+<p>Date: 04.06.2018 18:27:41</p>
+<div>
+<p>Не очень пони&#1084;аю с&#1084;ысл этого кода, но выделять изображение путе&#1084; поиска последовательностей си&#1084;волов в потоке байтов, без анализа позиции в которой они находятся, не выглядит хорошей идеей. Что если в файле случайно окажется такая
+ же последовательность си&#1084;волов в виде текстовой строки? Файлы какого фор&#1084;ата вы так пытаетесь обрабатывать?</p>
+<p>Кро&#1084;е того, заче&#1084; писать данные в файл только для того, чтобы их сразу же считать в Image? Поче&#1084;у не MemoryStream?</p>
+</div>
+<h2>Message 448</h2>
+<p>Date: 05.06.2018 3:22:57</p>
+<div>
+Понятно, фор&#1084;ат недоку&#1084;ентированный, и библиотек по работе с ни&#1084; вроде нет. Ну, для получения картинки я бы все же с&#1084;отрел в сторону IExtractImage. Хоть и больше кода, но должно быть надежнее.
+</div>
+<h2>Message 447</h2>
+<p>Date: 05.06.2018 8:38:44</p>
+<div>
+<p>Не, у &#1084;еня код по ссылке работает из коробки. Просто скопировал себе класс&nbsp;ShellThumbnail и пишу так:</p>
+<pre class="prettyprint">ShellThumbnail t = new ShellThumbnail();
+pictureBox1.Image = t.GetThumbnail(@&quot;C:\foo\bar\1.xps&quot;);</pre>
+<p>и выводит картинку. Проверял на JPG, WMV, XPS.</p>
+<p>Но на са&#1084;о&#1084; деле, ва&#1084; этот способ &#1084;ожет и не подойдет. Чтобы он работал, нужно установленное расширение проводника, которое реализует извлечение картинки из файла. Оно, види&#1084;о, устанавливается в&#1084;есте с эти&#1084; ваши&#1084;
+ Autodesk Revit, т.е. если на &#1084;ашине он не будет установлен, ничего не будет работать.</p>
+<p></p>
+<p></p>
+</div>
+<h2>Message 446</h2>
+<p>Date: 05.06.2018 9:39:14</p>
+<div>
+<p>Можно попробовать&nbsp;</p>
+<pre class="prettyprint">regsvr32 /i shell32.dll</pre>
+<p><br/>
+</p>
+<p>А на какую строку исключение выбивает?</p>
+<br/>
+<br/>
+<br/>
+</div>
+<h2>Message 445</h2>
+<p>Date: 05.06.2018 10:36:08</p>
+<div>
+<p>&quot;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>А давно Вы зани&#1084;аетесь Revit - о&#1084;?</em></span>&quot;</p>
+<p>Да у &#1084;еня нет этой проги, поэто&#1084;у я и &#1084;огу только гадать, поче&#1084;у ошибка.</p>
+<p>&quot;<em>п</em><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em></em></span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>ишете
+ о файлах JPG, WMV</em></span><br style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>Эти файлы и у &#1084;еня открываются.</em></span><br style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>Не открывается только XPS</em></span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em></em></span>&quot;</p>
+<p></p>
+<p>Этот &#1084;етод должен работать для всех типов файлов, для которых зарегистрировано расширение проводника на эскизы. У &#1084;еня, по&#1084;и&#1084;о стандартных для картинок и видео, установлено расширение для XPS (с&#1084;отрел через прогу ShellExView),
+ поэто&#1084;у на не&#1084; и проверял.&nbsp;</p>
+<p>У &#1084;еня исключения &quot;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Класс не зарегистрирован</span>&quot; вообще ни на один файл не выдает. На некоторые выдает &quot;Операция
+ не реализована&quot;.&nbsp;</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>но в какой &#1084;о&#1084;ент не понятно, в пошагово&#1084; режи&#1084;е не за&#1084;етно.</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Отладчик &#1084;ожет глючит из-за того, что сборка Release в&#1084;есто Debug. Или какие-то настройки отладчика сбиты. При настройках по
+ у&#1084;олчанию должен авто&#1084;атически делать останов на исключении и показывать конкретную строку.</span></p>
+<p></p>
+</div>
+<h2>Message 444</h2>
+<p>Date: 05.06.2018 11:10:57</p>
+<div>
+Дело в то&#1084;, что проводник использует несколько COM-интерфейсов для вытягивания этих эскизов:&nbsp;<span style="color:#242729; font-family:Arial,'Helvetica Neue',Helvetica,sans-serif; font-size:15px">IExtractImage,&nbsp;</span><span style="color:#242729; font-family:Arial,'Helvetica Neue',Helvetica,sans-serif; font-size:15px">IExtractImage2,</span>&nbsp;<span style="color:#242729; font-family:Arial,'Helvetica Neue',Helvetica,sans-serif; font-size:15px">IThumbnailProvider,&nbsp;</span><span style="color:#242729; font-family:Arial,'Helvetica Neue',Helvetica,sans-serif; font-size:15px">&nbsp;IPreviewHandler
+ (</span><a href="https://stackoverflow.com/a/39397932/8674428">https://stackoverflow.com/a/39397932/8674428</a><span style="color:#242729; font-family:Arial,'Helvetica Neue',Helvetica,sans-serif; font-size:15px">). Види&#1084;о Autodesk реализует какой-то
+ другой из них.</span>
+</div>

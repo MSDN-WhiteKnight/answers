@@ -1,0 +1,28 @@
+<h2>Message 642</h2>
+<p>Date: 18.10.2017 8:23:09</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>у &#1084;еня не получается взять данные из&nbsp;DataGridView1 и работать с ни&#1084;и</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Что и&#1084;енно не получилось? если DataGidView привязан к DataTable, нужно просто брать DataTable.Rows</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>а пото&#1084; запустить обновление&nbsp;DataGridView1 уже из из&#1084;енённой базы, что не правильно</em>&quot;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">В че&#1084; и&#1084;енно неправильно? Нет правила, что &quot;внести из&#1084;енения напря&#1084;ую в базу и пото&#1084; обновить UI&quot;
+ хуже &quot;работать с локальны&#1084; кэше&#1084; и пото&#1084; все слить в базу&quot;. Каждый способ и&#1084;еет свои достоинства и недостатки.</span></p>
+</div>
+<h2>Message 641</h2>
+<p>Date: 18.10.2017 15:05:41</p>
+<div>
+<p>С по&#1084;ощью SQL-запроса update обновляются данные в БД. Данные в локальной &#1084;одели &#1084;ожно обновить просты&#1084; присваивание&#1084; полей. Не пишу на Basic, это должно быть что-то вроде:
+</p>
+<p>DataSet[<span><span style="color:#000000">&quot;Таблица1&quot;].Rows[i][&quot;</span></span>Цена&quot;]=NewValue;</p>
+</div>
+<h2>Message 640</h2>
+<p>Date: 18.10.2017 15:53:39</p>
+<div>
+<div>
+<p>Сверять строчки наверное не обязательно. Как я понял, ва&#1084; просто нужну отфильтровать по полю Артикул, поэто&#1084;у &#1084;ожно использовать LINQ-запрос Where (если ваша версия VB их поддерживает):</p>
+<pre class="prettyprint lang-vb"><p>Dim result = From DataRow myRow  In myDataTable.Rows Where myRow[&quot;Артикул&quot;]=НужныйАртикул</p><p><span class="kwd"><span style="color:#000000">select</span></span><span class="pln"> myRow</span></p></pre>
+<br/>
+<p></p>
+</div>
+<br/>
+<br/>
+</div>

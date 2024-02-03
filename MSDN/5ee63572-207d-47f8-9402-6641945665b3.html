@@ -1,0 +1,9 @@
+<h2>Message 534</h2>
+<p>Date: 06.02.2018 8:21:27</p>
+<div>
+<p>Что такое&nbsp;COM_FTC_UTCA_LIB_EXPORT? </p>
+<p>Какой и&#1084;енно пара&#1084;етр приходит неправильно?</p>
+<p>mifareKey у вас указатель на char, а превращается в&nbsp;IntPtr, к че&#1084;у это? Поче&#1084;у не string?</p>
+<p>Еще к <em>StringBuilder</em>, воз&#1084;ожно, надо добавлять&nbsp;[MarshalAs(UnmanagedType.LPStr)]. По у&#1084;олчанию, насколько я знаю, подразу&#1084;евается wchar, а не char.&nbsp;</p>
+<br/>
+</div>

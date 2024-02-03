@@ -1,0 +1,64 @@
+<h2>Message 47</h2>
+<p>Date: 10.04.2021 13:31:29</p>
+<div>
+Особой разницы нет, собирать DLL из одного файла или нескольких. Если файлов несколько, просто добавьте в проект несколько файлов, остальные шаги будут те&#1084;и же.&nbsp;<br/>
+<br/>
+Впроче&#1084;, по опыту предыдущей похожей те&#1084;ы (<a href="https://social.msdn.microsoft.com/Forums/ru-RU/a24a7b4c-0e44-41db-939b-60c31327a1e5/10571086107310891090107410771085108510721103-dll?forum=fordesktopru">https://social.msdn.microsoft.com/Forums/ru-RU/a24a7b4c-0e44-41db-939b-60c31327a1e5/10571086107310891090107410771085108510721103-dll?forum=fordesktopru</a>)
+ &#1084;огу сказать, что идея взять некий большой набор исходников на С/С&#43;&#43; и собрать его Visual C&#43;&#43; и&#1084;еет высокие шансы закончиться ниче&#1084;. Если проект рассчитан на другую систе&#1084;у сборки, напри&#1084;ер GCC&#43;Make или использует
+ что-то, неподдерживае&#1084;ое в Visual C&#43;&#43;, он просто не соберется. И даже если он соберется, не факт, что это проект DLL, т.е. он &#1084;ожет ничего не экспортировать через decslpec(dllexport). Тут все же надо начинать с руководства от разработчиков
+ библиотеки, что с ней нужно делать.
+</div>
+<h2>Message 46</h2>
+<p>Date: 12.04.2021 6:06:16</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">ANSI C и С&#43;&#43; интегрируются вполне нор&#1084;ально, но в объявлениях иногда &#1084;ожет понадобиться добавить extern &quot;C&quot;,
+ либо указать ко&#1084;пилятору, что С нужно собирать как С&#43;&#43;. Допусти&#1084;, у нас есть файл test.c (расширение .с по у&#1084;олчанию собирается как С)</span></p>
+<pre class="prettyprint">int CalcSum(int x, int y) {
+	return x &#43; y;
+}</pre>
+<p>Тогда в файле main.cpp &#1084;ы &#1084;оже&#1084; вызвать функцию так:</p>
+<pre class="prettyprint">extern &quot;C&quot; int CalcSum(int x, int y);
+
+void main()
+{
+	int res = CalcSum(1, 2);
+}</pre>
+Либо в свойствах проекта &quot;С&#43;&#43; - Дополнительно - Ко&#1084;пилировать как&quot; выбрать С&#43;&#43;. Тогда не надо будет прописывать&nbsp;&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">extern
+ &quot;C&quot;, но &#1084;огут вылезти какие-то другие пробле&#1084;ы, учитывая что С и С&#43;&#43; это все же разные языки.</span><br/>
+<p><br/>
+</p>
+<p></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+</div>
+<h2>Message 45</h2>
+<p>Date: 12.04.2021 6:11:16</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Попробовал построение и DLL</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Вы выполнили все пункты из руководства? В частности:</span></p>
+<p>1. Убедились что в нужных &#1084;естах функции по&#1084;ечены _declspec(dllexport) или _declspec(dllimport)</p>
+<p>2. Подключили .lib файл с раздело&#1084; экспорта библиотеки к проекту, который использует dll (<a href="https://docs.microsoft.com/en-us/cpp/build/walkthrough-creating-and-using-a-dynamic-link-library-cpp?view=msvc-160#to-add-the-dll-import-library-to-your-project">https://docs.microsoft.com/en-us/cpp/build/walkthrough-creating-and-using-a-dynamic-link-library-cpp?view=msvc-160#to-add-the-dll-import-library-to-your-project</a>)</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+</div>
+<h2>Message 44</h2>
+<p>Date: 12.04.2021 17:27:48</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">_declspec(dllexport) должно быть прописано у всех функций, которые экспортируются из dll. Альтернативны&#1084; способо&#1084; является
+ .def файл. Если у вас нет ни того ни другого, идею сборки DLL придется отбросить, проект не предназначен для этого.&nbsp;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>dll строится без сбоев.</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Види&#1084;о, пото&#1084;у что ко&#1084;пилятор не проверяет наличие атрибута экспорта на хотя бы одной функции. Но если строится это уже
+ хорошо, значит код сов&#1084;ести&#1084; с Visual C&#43;&#43;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+</div>
+<h2>Message 43</h2>
+<p>Date: 13.04.2021 3:50:34</p>
+<div>
+<p>SOFA это&nbsp;http://www.iausofa.org/ ? Глянул, та&#1084; есть makefile для сборки статической библиотеки под Unix, для Windows и Visual C&#43;&#43; стандартно ничего не предоставляется. Есть какие-то неофициальные решения, попробуйте по запросу &quot;sofa
+ library build for windows&quot; в поисковике.&nbsp;</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;Хорошо бы почитать что-нибудь с нуля...&quot;</span></p>
+<p>У вас же в перво&#1084; сообщении есть ссылка не доку&#1084;ентацию. Перейдите та&#1084; в корневой раздел и читайте. Только лучше английскую версию, пусть со словаре&#1084;, так как официальный русский перевод по большей части никуда не годится.</p>
+<p></p>
+</div>
+<h2>Message 42</h2>
+<p>Date: 14.04.2021 6:56:34</p>
+<div>
+С&#1084;. выше, либо по&#1084;ечаете нужные функции __declspec(dllexport), либо добавляете .def файл со списко&#1084; экспортируе&#1084;ых функций. Если ва&#1084; нужно только несколько функций, ни то, ни другое не будет очень трудны&#1084;.
+</div>
