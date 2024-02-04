@@ -1,0 +1,38 @@
+<h2>Ошибка 10060 в WinSock</h2>
+<p>Date: 09.10.2018 10:18:21</p>
+<div>
+Попробуйте в&#1084;есто localhost задавать 0.0.0.0 или *.&nbsp;
+</div>
+<h2>Message 364</h2>
+<p>Date: 09.10.2018 11:26:13</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Почитала про tcp 10060... На одно&#1084; из фору&#1084;ов про 1С советуют отрубить&nbsp;</em></span><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><span style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px"><em>бранд&#1084;ауэр</em>.&quot;</span></span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">10060 это ошибка
+</span><span style="font-weight:600; font-family:'Segoe UI',SegoeUI,'Segoe WP','Helvetica Neue',Helvetica,Tahoma,Arial,sans-serif; font-size:14px">WSAETIMEDOUT&nbsp;</span>&nbsp;в Winsock</p>
+<dt style="font-family:'Segoe UI',SegoeUI,'Segoe WP','Helvetica Neue',Helvetica,Tahoma,Arial,sans-serif; font-size:14px">
+Connection timed out.</dt><dd style="font-family:'Segoe UI',SegoeUI,'Segoe WP','Helvetica Neue',Helvetica,Tahoma,Arial,sans-serif; font-size:14px">
+A connection attempt failed because the connected party did not properly respond after a period of time, or the established connection failed because the connected host has failed to respond.
+<p></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><a href="https://docs.microsoft.com/en-us/windows/desktop/winsock/windows-sockets-error-codes-2">https://docs.microsoft.com/en-us/windows/desktop/winsock/windows-sockets-error-codes-2</a></span><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><span style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px"></span></span></p>
+<p><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><span style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">Причин
+ &#1084;ожет быть &#1084;ного. Да, если с 0.0.0.0 не работает, то дело &#1084;ожет быть в бранд&#1084;ауэре.</span></span></p>
+<p><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><span style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">&quot;<em>а
+ на включенный &quot;</em></span></span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>ошибка вызова sspi с&#1084; внутреннее исключение</em></span><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><span style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">&quot;</span></span><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><span style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px"></span></span></p>
+<p><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><span style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">Покажите
+ полный текст исключения (Exception.ToString)</span></span></p>
+</dd>
+</div>
+<h2>Message 363</h2>
+<p>Date: 09.10.2018 11:54:11</p>
+<div>
+<p>Види&#1084;о, по у&#1084;олчанию NET TCP Binding использует аутентификацию Windows (NTLM или Kerberos). На локально&#1084; ко&#1084;пе он неявно работает, а с другого ко&#1084;па не работает, нужно явно передавать учетные данные.</p>
+<p>В бренд&#1084;ауере ва&#1084; нужно в исключения добавить ваше приложение (скорее всего, на обеих сторонах). В Windows 10, в настройках бренд&#1084;ауера выбрать пункт &quot;Разрешения взаи&#1084;одействия с приложение&#1084; ...&quot; и та&#1084; в список
+ добавить вашу програ&#1084;&#1084;у.</p>
+</div>
+<h2>Message 362</h2>
+<p>Date: 09.10.2018 15:55:16</p>
+<div>
+<p>Здесь:</p>
+<p><a href="https://docs.microsoft.com/ru-ru/previous-versions/windows/desktop/ics/portal">https://docs.microsoft.com/ru-ru/previous-versions/windows/desktop/ics/portal</a></p>
+<p><a href="https://docs.microsoft.com/en-us/windows/desktop/api/netfw/">https://docs.microsoft.com/en-us/windows/desktop/api/netfw/</a></p>
+</div>

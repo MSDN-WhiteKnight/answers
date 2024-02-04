@@ -1,0 +1,10 @@
+<h2>ThreadState.WaitSleepJoin</h2>
+<p>Date: 28.12.2020 5:21:55</p>
+<div>
+<p>ThreadState.WaitSleepJoin соответствует внутренне&#1084;у состоянию&nbsp;TS_Interruptible в CLR:&nbsp;<a href="https://github.com/dotnet/runtime/blob/master/src/coreclr/vm/comsynchronizable.cpp#L673">https://github.com/dotnet/runtime/blob/master/src/coreclr/vm/comsynchronizable.cpp#L673</a>.
+ В это состояние поток переходит, когда вызывается один из &#1084;етодов ожидания в .NET: WaitHandle.WaitOne, Thread.Sleep, Monitor.Enter и другие. Но функция GetMessage является функцией Windows, и при ее вызове этот флаг не устанавливается, хотя она также
+ переводит поток в состояние ожидания прерывания. С точки зрения CLR, поток остается в состоянии Running. А&nbsp;&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">System.Diagnostics.ThreadState
+</span>считывает реальное состояние потока ОС через счетчики производительности, поэто&#1084;у оно всегда вернет актуальное значение.</p>
+<p></p>
+<p></p>
+</div>

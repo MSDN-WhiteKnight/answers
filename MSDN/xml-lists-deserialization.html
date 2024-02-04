@@ -1,0 +1,70 @@
+<h2>Десериализация списков из XML</h2>
+<p>Date: 08.02.2017 11:51:14</p>
+<div>
+<p><span style="color:#242729; font-family:Arial,'Helvetica Neue',Helvetica,sans-serif; font-size:15px">&quot;<em>Я создал ещё более простую по структуре XML'ку:</em>&quot;</span></p>
+<p><span style="color:#242729; font-family:Arial,'Helvetica Neue',Helvetica,sans-serif; font-size:15px">Так не работает. Десериализация, в отличие от парсера, кушает только XML строго определенной структуры. Напри&#1084;ер:&nbsp;</span></p>
+<pre class="prettyprint">&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;PrintEngine xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;
+  &lt;ProgramDirectory&gt;C:\Program Files (x86)\Foxit Software\Foxit Reader&lt;/ProgramDirectory&gt;
+  &lt;ProgramFilename&gt;FoxitReader.exe&lt;/ProgramFilename&gt;
+  &lt;TimeWait&gt;500&lt;/TimeWait&gt;
+&lt;/PrintEngine&gt;</pre>
+<p>для класса</p>
+<pre class="prettyprint">[Serializable]
+public class PrintEngine
+    {        
+
+        public string ProgramDirectory
+        {
+            get { return program_directory; }
+            set { program_directory = value; }
+        }
+
+        public string ProgramFilename
+        {
+            get { return program_filename; }
+            set { program_filename = value; }
+        }
+
+        public int TimeWait
+        {
+            get { return time_wait; }
+            set { time_wait = value; }
+        }
+        
+
+    }</pre>
+<br/>
+<p><br/>
+</p>
+</div>
+<h2>Message 943</h2>
+<p>Date: 09.02.2017 7:39:11</p>
+<div>
+<p>А, не увидел что вы создаете сериализатор для списка а скар&#1084;ливаете е&#1084;у одиночный эле&#1084;ент.&nbsp;</p>
+<p>В конструкторе XmlSerializer надо передавать тот тип, который десериализуется. Чтобы работать со списко&#1084;, его надо заверенуть в класс и работать уже с эти&#1084; классо&#1084;.</p>
+<p><br/>
+</p>
+<p></p>
+<br/>
+</div>
+<h2>Message 941</h2>
+<p>Date: 09.02.2017 9:22:26</p>
+<div>
+<p>вот это неправильно:</p>
+<pre class="prettyprint">XmlSerializer serializer = new XmlSerializer(typeof(List&lt;Employee&gt;));
+Employee DE = (Employee)serializer.Deserialize(reader);</pre>
+надо<br/>
+<pre class="prettyprint">XmlSerializer serializer = new XmlSerializer(typeof(Employee));
+Employee DE = (Employee)serializer.Deserialize(reader);</pre>
+<p></p>
+<p></p>
+<p></p>
+</div>
+<h2>Message 940</h2>
+<p>Date: 09.02.2017 10:48:04</p>
+<div>
+<p>Во-первых, ко&#1084;пилятор не ругался пото&#1084;у что контроль типа сериализатор делает на этапе выполнения</p>
+<p>Во-вторых, разница в то&#1084;, что List&lt;Employee&gt; это список (точнее, дина&#1084;ический &#1084;ассив) объектов, а Emploee - одиночный объект, т.е. типы разные. Сериализатор обрабатывает только тот тип, который указать при его создании.</p>
+<p>В-третьих, для вашей исходной задачи десериализация, в обще&#1084;-то, не нужна. Вы &#1084;ожете ее решить также оперируя классо&#1084; XElement.</p>
+</div>
