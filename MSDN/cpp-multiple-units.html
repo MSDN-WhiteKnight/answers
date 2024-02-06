@@ -1,0 +1,32 @@
+<h2>C++ - Разделение кода на несколько файлов</h2>
+<p>Date: 08.02.2021 6:24:49</p>
+<div>
+<p>В простейше&#1084; случае &#1084;ожно дописать перед использование&#1084; H:&nbsp;</p>
+<pre class="prettyprint prettyprinted" style="font-family:inherit; outline:0px; list-style-type:none; min-height:70px; color:#333333; font-size:14px"><span class="kwd" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">extern void</span><span class="pln" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px"> H</span><span class="pun" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">();</span></pre>
+<p></p>
+<p>Но в реально&#1084; проекте, конечно, нужно выделять объявления в заголовочные файлы и подключать их, а не дописывать поодиночке. Тут пробле&#1084;а не в порядке как таково&#1084;, а то&#1084;, как организовать структуру проекта. В C# &#1084;ожно разделить
+ проект на сколько угодно файлов, и они будут все &quot;видеть&quot; друг друга. В С&#43;&#43; же это не работает, нужно подключать объявления для всех внешних си&#1084;волов.</p>
+</div>
+<h2>Message 80</h2>
+<p>Date: 08.02.2021 7:44:28</p>
+<div>
+<p>Суть в то&#1084;, что определенного &quot;как надо&quot; не существует. Как и&#1084;енно делить проект С&#43;&#43; на файлы, зависит от того, чего вы хотите добиться, а также от личных предпочтений. Можно сделать файл H.h, в дополнение к файлу H.cpp, с объявление&#1084;
+ функции, и подключить его к M.cpp. Можно по&#1084;естить са&#1084;о тело функции в&nbsp;H.h, сделав ее inline, и вовсе избавиться от файла&nbsp;H.cpp. Естественно, файл&nbsp;H.h надо физически создать, чтобы он был в проекте.&nbsp;</p>
+<p>Если вы пишете простые програ&#1084;&#1084;ы, воз&#1084;ожно ва&#1084; все это и не нужно. Ничто не &#1084;ешает напихать весь код в один файл, благо навигация в Visual C&#43;&#43; работает отлично.</p>
+</div>
+<h2>Message 79</h2>
+<p>Date: 08.02.2021 9:35:20</p>
+<div>
+<p>&gt;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>А я с Cpp давны&#1084;-давно не дружу...</em></span></p>
+<p>Это не опровергает то, что я написал, а только подтверждает. Если не дружите, начните со схе&#1084;ы &quot;все в одно&#1084; файле&quot;, это будет проще. Либо сохраните ту структуру файлов, которая сейчас в той библиотеке. Когда получите &#1084;ини&#1084;ально
+ рабочее решение, &#1084;ожете уже ду&#1084;ать о то&#1084;, как разбивать на файлы.</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&gt;<em>Куча сообщений об ошибках.</em></span></p>
+<p>1. В .h файле не должно быть <span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+#include &quot;stdafx.h&quot;</span>. Предко&#1084;пилированные заголовки должны включаться в каждый cpp файл только один раз, и в са&#1084;о&#1084; начале файла.&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Либо
+ &#1084;ожно их отключить, опять же, в просто&#1084; проекте они только &#1084;ешают.</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">2.&nbsp; В&nbsp;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">H.h
+ нужно включить то, что я привел ранее</span></p>
+<pre class="prettyprint prettyprinted" style="font-family:inherit; outline:0px; list-style-type:none; min-height:70px; color:#333333; font-size:14px"><span class="kwd" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">extern void</span><span class="pln" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px"> H</span><span class="pun" style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">();</span></pre>
+<p></p>
+<p></p>
+</div>

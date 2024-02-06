@@ -1,0 +1,45 @@
+<h2>C# - Инкремент внутри выражения</h2>
+<p>Date: 24.11.2016 7:39:48</p>
+<div>
+<p><br/>
+</p>
+<pre class="prettyprint">int x = 3;
+x &#43;= x&#43;&#43;;
+Console.WriteLine(x.ToString());
+Console.ReadKey();</pre>
+<p>В IL превращается в:</p>
+<pre class="prettyprint">  .entrypoint
+  // Code size       29 (0x1d)
+  .maxstack  4
+  .locals init ([0] int32 x)
+  IL_0000:  ldc.i4.3 		//Push num of type int32 onto the stack as int32. 
+  IL_0001:  stloc.0 		//Pop a value from stack into local variable 0.
+  IL_0002:  ldloc.0 		//Load local variable 0 onto stack. В стеке:3
+  IL_0003:  ldloc.0 		//Load local variable 0 onto stack. В стеке:3|3
+  IL_0004:  dup 		//Duplicate the value on the top of the stack. В стеке:3|3|3
+  IL_0005:  ldc.i4.1 		//Push num of type int32 onto the stack as int32. В стеке:3|3|3|1
+  IL_0006:  add 		//Add two values, returning a new value. В стеке:3|3|4
+  IL_0007:  stloc.0 		//Pop a value from stack into local variable 0. В стеке:3|3
+  IL_0008:  add 		//Add two values, returning a new value. В стеке:6
+  IL_0009:  stloc.0 		//Pop a value from stack into local variable 0.
+  IL_000a:  ldloca.s   x	//Load address of local variable with index indx.
+  IL_000c:  call       instance string [mscorlib]System.Int32::ToString()
+  IL_0011:  call       void [mscorlib]System.Console::WriteLine(string)
+  IL_0016:  call       valuetype [mscorlib]System.ConsoleKeyInfo [mscorlib]System.Console::ReadKey()
+  IL_001b:  pop
+  IL_001c:  ret</pre>
+Т.е. полученная четверка просто отбрасывается? Мда. Я догадывался, что сложные выражения использовать плохо, но не знал что настолько...<br/>
+<p></p>
+<p></p>
+<p></p>
+</div>
+<h2>Message 1070</h2>
+<p>Date: 24.11.2016 11:23:03</p>
+<div>
+<p><span style="color:#2a2a2a; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:13px"><a href="https://msdn.microsoft.com/en-us/library/36x43w8w.aspx">https://msdn.microsoft.com/en-us/library/36x43w8w.aspx</a></span></p>
+<p><span style="color:#2a2a2a; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:13px">&quot;The second form is a postfix increment operation. The result of the operation is the value of the operand before it has been incremented.&quot;</span></p>
+<p><span style="color:#2a2a2a; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:13px">выполняться то он выполняется, но толку 0. постфиксный инкре&#1084;ент возвращает значение ДО инкре&#1084;ента, оно и идет в следующую
+ операцию.</span></p>
+<p><span style="color:#2a2a2a; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:13px">в листинге IL видно, как четверка честно вычисляется до операции су&#1084;&#1084;ирования и по&#1084;ещается в пере&#1084;енную 0, но пото&#1084;
+ перезаписывается 6-кой</span></p>
+</div>
