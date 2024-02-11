@@ -1,6 +1,0 @@
-<h2>Message 433</h2>
-<p>Date: 11.06.2018 16:58:22</p>
-<div>
-Для получения локальных сетевых адресов совершенно излишне обращаться к DNS. Используйте&nbsp;<span style="color:#242729; font-family:Consolas,Menlo,Monaco,'Lucida Console','Liberation Mono','DejaVu Sans Mono','Bitstream Vera Sans Mono','Courier New',monospace,sans-serif; font-size:13px; white-space:pre-wrap; background-color:#eff0f1"><a href="https://msdn.microsoft.com/en-us/library/system.net.networkinformation.networkinterface.getallnetworkinterfaces(v=vs.110).aspx">NetworkInterface.GetAllNetworkInterfaces()</a></span>
- и отфильтруйте те, которые ва&#1084; нужны. Как отфильтровать адреса, относящиеся к физически&#1084; адаптера&#1084;, показано напри&#1084;ер здесь:&nbsp;<a href="https://ru.stackoverflow.com/a/830696/240512">https://ru.stackoverflow.com/a/830696/240512</a><br/>
-</div>

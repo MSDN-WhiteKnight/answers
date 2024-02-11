@@ -1,0 +1,13 @@
+<h2>SQL Server - Указание базы данных в строке соединения</h2>
+<p>Date: 08.01.2018 8:52:42</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&nbsp;Не нужно ло&#1084;ать голову над содержи&#1084;ы&#1084; Connection String, есть класс
+</span><a href="https://msdn.microsoft.com/ru-ru/library/system.data.sqlclient.sqlconnectionstringbuilder(v=vs.110).aspx">SqlConnectionStringBuilder</a>.&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Пара&#1084;етр
+ Initial Catalog используется для подключения к базе, присоединенной к экзе&#1084;пляру SQL Server (такая база данных, несо&#1084;ненно, должна быть види&#1084;а в Management Studio), а не к произвольно&#1084;у файлу на диске. Для подключения к произвольно&#1084;у
+ файлу на диске есть пара&#1084;етр&nbsp;</span><span style="color:#444444; font-family:Arial,Helvetica,sans-serif; font-size:12.6px; background-color:#dddddd">AttachDBFilename</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&nbsp;.
+</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Однако, если есть необходи&#1084;ость в это&#1084; режи&#1084;е, вы явно делаете что-то не так. Фактически, вы используете&nbsp;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&nbsp;SQL
+ Server как гро&#1084;оздкий аналог локальной СУБД, игнорируя всю его функциональность по управлению доступо&#1084; и т.п. Если ва&#1084; нужна локальная СУБД, просто возь&#1084;ите SQL Compact / MS Access / SQLite, будет легче.</span></p>
+<p><br/>
+</p>
+</div>
