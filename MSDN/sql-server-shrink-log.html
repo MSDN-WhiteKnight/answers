@@ -1,0 +1,23 @@
+<h2>SQL Server - Уменьшение размера файла журнала базы данных</h2>
+<p>Date: 20.12.2016 7:57:22</p>
+<div>
+<p>начиная с 2012 SQL Server такое прокатит:</p>
+<pre class="prettyprint lang-sql">USE MyDB
+GO
+
+DECLARE @MyDB_log nvarchar(max)
+SET @MyDB_log=(SELECT name FROM sys.database_files where type_desc='LOG')
+
+IF (select size*8 as SIZE_KB from sys.database_files 
+where type_desc='LOG') &gt; 5*1024*1024
+BEGIN 
+ ALTER DATABASE CURRENT SET RECOVERY SIMPLE 
+ DBCC SHRINKFILE (@MyDB_log, 1024); 
+ ALTER DATABASE CURRENT SET RECOVERY FULL
+
+END
+GO</pre>
+<br/>
+<p></p>
+<p></p>
+</div>
