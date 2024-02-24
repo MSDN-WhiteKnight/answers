@@ -1,0 +1,43 @@
+<h2>C# - Какой код генерируется компилятором для цикла for?</h2>
+<p>Date: 17.05.2019 10:23:40</p>
+<div>
+<p>Найти что-либо в исходно&#1084; коде ко&#1084;пилятора не так то просто. Классы кодогенерации расположены в каталоге&nbsp;<a href="https://github.com/dotnet/roslyn/tree/master/src/Compilers/CSharp/Portable/CodeGen">roslyn/src/Compilers/CSharp/Portable/CodeGen/</a>.
+ Поиско&#1084; по github &#1084;ожно найти то, что ва&#1084; нужно.</p>
+<p>Однако, выражение for несколько особое - для него нет определенной процедуры кодогенерации, в&#1084;есто этого ко&#1084;пилятор предварительно за&#1084;еняет его на эквивалентную последовательность выражений с использование&#1084; goto, условных переходов
+ и инкре&#1084;ентов - это преобразование реализовано здесь:&nbsp;<a href="https://github.com/dotnet/roslyn/blob/master/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_ForStatement.cs">https://github.com/dotnet/roslyn/blob/master/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_ForStatement.cs</a></p>
+<pre class="prettyprint" style="">            // for (initializer; condition; increment)
+            //   body;
+            //
+            // becomes the following (with block added for locals)
+            //
+            // {
+            //   initializer;
+            //   goto end;
+            // start:
+            //   body;
+            // continue:
+            //   increment;
+            // end:
+            //   GotoIfTrue condition start;
+            // break:
+            // }</pre>
+Эта последовательность уже подается на вход кодогенерации и соответственно генерируются IL-инструкции для этих операции (напри&#1084;ер для goto&nbsp;<span style="color:#6f42c1; font-family:SFMono-Regular,Consolas,'Liberation Mono',Menlo,Courier,monospace; white-space:pre; background-color:#fffbdd"><a href="https://github.com/dotnet/roslyn/blob/master/src/Compilers/CSharp/Portable/CodeGen/EmitStatement.cs#L579">EmitGotoStatement</a></span>&nbsp;генерирует
+ инструкцию <a href="https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.br?view=netframework-4.7">
+Br</a>)<br/>
+<p></p>
+<p>На&#1084;ного проще изучать генерируе&#1084;ый ко&#1084;пиляторо&#1084; код практически - ско&#1084;пилировав его и открыв бинарник утилитой
+<a href="https://docs.microsoft.com/ru-ru/dotnet/framework/tools/ildasm-exe-il-disassembler">
+IL Disassembler</a>.</p>
+<p></p>
+<p><a href="https://github.com/dotnet/roslyn/blob/master/src/Compilers/CSharp/Portable/Lowering/LocalRewriter/LocalRewriter_ForStatement.cs"></a></p>
+&nbsp;<br/>
+</div>
+<h2>Message 247</h2>
+<p>Date: 18.05.2019 7:36:11</p>
+<div>
+<p>Проще всего также, практически - изучение&#1084; генерируе&#1084;ого JIT ассе&#1084;блерного кода в отладчике:&nbsp;<a href="https://docs.microsoft.com/ru-ru/visualstudio/debugger/how-to-use-the-disassembly-window?view=vs-2019">https://docs.microsoft.com/ru-ru/visualstudio/debugger/how-to-use-the-disassembly-window?view=vs-2019</a>&nbsp;CoreCLR
+ в части кодогенерации написана на С&#43;&#43;, поэто&#1084;у, если вы не знаете этот язык хотя бы на уровне чтения, вы не с&#1084;ожете извлечь эту инфор&#1084;ацию из исходников.</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Я вижу, что разработчика&#1084; есть, куда стре&#1084;иться для взаи&#1084;опони&#1084;ания с пользователя&#1084;и</em>&quot;</span></p>
+<p>Разработчика&#1084; чего? C#/.NET Core? Вроде и так открыты на полную, все в open source - и ко&#1084;пилятор, и платфор&#1084;а, и доку&#1084;ентация по ни&#1084;. Статьи в блогах по новы&#1084; воз&#1084;ожностя&#1084; постоянно публикуются. Каналы для
+ обратной связи тоже есть - как github issues, так и средство отправки отзывов из са&#1084;ой студии. Хотя &#1084;атериалов на русско&#1084; языке действительно не&#1084;ного, если вы об это&#1084;.</p>
+</div>

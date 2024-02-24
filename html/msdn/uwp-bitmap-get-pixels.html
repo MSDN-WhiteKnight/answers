@@ -1,0 +1,17 @@
+<h2>Получить отдельные пиксели изображения в UWP</h2>
+<p>Date: 26.07.2017 3:48:29</p>
+<div>
+<p>Ну, для начала ее надо конвертнуть в фор&#1084;ат, с которы&#1084; &#1084;ожно работать. Для вас это наверное RGBA8. Пото&#1084; получить доступ к буферу данных и работать с ни&#1084; как с &#1084;ассиво&#1084;:</p>
+<pre class="prettyprint">using System.Runtime.InteropServices.WindowsRuntime;
+...
+
+SoftwareBitmap soft=SoftwareBitmap.Convert(source,BitmapPixelFormat.Rgba8);
+byte [] imageBytes = new byte[4*soft.PixelWidth*soft.PixelHeight];
+soft.CopyToBuffer(imageBytes.AsBuffer());
+for(int i=0;i&lt;soft.PixelWidth*soft.PixelHeight;i&#43;&#43;){
+	if(imageBytes[i * 4]&gt;0 &amp;&amp; imageBytes[(i * 4)&#43;1]==0 &amp;&amp; imageBytes[(i * 4)&#43;2]==0)//красный пиксель
+}</pre>
+<br/>
+<p></p>
+<p></p>
+</div>

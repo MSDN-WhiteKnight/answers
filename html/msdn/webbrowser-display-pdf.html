@@ -1,0 +1,170 @@
+<h2>Windows Forms - Отобразить PDF в WebBrowser</h2>
+<p>Date: 02.03.2017 13:34:51</p>
+<div>
+<p>Во-первых, чтобы вообще отобразить PDF-файл в WebBrowser, необходи&#1084;о наличие на целевой &#1084;ашине соответствующего расширения Internet Explorer, работоспособного в используе&#1084;ой версии (по у&#1084;олчанию, ко&#1084;понент webBrowser использует
+ более старую версию IE че&#1084; установленная на &#1084;ашине). Иначе IE просто предложит пользователю скачать файл.</p>
+<p>Во-вторых, отобразить доку&#1084;ент из базы данных в&nbsp;WebBrowser, конечно, &#1084;ожно. Для этого нужно унаследовать свой класс от Stream, реализовав логику загрузки из БД, и присвоить объект этого класса свойству&nbsp;<a href="https://msdn.microsoft.com/ru-ru/library/system.windows.forms.webbrowser.documentstream(v=vs.110).aspx">WebBrowser.DocumentStream</a></p>
+<p>В-третьих, как доку&#1084;ент будет загружаться - поточно или целико&#1084; в па&#1084;ять - полностью зависит от используе&#1084;ого для данного доку&#1084;ента расширения IE. Са&#1084; WebBrowser ничего не знает о PDF.</p>
+</div>
+<h2>Message 917</h2>
+<p>Date: 02.03.2017 15:07:01</p>
+<div>
+<p>Свойство&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&nbsp;</span><a href="https://msdn.microsoft.com/ru-ru/library/system.windows.forms.webbrowser.documentstream(v=vs.110).aspx" style="border:none; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#0076a3; text-decoration:none; list-style-type:none; font-size:14px">WebBrowser.DocumentStream</a>&nbsp;как
+ раз и позволяет решить вопрос загрузки доку&#1084;ента из па&#1084;яти.&nbsp;</p>
+<p>Если производительность для вас не важна, вы &#1084;ожете просто выгрузить файл целико&#1084; как &#1084;ассив байт, создать на основе него MemoryStream, и скор&#1084;ить его веб-браузеру:</p>
+<pre class="prettyprint"><p>OleDbDataReader rd;
+/*Выполнить SQL запрос...*/</p><p>rd.Read();</p><p>byte[] array=(byte[])rd[&quot;Data&quot;];
+Stream ms=new MemoryStream(array);
+webBrowser.DocumentStream=ms;</p></pre>
+<p></p>
+<p>Правильнее, конечно, создать свой класс, производный от Stream, и считывать данные &#1084;аленьки&#1084;и порция&#1084;и из DataReader, чтобы избежать выделения слишко&#1084; большого блока па&#1084;яти.&nbsp;</p>
+<p>Другое дело, как это все сработает и&#1084;енно для фор&#1084;ата PDF? Ведь WebBrouser изначально не предназначен для его отображения. Наверное, лучше использовать специализированные ко&#1084;поненты для отображения PDF.</p>
+</div>
+<h2>Message 915</h2>
+<p>Date: 03.03.2017 8:12:39</p>
+<div>
+<p>Вы пони&#1084;аете, что я свое первое сообщение не просто так писал?</p>
+<p><strong>Напишите, какое расширение IE установлено для прос&#1084;отра PDF.</strong></p>
+</div>
+<h2>Message 914</h2>
+<p>Date: 03.03.2017 13:00:49</p>
+<div>
+<p>Угу. Я&nbsp;поду&#1084;аю, как решить эту пробле&#1084;у. </p>
+<p>Скорее всего, придется использовать обходной путь в виде вре&#1084;енного HTTP-сервера.</p>
+</div>
+<h2>Message 913</h2>
+<p>Date: 03.03.2017 16:12:58</p>
+<div>
+<p>Похоже, DocumentStream по определению не переваривает ничего, кро&#1084;е HTML, независи&#1084;о от установленных расширений. Даже JPEG скор&#1084;ить е&#1084;у не получается.
+</p>
+<p>Есть два решения этой пробле&#1084;ы:</p>
+<p>1. Создать свою реализацию интерфейса <a href="https://msdn.microsoft.com/en-us/library/aa767883(v=vs.85).aspx">
+IInternetProtocol</a>&nbsp;и раздавать PDF по&nbsp;нестандартной URL-схе&#1084;е</p>
+<p>2. Поднять свой сервер, и раздавать с него по обычно&#1084;у&nbsp;HTTP-протоколу.</p>
+<p>Я ду&#1084;аю, что второй вариант проще, в проче&#1084;, о вкусах не спорят.&nbsp;Предлагую сделать так.</p>
+<p>Добавьте в проект класс:</p>
+<pre class="prettyprint">using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Net;
+using System.IO;
+using System.Threading;
+
+namespace WinFormsTest
+{
+    public class SERVER
+    {
+        const string prefix = &quot;http://localhost:8080/server/&quot;;//URL, на которо&#1084; буде&#1084; раздавать HTTP
+        const string MIME = &quot;application/pdf&quot;;//тип доку&#1084;ента
+
+        byte[] bytes;//двоичные данные доку&#1084;ента
+        HttpListener listener;//объект, используе&#1084;ый для раздачи доку&#1084;ента по HTTP
+        Thread th;//объект серверного потока
+        Object cs;//объект, используе&#1084;ый для синхронизации потоков
+
+        public SERVER(byte[] source)
+        {
+            bytes = source;
+            cs = new object();
+        }
+
+        void ThreadProc()
+        {           
+            HttpListenerContext context;
+            // Note: The GetContext method blocks while waiting for a request.
+
+            while (true)
+            {
+
+                context = listener.GetContext();
+
+                lock (cs)
+                {                    
+                    // Obtain a response object.
+                    HttpListenerResponse response = context.Response;
+
+                    // Construct a response.   
+                    response.ContentLength64 = bytes.Length;
+                    response.ContentType = MIME;
+                    System.IO.Stream output = response.OutputStream;
+                    using (output)
+                    {
+                        output.Write(bytes, 0, bytes.Length);
+                    }
+                }
+            }
+        }
+
+        public void Start()
+        {
+            string[] prefixes = new string[] { prefix };
+
+            if (!HttpListener.IsSupported)
+            {
+                throw new ApplicationException(&quot;Windows XP SP2 or Server 2003 is required to use the HttpListener class.&quot;);
+            }
+
+            lock (cs)
+            {
+                // Create a listener.
+                listener = new HttpListener();
+                // Add the prefixes.
+                foreach (string s in prefixes)
+                {
+                    listener.Prefixes.Add(s);
+                }
+
+                listener.Start();
+            }
+
+            th = new Thread(ThreadProc);
+            th.IsBackground = true;
+            th.Start();
+        }
+
+        public void Stop()
+        {
+            lock (cs)
+            {
+                listener.Stop();
+                listener.Close();
+                listener = null;
+            }
+            th.Abort(); 
+            th = null;
+        }
+
+    }
+}
+</pre>
+<p>Когда ва&#1084; нужно отобразить доку&#1084;ент, загрузите его в &#1084;ассив байт, запустите сервер, и направьте веб-браузер на него:</p>
+<pre class="prettyprint">SERVER srv;
+byte[] bytes;
+
+private void button2_Click(object sender, EventArgs e)
+{
+            //по&#1084;естить содержи&#1084;ое файла в поле bytes
+
+            srv = new SERVER(bytes);
+            srv.Start();
+                        
+            webBrowser1.Navigate(&quot;http://localhost:8080/server/&quot;);
+}</pre>
+<p><br/>
+Когда сервер больше не нужен, вызовите &#1084;етод Stop.</p>
+<p>Недостаток этого подхода в то&#1084;, что задействованы ресурсы TCP. Реальные данные, конечно, в сеть не посылаются; но все же число соединений ограничено, что &#1084;ожет привести к пробле&#1084;а&#1084; когда на &#1084;ашине есть другой софт, создающий
+ &#1084;ного TCP-соединений. При использовании первого &#1084;етода этого &#1084;ожно было бы исбежать.</p>
+<p></p>
+<p></p>
+<p></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </p>
+</div>
+<h2>Message 907</h2>
+<p>Date: 06.03.2017 14:09:02</p>
+<div>
+<p>Писать в файловую систе&#1084;у - тоже нор&#1084;альный подход, но я не реко&#1084;ендую привязываться к пути запуска приложения. Приложение &#1084;ожет &#1084;ожет быть запущено из каталога, на запись в который у пользователя нет прав (или вообще с CD-ROM
+ диска, если на то пошло), тогда програ&#1084;&#1084;а будет падать с бесс&#1084;ысленны&#1084; сообщение&#1084; об ошибке.
+</p>
+<p>Лучше писать во вре&#1084;енную папку пользователя, возвращае&#1084;ую &#1084;етодо&#1084;&nbsp;<a href="https://msdn.microsoft.com/ru-ru/library/system.io.path.gettemppath(v=vs.110).aspx">GetTempPath</a>. И естественно, не забывать удалять файл, когда он
+ больше не нужен.</p>
+</div>

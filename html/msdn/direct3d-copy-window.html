@@ -1,0 +1,27 @@
+<h2>Копирование содержимого окна на поверхность Direct3D</h2>
+<p>Date: 04.06.2020 10:42:01</p>
+<div>
+<p>Да, &#1084;ожете, поче&#1084;у бы и нет? Напри&#1084;ер так:</p>
+<pre class="prettyprint">	IDirect3DSurface9 *surface = nullptr;
+	device-&gt;CreateOffscreenPlainSurface(W, H, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &amp;surface, nullptr);
+
+	IDirect3DSurface9 *buffer = nullptr;
+	device-&gt;GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &amp;buffer);
+
+	HDC targetdc = NULL;
+	surface-&gt;GetDC(&amp;targetdc);
+
+	HDC scrdc = GetDC(srcwnd);
+
+	BOOL res = BitBlt(targetdc, 0, 0, W, H, scrdc, 0, 0, SRCCOPY);
+	ReleaseDC(srcwnd, scrdc);
+	surface-&gt;ReleaseDC(targetdc);
+
+	device-&gt;UpdateSurface(surface, NULL, buffer, NULL);
+	device-&gt;Present(NULL, NULL, NULL, NULL);</pre>
+<p>где device - указатель на устройство IDirect3DDevice9 *</p>
+<p>srcwnd - окно, которые вы копируете</p>
+<p>W,H - ширина и высота копируе&#1084;ого фраг&#1084;ента</p>
+<p>изображение 1200х800 копируется за 17-18 &#1084;с</p>
+<p></p>
+</div>

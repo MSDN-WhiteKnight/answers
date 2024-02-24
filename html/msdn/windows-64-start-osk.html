@@ -1,0 +1,52 @@
+<h2>Запуск экранной клавиатуры в 64-битной Windows</h2>
+<p>Date: 27.02.2018 18:40:22</p>
+<div>
+<p>Что значит из другой папки? Если вы физически пытаетесь скопировать osk.exe в другую папку, это естественно не работает.</p>
+<p>У &#1084;еня</p>
+<pre class="prettyprint">Process.Start(&quot;osk&quot;);</pre>
+<p>Нор&#1084;ально запускает экранную клавиатуру из 64-битного приложения, но не работает из 32-битного.</p>
+<p>Более того, sysnative поче&#1084;у-то не пашет в Windows 10. Не &#1084;огу понять поче&#1084;у.</p>
+<p></p>
+<p></p>
+<p></p>
+</div>
+<h2>Message 524</h2>
+<p>Date: 27.02.2018 19:01:58</p>
+<div>
+<p>64-битные приложения, определенно, не работают на 32-битных систе&#1084;ах.&nbsp;</p>
+<p><s><span style="font-size:9pt; font-family:Verdana">Впроче&#1084;, 32-битной Windows 10 в природе не существует.</span></s></p>
+<p>Если не работает краткий путь, &#1084;ожно использовать полный:</p>
+<pre class="prettyprint" style="">System.IO.Path.Combine(
+Environment.GetFolderPath(Environment.SpecialFolder.Windows),
+
+&quot;System32\\osk.exe&quot;);</pre>
+В x86 теоретически, в&#1084;есто System32 должно работать Sysnative. Но не работает.&nbsp;<br/>
+<p><br/>
+</p>
+<p></p>
+<br/>
+<br/>
+<br/>
+</div>
+<h2>Message 523</h2>
+<p>Date: 28.02.2018 4:21:04</p>
+<div>
+<p>Да, точно.</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Process.Start(&quot;osk&quot;)&nbsp; работает без пробле&#1084;
+</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">x86 или x64 ? У &#1084;еня на x86 так и не заработало. Только через хак с вызово&#1084; 64-битного cmd:</span></p>
+<pre class="prettyprint">ProcessStartInfo psi = new ProcessStartInfo();
+psi.FileName = &quot;c:\\windows\\sysnative\\cmd.exe&quot;;            
+psi.Arguments = &quot;/k start osk &amp;&amp; exit&quot;;
+psi.CreateNoWindow = true;
+psi.WindowStyle = ProcessWindowStyle.Hidden;
+Process.Start(psi);</pre>
+<br/>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+</div>
+<h2>Message 521</h2>
+<p>Date: 28.02.2018 7:59:59</p>
+<div>
+Я пони&#1084;аю, что ОС&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">x64 (на х86 бы не было пробле&#1084;ы). Проект под какую архитектуру собираете? (я не знаю, что выбрано
+ по у&#1084;олчанию в VS 2017)</span>
+</div>

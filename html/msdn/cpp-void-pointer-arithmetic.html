@@ -1,0 +1,19 @@
+<h2>Арифметика указателей типа void в C++</h2>
+<p>Date: 13.12.2017 8:03:14</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>По все&#1084; правила&#1084;,&nbsp;</em></span><strong style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><em>*v</em></strong><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>&nbsp;должен
+ увеличиться на&nbsp;</em></span><strong style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><em>s * soe</em></strong><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>.</em>&quot;</span></p>
+<p><span style="color:#333333"><span style="font-size:14px">Укажите по како&#1084;у и&#1084;енно правилу, иначе те&#1084;а не и&#1084;еет с&#1084;ысла. В VS 2012 напри&#1084;ер, код вообще не ко&#1084;пилируется. Что выглядит вполне естественно: тип void не
+ и&#1084;еет определенного раз&#1084;ера, и ариф&#1084;етика указателей для него при&#1084;ени&#1084;а.</span></span></p>
+</div>
+<h2>Message 593</h2>
+<p>Date: 13.12.2017 9:13:02</p>
+<div>
+<p>Ни в режи&#1084;е С, ни в режи&#1084;е С&#43;&#43; не ко&#1084;пилируется. </p>
+<p>Ошибка<span style="white-space:pre"> </span>1<span style="white-space:pre"> </span>
+error C2036: void *: неизвестный раз&#1084;ер<span style="white-space:pre"> </span>
+</p>
+<p>Я про ваш первый фраг&#1084;ент, а не тот который на картинке, если что (во второ&#1084; вообще нет сложения void*, поэто&#1084;у не понятно, в че&#1084; пробле&#1084;а).</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Найти точное описание для ариф&#1084;етики с void* я не с&#1084;ог</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">А где искали то? В стандарте ее нет, а в расширениях GCC она определяется как ариф&#1084;етика для char*. (<a href="https://gcc.gnu.org/onlinedocs/gcc-5.5.0/gcc/Pointer-Arith.html">https://gcc.gnu.org/onlinedocs/gcc-5.5.0/gcc/Pointer-Arith.html</a>)</span></p>
+</div>

@@ -1,0 +1,42 @@
+<h2>XML-документация для библиотеки .NET</h2>
+<p>Date: 03.03.2017 17:56:45</p>
+<div>
+<p>Создать XML-доку&#1084;ентацию для чужой библиотеки, конечно, &#1084;ожно. Для этого нужно создать в папке со сборкой, на которую вы ссылаетесь, XML-файл, совпадающий с и&#1084;ене&#1084; сборки, такого содержания:</p>
+<pre class="prettyprint">&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;doc&gt;
+    &lt;assembly&gt;
+        &lt;name&gt;MyCoolAssembly&lt;/name&gt;
+    &lt;/assembly&gt;
+    &lt;members&gt;
+		&lt;!--- Доку&#1084;ентация класса ---&gt;
+		&lt;member name=&quot;T:MyNamespace.MyClass&quot;&gt;
+            &lt;summary&gt;
+            Описание класса
+            &lt;/summary&gt;
+        &lt;/member&gt;
+	
+		&lt;!--- Доку&#1084;ентация &#1084;етода ---&gt;
+		&lt;member name=&quot;M:MyNamespace.MyClass.DoSomething(Int32)&quot;&gt;
+            &lt;summary&gt;
+            Описание &#1084;етода
+            &lt;/summary&gt;
+            &lt;param name=&quot;x&quot;&gt;Описание аргу&#1084;ента &#1084;етода&lt;/param&gt;
+        &lt;/member&gt;
+		
+		&lt;!--- Доку&#1084;ентация поля ---&gt;
+		&lt;member name=&quot;F:MyNamespace.MyClass.FieldType.FieldName&quot;&gt;
+            &lt;summary&gt;
+            Описание поля
+            &lt;/summary&gt;
+        &lt;/member&gt;
+	
+	&lt;/members&gt;
+&lt;/doc&gt;</pre>
+<p>Такой файл обычно генерируется авто&#1084;атически ко&#1084;пиляторо&#1084; при установки галки &quot;Генерировать XML-доку&#1084;ентацию&quot; в свойствах проекта.</p>
+<p>Подробное описание&nbsp;тегов для разных эле&#1084;ентов языка &#1084;ожно найти здесь:
+<a href="https://msdn.microsoft.com/en-us/library/fsbx0t7x(v=vs.71).aspx">Processing the XML File</a><br/>
+</p>
+<p></p>
+<p></p>
+<br/>
+</div>

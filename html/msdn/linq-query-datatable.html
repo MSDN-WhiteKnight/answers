@@ -1,0 +1,10 @@
+<h2>LINQ-запросы к DataTable</h2>
+<p>Date: 20.01.2017 17:29:37</p>
+<div>
+<p>Писать LINQ запросы с группировкой&nbsp;к DataTable, несо&#1084;ненно, &#1084;ожно. Попробуйте так:</p>
+<pre class="prettyprint">IEnumerable&lt;DataRow&gt; results = dataTable.AsEnumerable().GroupBy(t =&gt; t[&quot;columnName&quot;])
+      .Select(g =&gt; g.First());</pre>
+<br/>
+<p></p>
+&nbsp;
+</div>

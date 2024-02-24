@@ -1,0 +1,228 @@
+<h2>Программное отображение окна WPF из BAML-файла</h2>
+<p>Date: 31.12.2018 9:43:52</p>
+<div>
+&quot;<em>Подскажите где &#1084;ожно найти ко&#1084;пилятор приложений С# WPF</em>&quot;<br/>
+<br/>
+MSBuild (<a href="https://docs.microsoft.com/ru-ru/visualstudio/msbuild/msbuild?view=vs-2017">https://docs.microsoft.com/ru-ru/visualstudio/msbuild/msbuild?view=vs-2017</a>)<br/>
+<br/>
+&quot;<em>Мне нужен XAML Designer такой как в Visual Studio</em>&quot;<br/>
+<br/>
+Если нужно работать только с голы&#1084; XAML, без Code-behind, &#1084;ожно использовать System.Windows.Markup.XamlReader (<a href="https://docs.microsoft.com/ru-ru/dotnet/api/system.windows.markup.xamlreader?view=netframework-4.7.2">https://docs.microsoft.com/ru-ru/dotnet/api/system.windows.markup.xamlreader?view=netframework-4.7.2</a>).
+ Однако, когда доходит до XAML с Code-Behind, задача распарсить все это на уровне исходного кода становится неподъе&#1084;но сложной. В&#1084;есто этого, куда проще собрать проект и проанализировать бинарную сборку через Reflection.&nbsp;<br/>
+<br/>
+Вот при&#1084;ер кода для сборки проекта через MSBuild и отображения содержащихся в не&#1084; окон.<br/>
+<br/>
+XAML:<br/>
+<br/>
+<pre class="prettyprint">&lt;Window x:Class=&quot;WpfBuild.MainWindow&quot;
+        xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
+        xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+        Title=&quot;WPF Viewer&quot; Height=&quot;350&quot; Width=&quot;525&quot; WindowState=&quot;Maximized&quot;&gt;
+    &lt;Grid HorizontalAlignment=&quot;Stretch&quot; VerticalAlignment=&quot;Stretch&quot;&gt;
+        &lt;Label Content=&quot;Путь к проекту&quot; HorizontalAlignment=&quot;Left&quot; Margin=&quot;31,31,0,0&quot; VerticalAlignment=&quot;Top&quot;/&gt;
+        &lt;Label Content=&quot;Каталог для вывода&quot; HorizontalAlignment=&quot;Left&quot; Margin=&quot;31,87,0,0&quot; VerticalAlignment=&quot;Top&quot;/&gt;
+        &lt;TextBox x:Name=&quot;tbProject&quot; HorizontalAlignment=&quot;Stretch&quot; Height=&quot;26&quot; Margin=&quot;189,31,10,00&quot; 
+                 TextWrapping=&quot;Wrap&quot; Text=&quot;&quot; VerticalAlignment=&quot;Top&quot; /&gt;
+        &lt;TextBox x:Name=&quot;tbOutputDir&quot; HorizontalAlignment=&quot;Stretch&quot; Height=&quot;26&quot; Margin=&quot;189,87,10,10&quot; 
+                 TextWrapping=&quot;Wrap&quot; Text=&quot;&quot; VerticalAlignment=&quot;Top&quot;/&gt;
+        &lt;Button x:Name=&quot;btnBuild&quot; Content=&quot;Построить&quot; HorizontalAlignment=&quot;Left&quot; Height=&quot;25&quot; 
+                Margin=&quot;31,141,0,0&quot; VerticalAlignment=&quot;Top&quot; Width=&quot;130&quot; Click=&quot;btnBuild_Click&quot;/&gt;
+        &lt;Button x:Name=&quot;btnView&quot; Content=&quot;Прос&#1084;отр&quot; HorizontalAlignment=&quot;Left&quot; Height=&quot;25&quot; 
+                Margin=&quot;189,141,0,0&quot; VerticalAlignment=&quot;Top&quot; Width=&quot;130&quot; Click=&quot;btnView_Click&quot; /&gt;
+        &lt;ListBox x:Name=&quot;lbBamlList&quot; HorizontalAlignment=&quot;Left&quot;  Margin=&quot;10,189,10,10&quot; 
+                 VerticalAlignment=&quot;Stretch&quot; Width=&quot;198&quot; SelectionChanged=&quot;lbBamlList_SelectionChanged&quot;/&gt;
+        &lt;Grid x:Name=&quot;grid&quot; HorizontalAlignment=&quot;Stretch&quot;  Margin=&quot;236,190,10,10&quot; VerticalAlignment=&quot;Stretch&quot; Background=&quot;{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}&quot; /&gt;
+
+    &lt;/Grid&gt;
+&lt;/Window&gt;</pre>
+<br/>
+<br/>
+C#:<br/>
+<br/>
+<pre class="prettyprint">using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Controls;
+using System.Reflection;
+using System.Resources;
+
+namespace WpfBuild
+{
+
+    public partial class MainWindow : Window
+    {
+        List&lt;string&gt; BamlList = new List&lt;string&gt;();
+        Assembly ass = null;
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            btnView.IsEnabled = false;
+        }
+
+        bool BuildProject(string proj, string outdir)
+        {
+            if (String.IsNullOrEmpty(proj))
+            {
+                MessageBox.Show(&quot;Project path not specified&quot;, &quot;Error&quot;);
+                return false;
+            }
+
+            if (String.IsNullOrEmpty(outdir))
+            {
+                MessageBox.Show(&quot;Output path not specified&quot;, &quot;Error&quot;);
+                return false;
+            }
+
+            string DotnetPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.Windows),
+                &quot;Microsoft.NET\\Framework\\&quot;
+                );
+
+            try
+            {
+                //найде&#1084; са&#1084;ую новую версию MSBuild на этой &#1084;ашине...
+                string[] dirs = Directory.GetDirectories(DotnetPath);
+                Array.Sort(dirs);
+
+                string MSBuildPath = &quot;&quot;;
+
+                for (int i = dirs.Length - 1; i &gt;= 0; i--)
+                {
+                    string s = Path.Combine(dirs[i], &quot;msbuild.exe&quot;);
+                    if (File.Exists(s))
+                    {
+                        MSBuildPath = s; break;
+                    }
+                }
+
+                if (MSBuildPath == &quot;&quot;)
+                {
+                    throw new FileNotFoundException(&quot;Fatal error: MSBuild not found!&quot;);
+                }
+
+                //собере&#1084; проект через MSBuild...
+                ProcessStartInfo psi = new ProcessStartInfo();
+                psi.FileName = MSBuildPath;
+                psi.Arguments = String.Format(
+                    &quot;\&quot;{0}\&quot; /property:OutDir=\&quot;{1}\&quot;&quot;, proj, outdir
+                    );
+                psi.WindowStyle = ProcessWindowStyle.Hidden;
+                Process pr = Process.Start(psi);
+                pr.WaitForExit();
+                int code = pr.ExitCode;
+
+                if (code == 0) 
+                {
+                    MessageBox.Show(&quot;Build success&quot;);
+                    return true; 
+                }
+                else
+                {
+                    MessageBox.Show(&quot;MSBuild error: &quot; &#43; code.ToString());
+                    return false;
+                }                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().ToString());
+                return false;
+            }
+        }
+
+        void ShowWindowFromBaml()
+        {
+            object val = lbBamlList.SelectedValue;
+            if (val == null) return;
+
+            string name = Path.GetFileNameWithoutExtension(val.ToString());
+
+            try
+            {
+                var types = ass.DefinedTypes;
+
+                //найде&#1084; в сборке класс окна, соответствующий по и&#1084;ени baml-файлу
+                foreach (TypeInfo type in types)
+                {
+                    if (type.BaseType == typeof(Window) &amp;&amp; type.Name.ToLower() == name.ToLower())
+                    {
+                        //создади&#1084; экзе&#1084;пляр окна и отобрази&#1084; его в Grid'е
+                        Point basepoint = grid.TranslatePoint(new Point(0, 0), this);
+                        Window wnd = (Window)Activator.CreateInstance(type);
+                        wnd.Owner = this;
+
+                        wnd.Top = basepoint.Y &#43; SystemParameters.CaptionHeight;
+                        wnd.Left = basepoint.X;
+                        wnd.WindowState = System.Windows.WindowState.Normal;
+                        wnd.Show();
+                        return;
+                    }
+                }
+
+                MessageBox.Show(&quot;Error: window class not found in assembly&quot;);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().ToString());
+            }
+        }
+
+        private void btnBuild_Click(object sender, RoutedEventArgs e)
+        {
+            btnView.IsEnabled = false;
+            bool success = BuildProject(tbProject.Text, tbOutputDir.Text);
+            if (!success) return;
+
+            try
+            {
+                //найде&#1084; сборку в выходных файлах MSBuild
+                string AssPath = Path.Combine(tbOutputDir.Text, Path.GetFileNameWithoutExtension(tbProject.Text) &#43; &quot;.exe&quot;);
+                ass = Assembly.LoadFrom(AssPath);
+
+                var names = ass.GetManifestResourceNames();
+
+                //найде&#1084; все BAML-ресурсы в сборке
+                BamlList.Clear();
+                foreach (var s in names)
+                {
+                    var stream = ass.GetManifestResourceStream(s);
+
+                    using (ResourceReader reader = new ResourceReader(stream))
+                    {
+
+                        foreach (System.Collections.DictionaryEntry entry in reader)
+                        {
+                            BamlList.Add(entry.Key.ToString());
+                        }
+                    }
+
+                }
+
+                lbBamlList.ItemsSource = BamlList;                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, ex.GetType().ToString());
+            }
+        }
+
+        private void btnView_Click(object sender, RoutedEventArgs e)
+        {
+            ShowWindowFromBaml(); //отобрази&#1084; окно для выбранного BAML-файла
+        }
+
+        private void lbBamlList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            object val = lbBamlList.SelectedValue;
+            if (val != null) btnView.IsEnabled = true;
+        }
+    }
+}</pre>
+<br/>
+<br/>
+<br/>
+</div>

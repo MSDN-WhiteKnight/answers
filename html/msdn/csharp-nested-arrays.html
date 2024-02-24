@@ -1,0 +1,48 @@
+<h2>Обход вложенных массивов в C#</h2>
+<p>Date: 23.03.2020 7:32:24</p>
+<div>
+<p>А что и&#1084;енно вы хотите реализовать? Пользуйтесь Array.Rank, Array.GetLengh, Array.Get(Set)Value и т.п.</p>
+<p>Обход произвольного &#1084;ассива из вложенных друг в друга одно&#1084;ерных &#1084;ассивов напри&#1084;ер &#1084;ожно так реализовать:</p>
+<pre class="prettyprint">    static void PrintArrItem(Array arr, int index)
+    {
+        Type t = arr.GetType();
+        if (t.GetElementType().IsArray)
+        {
+            Array inner = (Array)arr.GetValue(index);
+            Console.Write(&quot;[&quot;);
+            for (int i = 0; i &lt; inner.GetLength(0); i&#43;&#43;)
+            {
+                if(i&gt;=1) Console.Write(&quot;,&quot;);
+                PrintArrItem(inner, i);                
+            }
+            Console.Write(&quot;]&quot;);
+        }
+        else
+        {
+            Console.Write(arr.GetValue(index));
+        } 
+    }
+
+    static void Main(string[] args)
+    {
+        TestClass test = new TestClass();
+        test.F3 = new byte[][][] {
+            new byte[][] { new byte[] { 1,2 } },
+            new byte[][] { new byte[] { 3,4 },new byte[] { 5 } }
+        };
+
+        PropertyInfo pi = typeof(TestClass).GetProperty(&quot;F3&quot;);
+        Array arr = (Array)pi.GetValue(test);
+
+        for (int i=0; i &lt; arr.GetLength(0); i&#43;&#43;)
+        {
+            if (i &gt;= 1) Console.Write(&quot;,&quot;);
+            PrintArrItem(arr, i);
+        }
+        
+        Console.ReadKey();
+    }</pre>
+Обход произвольного &#1084;ного&#1084;ерного &#1084;ассива, конечно реализовать посложнее, но суть будет та же - свести к &#1084;ассиву одно&#1084;ерных &#1084;ассивов и обойти рекурсивно.<br/>
+<p></p>
+<p></p>
+</div>

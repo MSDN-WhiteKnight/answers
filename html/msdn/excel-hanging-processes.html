@@ -1,0 +1,28 @@
+<h2>Зависшие процессы Excel</h2>
+<p>Date: 24.05.2017 17:05:36</p>
+<div>
+<p>когда надоест искать все висящие COM-объекты, сделайте как-то так (не знаю VB, ду&#1084;аю разберетесь как перевести):</p>
+<pre class="prettyprint">[DllImport(&quot;user32.dll&quot;)]
+private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+public static void ExcelKill(int hWnd)
+{
+	uint processID;
+	GetWindowThreadProcessId((IntPtr)hWnd, out processID);    
+	Process pr=Process.GetProcessById((int)processID);
+	pr.Kill();	
+}
+
+void WorkWithExcel()
+{
+	Application excel = new Application();
+	int hWnd = excel.Hwnd;
+	
+	//работа с Excel...
+	
+	ExcelKill(hWnd);
+}</pre>
+<br/>
+<p></p>
+<br/>
+</div>

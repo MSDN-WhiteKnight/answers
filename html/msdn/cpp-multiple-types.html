@@ -1,0 +1,29 @@
+<h2>Переменная для значений нескольких типов в C++</h2>
+<p>Date: 23.04.2015 3:34:32</p>
+<div>
+<p>поче&#1084;у бы просто не сделать так:</p>
+<pre class="prettyprint"><p>typedef enum {
+ Type1,
+ Type2
+} ObjectTypes;//перечисление всех типов объектов
+
+struct MyObject{
+ ObjectTypes type,//тип объекта
+ void* content//указатель на объект
+};
+
+//или через объединение
+
+typedef union {</p><p> char raw_bytes[SIZE],
+ FirstType t1,
+ SecondType t2<span style="font-family:Verdana,Geneva,sans-serif; font-size:1.23em; line-height:1.5"> </span></p><p>}MyUnion;
+
+struct MyObject2{
+ ObjectTypes type,//тип объекта
+ MyUnion content//са&#1084; объект
+};</p></pre>
+Множественное наследование тут вообще незаче&#1084;.<br/>
+<p><br/>
+</p>
+<p></p>
+</div>

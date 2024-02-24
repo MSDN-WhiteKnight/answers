@@ -1,0 +1,73 @@
+<h2>Работа с cookies в WinHttp</h2>
+<p>Date: 19.11.2018 18:13:25</p>
+<div>
+<p>WinHttp поддерживает авто&#1084;атическую обработку Cookies во всех версиях (<a href="https://docs.microsoft.com/en-us/windows/desktop/winhttp/cookie-handling-in-winhttp">https://docs.microsoft.com/en-us/windows/desktop/winhttp/cookie-handling-in-winhttp</a>).
+ Ва&#1084; нужно просто выполнять запросы так же, как браузер это делает. Не сразу ло&#1084;ится авторизоваться, а сначала загрузить какую-либо страницу, при загрузке которой сервер отдает Cookie. Ну и за&#1084;аскироваться под обычный браузер (User-Agent и
+ все такое), так как сервер &#1084;ожет быть настроен, чтобы робота&#1084; Cookie не отдавать.</p>
+<p><br/>
+</p>
+</div>
+<h2>Message 341</h2>
+<p>Date: 21.11.2018 3:13:54</p>
+<div>
+<p>Только что попробовал через curl отправить запрос без всяких дополнительных заголовков, вроде выдает (хотя эта страница возвращает 302 редирект):</p>
+<pre class="prettyprint" style="">C:\Distr\curl-7.62.0-win32-mingw\curl-7.62.0-win32-mingw\bin&gt;curl --verbose http://www.news.krasnoyarsk.ru/client/review/
+*   Trying 80.91.193.81...
+* TCP_NODELAY set
+* Connected to www.news.krasnoyarsk.ru (80.91.193.81) port 80 (#0)
+&gt; GET /client/review/ HTTP/1.1
+&gt; Host: www.news.krasnoyarsk.ru
+&gt; User-Agent: curl/7.62.0
+&gt; Accept: */*
+&gt;
+&lt; HTTP/1.1 302 Found
+&lt; Date: Wed, 21 Nov 2018 03:04:14 GMT
+&lt; Server: Apache/2.2.34 (Unix) PHP/4.4.9 mod_ssl/2.2.34 OpenSSL/1.0.2o
+&lt; X-Powered-By: PHP/4.4.9
+&lt; Set-Cookie: PHPSESSID=c57c4351e1969e18044050465e7181e6; path=/
+&lt; Expires: Thu, 19 Nov 1981 08:52:00 GMT
+&lt; Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+&lt; Pragma: no-cache
+&lt; Location: /client/login/?back=%2Fclient%2Freview%2F
+&lt; Content-Length: 0
+&lt; Content-Type: text/html; charset=windows-1251
+&lt;
+* Connection #0 to host www.news.krasnoyarsk.ru left intact</pre>
+<p>Воз&#1084;ожно, у вас это банальная пробле&#1084;а кэширования или тот же Fidller глючит.<br/>
+</p>
+<p></p>
+<p></p>
+<p>Я так пони&#1084;аю, это VBScript? У &#1084;еня вот так работает, если сразу запрашивать нужную страницу, без редиректа:</p>
+<pre class="prettyprint lang-vb">urlExec =&quot;http://www.news.krasnoyarsk.ru/client/login/?back=%2Fclient%2Freview%2F&quot; 
+Set objWinHttp = CreateObject(&quot;WinHttp.WinHttpRequest.5.1&quot;) 
+objWinHttp.SetTimeouts 59000, 59000, 59000, 59000
+objWinHttp.Open &quot;GET&quot;, urlExec, False
+
+objWinHttp.SetRequestHeader &quot;Accept&quot;, &quot;text/html,application/xhtml&#43;xml,application/xml;q=0.9,image/webp,*/*;q=0.8&quot;
+objWinHttp.SetRequestHeader &quot;Accept-Language&quot;, &quot;ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4&quot;
+objWinHttp.SetRequestHeader &quot;User-Agent&quot;, &quot;Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.132 Safari/537.36&quot;
+objWinHttp.SetRequestHeader &quot;Accept-Encoding&quot;, &quot;gzip, deflate, sdch&quot;
+
+On Error Resume Next
+objWinHttp.Send &quot;&quot;
+objWinHttp.WaitForResponse
+MsgBox(objWinHttp.getAllResponseHeaders)
+
+' Результат:
+'
+'Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+'Connection: Keep-Alive
+'Date: Wed, 21 Nov 2018 03:36:13 GMT
+'Keep-Alive: timeout=5, max=100
+'Pragma: no-cache
+'Content-Length: 2225
+'Content-Type: text/html; charset=windows-1251
+'Expires: Thu, 19 Nov 1981 08:52:00 GMT
+'Server: Apache/2.2.34 (Unix) PHP/4.4.9 mod_ssl/2.2.34 OpenSSL/1.0.2o
+'Set-Cookie: PHPSESSID=5341e0c36539450ef5ecc93c534d9caf; path=/
+'X-Powered-By: PHP/4.4.9</pre>
+<br/>
+<p></p>
+<p></p>
+<p></p>
+</div>

@@ -1,0 +1,23 @@
+<h2>Предотвратить отправку жесткому диску ATA-команды SECURITY FREEZE LOCK в Windows</h2>
+<p>Date: 30.10.2017 3:50:21</p>
+<div>
+<p>Windows начиная с Vista (а также XP SP3) посылает ко&#1084;анду SECURITY FREEZE LOCK все&#1084; жестки&#1084; диска&#1084;, работающи&#1084; под стандартны&#1084; ATA-драйверо&#1084;. Сбросить ко&#1084;анду &#1084;ожно только перезагрузкой диска, но естественно,
+ если после перезагрузки грузятся те же дрова, это не решает пробле&#1084;у.</p>
+<p>На &quot;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>Можно ли отключить через са&#1084;описный драйвер</em></span>&quot; я полагаю, ответ - &quot;да&quot;. Однако, более просты&#1084;
+ решение&#1084; была бы разработка под более старую ОС или&nbsp;<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/storage/security-group-commands">Windows 8 Preinstallation Environment</a>, которые не посылают данную ко&#1084;анду.</p>
+</div>
+<h2>Message 628</h2>
+<p>Date: 30.10.2017 16:57:31</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>какие использовать библиотеки/функции/классы использовать, чтобы реализовать такой драйвер?</em>&quot;</span></p>
+<p>Драйвера пишутся на чисто&#1084; Си и используют пря&#1084;ые вызовы к функция&#1084; ядра (ntoskrnl). С&#1084;. этот раздел доку&#1084;ентации:&nbsp;<a href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff557573(v=vs.85).aspx">https://msdn.microsoft.com/en-us/library/windows/hardware/ff557573(v=vs.85).aspx</a>.
+ Та&#1084; же есть ссылка на скачивание Windows Driver Kit, который содержит необходи&#1084;ые заголовочные файлы, библиотеки и при&#1084;еры. Однако для разработки своей за&#1084;ены стандартного ATA-драйвера только доку&#1084;ентации Microsoft будет недостаточно,
+ нужно читать &#1084;ного специальной литературы. Которой боюсь и в свободно&#1084; доступе и нет в полной &#1084;ере (напри&#1084;ер, даже доку&#1084;ент по ATA-ко&#1084;&#1084;анда&#1084;, на который я ва&#1084; давал ссылку в соседней те&#1084;е - это по
+ сути черновик стандарта, а полноценную версию нужно покупать.)</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>И по поводу WinPE: Как и&#1084;енно с ни&#1084; работать? (ATA ко&#1084;анды и Freeze lock)</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">WinPE это просто упрощенная версия Windows, запускающаяся с загрузочной флешки или диска. Под нее &#1084;ожно также как под обычную Windows,
+ разрабатывать консольные или графические приложения и вызывать API-функции CreateFile и DeviceIoControl для отправки ко&#1084;анд устройству.</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Ссылки:</span></p>
+<p><a href="https://msdn.microsoft.com/ru-ru/library/windows/hardware/dn938389%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396">Среда предустановки Windows (WinPE)</a></p>
+<p><a href="https://developer.microsoft.com/ru-ru/windows/hardware/windows-assessment-deployment-kit">Windows ADK</a><a href="https://msdn.microsoft.com/ru-ru/library/windows/hardware/dn938389%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396"></a></p>
+</div>

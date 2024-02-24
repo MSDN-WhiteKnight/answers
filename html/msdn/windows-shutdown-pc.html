@@ -1,0 +1,33 @@
+<h2>Программное выключение компьютера в Windows</h2>
+<p>Date: 02.03.2017 15:46:42</p>
+<div>
+<p>Может через WMI попробовать</p>
+<pre class="prettyprint">using System.Management;
+
+void Shutdown()
+{
+    ManagementBaseObject mboShutdown = null;
+    ManagementClass mcWin32 = new ManagementClass(&quot;Win32_OperatingSystem&quot;);
+    mcWin32.Get();
+
+    // Set security privileges
+    mcWin32.Scope.Options.EnablePrivileges = true;
+    ManagementBaseObject mboShutdownParams =
+             mcWin32.GetMethodParameters(&quot;Win32Shutdown&quot;);
+     
+    mboShutdownParams[&quot;Flags&quot;] = &quot;12&nbsp;&quot;;//Forced power-off
+    mboShutdownParams[&quot;Reserved&quot;] = &quot;0&quot;;
+    foreach (ManagementObject manObj in mcWin32.GetInstances())
+    {
+        mboShutdown = manObj.InvokeMethod(&quot;Win32Shutdown&quot;, 
+                                       mboShutdownParams, null);
+    }
+}</pre>
+<p><strong>Добавлено:</strong></p>
+<p>М-да, не пос&#1084;отрел, что раздел - &quot;низкоуровневое програ&#1084;&#1084;ирование&quot;, значит вы ждете на с&#43;&#43;. В обще&#1084;, идея в то&#1084; чтобы вызвать &#1084;етод Win32Shutdown класса&nbsp;Win32_OperatingSystem с флаго&#1084; 12 (Forced
+ Power-Off). Не знаю, как это делается в с&#43;&#43;.</p>
+<p></p>
+<p></p>
+<p><br/>
+</p>
+</div>

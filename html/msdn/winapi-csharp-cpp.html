@@ -1,0 +1,40 @@
+<h2>Использование функций WinAPI в C# и C++</h2>
+<p>Date: 07.02.2019 17:43:16</p>
+<div>
+<p>Начать с того, что&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">MessageBox.Show</span> в&nbsp; тер&#1084;инах C# - это не &quot;функция&quot;. Функция&#1084;и в C# обычно называют
+ определенные типы делегатов (напри&#1084;ер <a href="https://docs.microsoft.com/ru-ru/dotnet/api/system.func-2?view=netframework-4.7.2">
+Func&lt;T,TResult&gt;</a>). Скорее всего, вы и&#1084;ели в виду &quot;&#1084;етоды&quot;.</p>
+<p><strong style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><em style="border:0px; font-weight:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px"><span style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">В
+ C# функции это обертки над низкоуровневы&#1084;и Win 32 API(API)?</span></em></strong></p>
+<p>Метод MessageBox.Show действительно является оберткой над функцией WinAPI, как и &#1084;ногие другие &#1084;етоды .NET. Но, разу&#1084;еется, не все, напри&#1084;ер
+<a href="https://referencesource.microsoft.com/#mscorlib/system/io/path.cs,e36b3edc1f3e2c8d,references">
+Path.GetFileNameWithoutExtension</a>&nbsp;реализован полностью в управляе&#1084;о&#1084; коде.&nbsp;</p>
+<p><strong style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><em style="border:0px; font-weight:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px"><span style="border:0px; font-weight:inherit; font-style:inherit; font-family:inherit; margin:0px; outline:0px; padding:0px">А
+ C&#43;&#43; функции обернутые, напишите при&#1084;ер, а в заголовке Winreg.h функции это обертки над Win 32 API(API) или нет?</span></em></strong></p>
+<p>В файле winreg.h не &quot;обертки&quot;, а объявления функций из WinAPI, которые позволяют использовать их в приложениях на С&#43;&#43;. Конечно, функции С&#43;&#43; также &#1084;огут быть обертка&#1084;и над че&#1084;-то.&nbsp;</p>
+<p></p>
+</div>
+<h2>Message 294</h2>
+<p>Date: 08.02.2019 3:09:01</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Я правильно понял?</em>&quot;</span></p>
+<p>В цело&#1084; правильно. Только объявления в заголовочных файлах С&#43;&#43; не ссылаются на конкретную DLL, а лишь описывают пара&#1084;етры функции и ее возвращае&#1084;ое значение, а также указывают, что функция является внешней (т.е. что ее реализация
+ находится в друго&#1084; &#1084;одуле). Ссылка на конкретную DLL задается уже путе&#1084; передачи ко&#1084;поновщику библиотеки и&#1084;порта для этой DLL (специального файла с расширение&#1084; lib) через пара&#1084;етры ко&#1084;андной строки или директивы
+ #pragma, в случае Visual C&#43;&#43;.</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+<p></p>
+</div>
+<h2>Message 293</h2>
+<p>Date: 08.02.2019 10:50:40</p>
+<div>
+<p>Lib-файл &#1084;ожет быть как статической библиотекой, так и библиотекой и&#1084;порта для DLL. На практике, конечно, чаще всего используется дина&#1084;ическое связывание. Библиотеки и&#1084;порта для библиотек Windows, вроде user32.dll, поставляются с
+ Windows SDK, для DirectX - с&nbsp;DirectX SDK.&nbsp;</p>
+<p><br/>
+</p>
+</div>
+<h2>Message 292</h2>
+<p>Date: 08.02.2019 14:19:55</p>
+<div>
+С Visual Studio в ко&#1084;плекте идет урезанная версия Windows SDK, которая содержит lib-файлы. С други&#1084;и IDE ситуация &#1084;ожет быть разной, напри&#1084;ер, CodeBlocks содержит часть lib-файлов Windows SDK (которые, правда, переи&#1084;енованы
+ в расширение .a, но суть от этого не &#1084;еняется, это абсолютно те же файлы).&nbsp;
+</div>

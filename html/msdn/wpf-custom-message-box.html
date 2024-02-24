@@ -1,0 +1,128 @@
+<h2>Нестандартный MessageBox в WPF</h2>
+<p>Date: 08.06.2017 2:56:56</p>
+<div>
+А свое окно MVVM сделать не позволяет? Или речь идет о браузерно&#1084; WPF?
+</div>
+<h2>Message 774</h2>
+<p>Date: 08.06.2017 7:53:16</p>
+<div>
+Вопрос в то&#1084;, поче&#1084;у бы не сделать обычное окно (Window), если это не браузерное приложение. И в како&#1084; с&#1084;ысле &quot;лучше&quot;? Отображение окна сообщения - довольно тривиальная задача, чтобы говорить о лучших практиках. Каждый
+ делает, как е&#1084;у удобнее.
+</div>
+<h2>Message 773</h2>
+<p>Date: 08.06.2017 19:12:15</p>
+<div>
+<p>Если фор&#1084;ы для разных типов принципиально различаются, то да, лепить для каждого свою фор&#1084;у. Если они выглядят одинаково, &#1084;ожно справиться с по&#1084;ощью привязок.
+</p>
+<p>Ва&#1084; нужно создать класс, который будет содержать пара&#1084;етры сообщения - текст, тип, необходи&#1084;ые кнопки и т.п. - который будет передаваться в конструктор окна. Поскольку вид окна сообщения не &#1084;еняется во вре&#1084;ени, он &#1084;ожет
+ быть предельно просты&#1084;, без NotifyPropertyChanged. Визуальные пара&#1084;етры окна связать со свойства&#1084;и этого класса с по&#1084;ощью DataTrigger. А для пере&#1084;енного числа кнопок использовать&nbsp;ItemsControl.ItemTemplate</p>
+<pre class="prettyprint">public enum MessageBoxType
+    {
+        Error,Warning,Information
+    }
+
+    public class MessageBoxParams
+    {
+        public string Text { get; set; }
+        public MessageBoxType Type { get; set; }
+        public string[] Buttons { get; set; }
+
+        public MessageBoxParams(string text,MessageBoxType type,string[] butt)
+        {
+            Text = text; Type = type; Buttons = butt;
+        }
+
+        public MessageBoxParams()
+        {
+            Text = &quot;&quot;; Type = MessageBoxType.Information; Buttons = new string[] { &quot;OK&quot; };
+        }
+    }</pre>
+<p>Раз&#1084;етка окна:</p>
+<pre class="prettyprint">&lt;Window x:Class=&quot;WpfTestApp1.CoolMessageBox&quot;
+        xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
+        xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+         Height=&quot;300&quot; Width=&quot;399&quot;&gt;
+    &lt;Window.Style&gt;
+        &lt;Style TargetType=&quot;{x:Type Window}&quot;&gt;
+            &lt;Setter Property=&quot;Title&quot; Value=&quot;Предупреждение&quot;/&gt;
+            &lt;Style.Triggers&gt;
+                &lt;DataTrigger Binding=&quot;{Binding Type}&quot; Value=&quot;Error&quot;&gt;
+                    &lt;Setter Property=&quot;Title&quot; Value=&quot;Ошибка&quot;/&gt;
+                &lt;/DataTrigger&gt;
+                &lt;DataTrigger Binding=&quot;{Binding Type}&quot; Value=&quot;Information&quot;&gt;
+                    &lt;Setter Property=&quot;Title&quot; Value=&quot;Инфор&#1084;ация&quot;/&gt;
+                &lt;/DataTrigger&gt;
+            &lt;/Style.Triggers&gt;
+        &lt;/Style&gt;
+    &lt;/Window.Style&gt;
+    &lt;Grid&gt;
+        &lt;Grid.RowDefinitions&gt;
+            &lt;RowDefinition Height=&quot;*&quot;/&gt;
+            &lt;RowDefinition Height=&quot;70&quot;/&gt;
+        &lt;/Grid.RowDefinitions&gt;
+       &lt;TextBlock  HorizontalAlignment=&quot;Stretch&quot; Grid.Row=&quot;0&quot; TextAlignment=&quot;Center&quot; 
+                   Name=&quot;textBlock1&quot; Text=&quot;{Binding Path=Text}&quot; VerticalAlignment=&quot;Stretch&quot; &gt;
+        &lt;TextBlock.Style&gt;
+        &lt;Style TargetType=&quot;{x:Type TextBlock}&quot;&gt;
+            &lt;Setter Property=&quot;Foreground&quot; Value=&quot;Black&quot;/&gt;
+            &lt;Style.Triggers&gt;                
+                &lt;DataTrigger Binding=&quot;{Binding Type}&quot; Value=&quot;Error&quot;&gt;
+                    &lt;Setter Property=&quot;Foreground&quot; Value=&quot;Red&quot;/&gt;
+                &lt;/DataTrigger&gt;
+                &lt;DataTrigger Binding=&quot;{Binding Type}&quot; Value=&quot;Information&quot;&gt;
+                    &lt;Setter Property=&quot;Foreground&quot; Value=&quot;Green&quot;/&gt;
+                &lt;/DataTrigger&gt;
+            &lt;/Style.Triggers&gt;
+        &lt;/Style&gt;
+    &lt;/TextBlock.Style&gt;&lt;/TextBlock&gt;
+
+        &lt;ItemsControl Name=&quot;items&quot; Grid.Row=&quot;1&quot; VerticalAlignment=&quot;Center&quot; HorizontalAlignment=&quot;Center&quot;&gt;
+
+            &lt;ItemsControl.ItemsPanel&gt;
+                &lt;ItemsPanelTemplate&gt;
+                    &lt;WrapPanel VerticalAlignment=&quot;Center&quot; HorizontalAlignment=&quot;Center&quot;/&gt;
+                &lt;/ItemsPanelTemplate&gt;
+            &lt;/ItemsControl.ItemsPanel&gt;
+
+            &lt;ItemsControl.ItemTemplate&gt;
+                &lt;DataTemplate&gt;
+                    &lt;Button Content=&quot;{Binding Path=''}&quot; Click=&quot;button1_Click&quot;/&gt;
+                &lt;/DataTemplate&gt;
+            &lt;/ItemsControl.ItemTemplate&gt;
+        &lt;/ItemsControl&gt;
+
+    &lt;/Grid&gt;
+&lt;/Window&gt;</pre>
+<p>Код окна:</p>
+<pre class="prettyprint">public partial class CoolMessageBox : Window
+    {
+        MessageBoxParams pars;
+
+        public string Result { get; set; }
+
+        public CoolMessageBox(MessageBoxParams p)
+        {
+            InitializeComponent();
+            pars = p;
+            this.DataContext = pars;
+            items.ItemsSource = pars.Buttons;
+        }
+
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            Result = (sender as Button).Content.ToString();
+            this.Close();
+        }
+    }</pre>
+<br/>
+<p>Использование:</p>
+<pre class="prettyprint">CoolMessageBox box = new CoolMessageBox(
+                new MessageBoxParams(&quot;Ваше люби&#1084;ое животное?&quot;,
+                    MessageBoxType.Information,
+                    new string[]{&quot;Собака&quot;,&quot;Кошка&quot;}));
+            box.ShowDialog();
+            label1.Content = &quot;Пользователь выбрал: &quot;&#43;box.Result;</pre>
+Если среда не позволяет плодить окна - в&#1084;есто Window использовать Popup &#43; UserControl, но в остально&#1084; все также.
+<p></p>
+<p></p>
+</div>

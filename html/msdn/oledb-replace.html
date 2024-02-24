@@ -1,0 +1,59 @@
+<h2>OleDB замена символа</h2>
+<p>Date: 20.11.2019 9:14:28</p>
+<div>
+<p>У &#1084;еня работает. Структура таблицы:</p>
+<p><img alt="access" src="https://social.msdn.microsoft.com/Forums/getfile/1506081"></p>
+<p>Код:</p>
+<pre class="prettyprint" style="">using System;
+using System.Data;
+using System.Data.OleDb;
+
+class Program
+{
+    
+    public static void Main()
+    {
+        
+        string file = @&quot;C:\Test\database1.mdb&quot;;
+        string p = &quot;Microsoft.ACE.OLEDB.12.0&quot;;
+        string tablename = &quot;Table1&quot;;
+
+        OleDbConnectionStringBuilder b = new OleDbConnectionStringBuilder();
+        b.Provider = p;
+        b.DataSource = file;
+        var constr = b.ConnectionString;
+        OleDbConnection conn = new OleDbConnection(constr);
+        
+        using (conn)
+        {
+            conn.Open();
+
+            OleDbCommand cmd = new OleDbCommand(&quot;SELECT * FROM Table1&quot;, conn);
+            OleDbDataReader rdr = cmd.ExecuteReader();
+            DataTable dt = new DataTable();
+            dt.Load(rdr);
+
+            foreach (DataColumn column in dt.Columns)
+            {
+                if (column.DataType == typeof(String))
+                {
+                    string query = &quot;UPDATE &quot; &#43; tablename &#43; &quot; SET [&quot; &#43; column.ColumnName &#43; &quot;] = Replace([&quot; &#43; column.ColumnName &#43; &quot;], \&quot;.\&quot;, \&quot;\&quot;);&quot;;
+
+                    using (cmd = new OleDbCommand(query, conn))
+                    {
+                        int res = cmd.ExecuteNonQuery();
+                        Console.WriteLine(&quot;Updated {0} records&quot;, res);
+                    }
+
+                }
+            }
+        }
+        
+        Console.ReadKey();
+    }
+}</pre>
+Выполняется бeз ошибок, си&#1084;вол за&#1084;еняется.<br/>
+<p></p>
+<p>Что в ваше&#1084; случае отличается? Провайдер ACE или Jet? Какие типы данных есть в таблице?</p>
+<br/>
+</div>

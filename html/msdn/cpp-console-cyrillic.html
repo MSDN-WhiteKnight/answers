@@ -1,0 +1,25 @@
+<h2>C++ - Вывод русского текста в консоль</h2>
+<p>Date: 23.04.2017 16:45:49</p>
+<div>
+<p>Детский вопрос, а Юникодо&#1084; то пользоваться не пробовали?</p>
+<pre class="prettyprint" style="font-family:inherit; outline:0px; list-style-type:none; word-wrap:normal; overflow-y:visible; overflow-x:auto; min-height:70px; color:#333333; font-size:14px">wprintf(L&quot;Тест&quot;);</pre>
+<br/>
+</div>
+<h2>Message 835</h2>
+<p>Date: 24.04.2017 11:45:30</p>
+<div>
+<p>Ваш код в '15 работал чудо&#1084;. Функция&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">OemToAnsi считалась устаревшей, наверное, уже в Windows 95. Вы &#1084;етод с Юникодо&#1084;
+ (в которо&#1084; количество кода, &#1084;ежду проче&#1084;, &#1084;еньше че&#1084; у вас) попробовали?&nbsp;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Для справки, printf и cout &gt;&gt; &nbsp;абсолютно эквивалентны.</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><strong>Edit:</strong> а, не за&#1084;етил, что пост с&nbsp;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">OemToAnsi(s,
+ s); не ваш. Тогда в че&#1084; ваша пробле&#1084;а, просто вывести текст? За&#1084;ените везде printf на wprintf, добавьте L к строка&#1084;, и все. Использование unicode дает &#1084;ножество преи&#1084;уществ.&nbsp;</span></p>
+<br/>
+<br/>
+</div>
+<h2>Message 834</h2>
+<p>Date: 24.04.2017 13:16:10</p>
+<div>
+<p>Ах да, забыл. Чтобы wprintf взлетело, надо в начало програ&#1084;&#1084;ы вставить&nbsp;setlocale(LC_ALL,&quot;Russian&quot;);</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Напри&#1084;ер какие преи&#1084;ущества&nbsp;у юникода?</em>&quot; - то что &#1084;ожно представить все си&#1084;волы &#1084;ира
+ в одной кодировке, и не за&#1084;орачиваться с текущей кодовой страницей ОС</span></p>
+</div>

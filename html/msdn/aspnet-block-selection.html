@@ -1,0 +1,40 @@
+<h2>ASP.NET - Запретить выделение текста в TextBox</h2>
+<p>Date: 02.01.2017 13:48:07</p>
+<div>
+<p>попробуйте так</p>
+<pre class="prettyprint">public void Page_Load(Object sender, EventArgs e)
+{
+    // Define the name and type of the client scripts on the page.
+    String csname1 = &quot;MyScript&quot;;    
+    Type cstype = this.GetType();
+
+    // Get a ClientScriptManager reference from the Page class.
+    ClientScriptManager cs = Page.ClientScript;
+    
+    string MyScript=@&quot;
+function SelectHandler(e){
+e = e || window.event;
+var targ = e.target || e.srcElement;
+targ.selectionEnd=targ.selectionStart;};	
+var inp = document.getElementById('&quot; &#43;
+textBox1.ClientID &#43; &quot;');inp.onselect = SelectHandler;&quot;;
+
+    cs.RegisterStartupScript(cstype, csname1, MyScript, true);
+        
+}</pre>
+<p></p>
+<p></p>
+</div>
+<h2>Message 1016</h2>
+<p>Date: 02.01.2017 15:46:22</p>
+<div>
+в с&#1084;ысле &quot;Курсоро&#1084;&quot;? Опишите подробнее, что вы хотите сделать.
+</div>
+<h2>Message 1015</h2>
+<p>Date: 02.01.2017 16:31:50</p>
+<div>
+<p>&quot;<em>Я прячу текст в textbox, хочу что его не было видно, но чтобы он сохранялся, я решил закрасить его в белый цвет</em>&quot;</p>
+<p>Отличный способ попасть в бан поисковых систе&#1084; :-) А к че&#1084;у это? Чтобы просто сохранить какой-то текст на странице не показывая пользователю, есть другие способы - напри&#1084;ер HiddenField.</p>
+<p>&quot;<em>хочу, чтобы он не выделялся при нажатии клавиш ctrl&#43;A</em>&quot;</p>
+<p>ну, &#1084;ое решение должно это обеспечить, попробуйте. у &#1084;еня не установлен на это&#1084; ко&#1084;пе ASP.NET, но с обычной HTML'овской&nbsp;Textarea работает</p>
+</div>

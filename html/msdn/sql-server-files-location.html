@@ -1,0 +1,29 @@
+<h2>SQL Server - Поместить файлы базы данных в другой каталог</h2>
+<p>Date: 03.05.2018 12:00:58</p>
+<div>
+<p>Не очень понятна суть вопроса. Можно указать и&#1084;я файла при создании базы:</p>
+<pre class="prettyprint lang-sql">CREATE DATABASE MyBase ON 
+( 
+  NAME = MyBase_dat,
+  FILENAME = 'C:\data\MyBase.mdf'
+)
+LOG ON
+( 
+  NAME = MyBase_log,
+  FILENAME = 'C:\data\MyBaseLog.ldf'    
+) ;</pre>
+<p>Можно отсоединить базу ко&#1084;андой</p>
+<pre class="prettyprint lang-sql">EXEC sp_detach_db 'MyBase', 'true';  </pre>
+<br/>
+<p>, пере&#1084;естить файлы, а зате&#1084; снова присоединить базу:</p>
+<pre class="prettyprint lang-sql">CREATE DATABASE MyBase
+      ON (FILENAME = 'D:\Data\MyNewBase.mdf') 
+      FOR ATTACH ;</pre>
+<br/>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<br/>
+</div>

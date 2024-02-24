@@ -1,0 +1,30 @@
+<h2>Изменить ориентацию PolarChart в Windows Forms</h2>
+<p>Date: 05.01.2022 18:47:04</p>
+<div>
+<p>Ду&#1084;аю бесс&#1084;ысленно ждать какого-либо исправления, учитывая это:&nbsp;<a href="https://github.com/dotnet/winforms-datavisualization">https://github.com/dotnet/winforms-datavisualization</a></p>
+<p><span style="color:#24292f; font-size:16px">We consider the&nbsp;</span><code style="">System.Windows.Forms.DataVisualization</code><span style="color:#24292f; font-size:16px">&nbsp;deprecated and we only provide it to ease porting to .NET Core 3. We're
+ not going to innovate in this component and subsequently will not accept any issues and/or PRs.</span></p>
+<p>Даже если это поправят, то не в составе <span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+.Net Framework 4.8</span>, а в виде отдельной библиотеки, только для .NET Core. Кро&#1084;е того, хоть IsReversed и не работает, &#1084;ожно просто у&#1084;ножить координаты на -1 и добиться того же са&#1084;ого.</p>
+<p></p>
+</div>
+<h2>Message 12</h2>
+<p>Date: 10.01.2022 18:10:16</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&gt;Только цифирь кривая.</span></p>
+<p>Точно, слона то я и не при&#1084;етил. Если просто у&#1084;ножить координаты на -1, числа-подписи на от&#1084;етках сетки будут не соответствовать реальны&#1084; значения&#1084;. Но на это нашлось решение здесь:
+<a href="https://social.msdn.microsoft.com/Forums/vstudio/en-US/644cb066-3501-417e-8610-6e3340fe6a95/how-to-change-polar-chart-orientation?forum=MSWinWebChart">
+https://social.msdn.microsoft.com/Forums/vstudio/en-US/644cb066-3501-417e-8610-6e3340fe6a95/how-to-change-polar-chart-orientation?forum=MSWinWebChart</a>&nbsp;- нужно еще вертануть подписи, добавив обработчик события Customize:</p>
+<pre class="prettyprint">        private void chart1_Customize(object sender, EventArgs e)
+        {
+            for (int i = 1; i &lt; chart1.ChartAreas[0].AxisX.CustomLabels.Count; i&#43;&#43;)
+            {
+                chart1.ChartAreas[0].AxisX.CustomLabels[i].Text = (360.0 - i*30.0).ToString();
+            }
+        }</pre>
+<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&gt;У нас в Ал&#1084;а-Ате пробле&#1084;ы,</span><br style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">поэто&#1084;у интернет заработал только сейчас.</span><br/>
+<br/>
+<p>Ваши пробле&#1084;ы были во всех новостях по ящику во вре&#1084;я новогодних праздников. Удачи ва&#1084;, надеюсь в скоро&#1084; вре&#1084;ени все нор&#1084;ализуется, как с интернето&#1084;, так и с &#1084;ирной жизнью на улицах.&nbsp;</p>
+<p></p>
+</div>

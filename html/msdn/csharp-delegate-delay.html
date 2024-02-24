@@ -1,0 +1,42 @@
+<h2>C# - Выполнение делегата с заданной минимальной задержкой</h2>
+<p>Date: 23.02.2019 14:45:52</p>
+<div>
+<p>Напри&#1084;ер, так:</p>
+<pre class="prettyprint" style="">using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading;
+using System.Diagnostics;
+
+namespace ConsoleTest
+{
+    class Program
+    {
+        static void DoSomething() 
+	{ 
+		//...
+	}
+
+        public static void ExecuteWithDelay(Action deleg, int delay)
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            deleg();
+            if (sw.ElapsedMilliseconds &lt; delay)
+            {
+                Thread.Sleep(delay - (int)sw.ElapsedMilliseconds);
+            }            
+        }
+
+        static void Main(string[] args)
+        {            
+            ExecuteWithDelay(DoSomething, 300);   
+        }
+    }
+}
+
+</pre>
+<br/>
+<p></p>
+<br/>
+</div>

@@ -1,0 +1,26 @@
+<h2>.NET Framework - Не находит JRO.JetEngine</h2>
+<p>Date: 26.06.2019 8:12:00</p>
+<div>
+<p>&quot;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>Я так понял в ссылках проекта не указана какая-то COM библиотека?</em></span>&quot;</p>
+<p>Нет, причина в друго&#1084;. JRO.JetEngine (как и &#1084;ногие другие COM API вре&#1084;ен Windows 2000) существует только в 32-разрядно&#1084; исполнении. Вы же пытаетесь обратиться к не&#1084;у из 64-разрядного приложения, и его не находит. Какая тут связь
+ с <span style="color:#545454; font-family:arial,sans-serif; font-size:small">Access 2010 Database Engine</span>, я пока не понял. JRO - это, насколько я пони&#1084;аю, библиотека и&#1084;енно старого Jet.</p>
+</div>
+<h2>Message 225</h2>
+<p>Date: 26.06.2019 14:22:45</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>А какие способы сжатия баз данных есть, которые будут работать в&nbsp;</em></span><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><em>64-разрядно&#1084;
+ приложении?</em>&quot;</span></p>
+<p><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px">Вот это &#1084;ожет быть:&nbsp;</span><a href="https://docs.microsoft.com/ru-ru/office/client-developer/access/desktop-database-reference/dbengine-compactdatabase-method-dao">https://docs.microsoft.com/ru-ru/office/client-developer/access/desktop-database-reference/dbengine-compactdatabase-method-dao</a>
+ ?</p>
+<p><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"></span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Мне
+ нужно после удаления всех записей с базы обнулить счетчик. Это реально сделать каки&#1084; либо други&#1084; способо&#1084;?</em>&quot;</span></p>
+<p>Под счетчико&#1084; вы пони&#1084;аете поле с автоинкре&#1084;енто&#1084;? Как вариант - пересоздать таблицы заново.&nbsp;</p>
+<p>По остально&#1084;у - даже не знаю. Раз&#1084;ер БД вряд ли напря&#1084;ую связан со счетчика&#1084;и. Как ведет себя раз&#1084;ер БД при различных операциях, проще всего, я ду&#1084;аю, проверить экспери&#1084;ентально.</p>
+<p></p>
+<br/>
+</div>
+<h2>Message 224</h2>
+<p>Date: 26.06.2019 16:40:24</p>
+<div>
+<p>Можно завернуть этот функционал в отдельное 32-разрядное консольное приложение и вызывать его из WPF. Если вас интересует только сжатие, то даже особого &#1084;еханиз&#1084;а IPC делать не надо, достаточно вызывать из ко&#1084;андной строки.&nbsp;</p>
+</div>

@@ -1,0 +1,88 @@
+<h2>Добавление надписи на изображение в C#</h2>
+<p>Date: 17.06.2019 6:50:58</p>
+<div>
+<p>У вас идет рисование на PictureBox. Чтобы обрабатывать файлы без отображения, нужно как-то отделить обработку от GUI, т.е. реализовать рисование на са&#1084;о&#1084; объекте Image.</p>
+<p>Вынесите добавление надписи в отдельный &#1084;етод:</p>
+<pre class="prettyprint">using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Text;
+
+namespace WindowsFormsApp1
+{
+    public static class ImageEditor
+    {
+        public static void AddText(Image img, string text, Font font, Brush br, Point position)
+        {
+            Graphics g = Graphics.FromImage(img);
+
+            using (g)
+            {
+                g.DrawString(text, font, br, position);
+            }
+        }
+    }
+}</pre>
+<p>Тогда добавление ее на все файлы в каталоге &#1084;ожно реализовать так:</p>
+<pre class="prettyprint">using System;
+using System.IO;
+using System.Drawing;
+using System.Collections.Generic;
+using System.Text;
+using System.Windows.Forms;
+using System.Threading.Tasks;
+
+namespace WindowsFormsApp1
+{
+    public partial class Form1 : Form
+    {        
+        public Form1()
+        {
+            InitializeComponent();            
+        }
+
+        void ProcessDirectory(string dir,string pattern,string text)
+        {
+            string[] files = Directory.GetFiles(dir,pattern);            
+
+            //обрабатывае&#1084; файлы в каталоге
+            for (int i = 0; i &lt; files.Length; i&#43;&#43;)
+            {                
+                var bmp = new Bitmap(files[i]); //загрузка изображения                                
+                Bitmap copy = new Bitmap(bmp); //создае&#1084; копию для обработки
+                bmp.Dispose(); //освобождае&#1084; файл
+
+                using (copy)
+                {
+                    //добавляе&#1084; надпись
+                    ImageEditor.AddText(copy, text, SystemFonts.CaptionFont, Brushes.Black, new Point(0, 0));
+
+                    //сохраняе&#1084; файл
+                    copy.Save(files[i]);
+                }
+            }
+
+            string[] dirs = Directory.GetDirectories(dir);
+
+            //обрабатывае&#1084; подкаталоги
+            for (int i = 0; i &lt; dirs.Length; i&#43;&#43;)
+            {
+                ProcessDirectory(dirs[i],pattern,text);
+            }
+        }        
+
+        private async void button1_Click(object sender, EventArgs e)
+        {            
+            string text = textBox1.Text;
+            await Task.Run(() =&gt; { ProcessDirectory(&quot;c:\\test\\images&quot;, &quot;*.png&quot;,text); });
+            MessageBox.Show(&quot;Completed!&quot;);
+        }      
+    }  
+}
+</pre>
+<br/>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+</div>

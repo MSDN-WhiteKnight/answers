@@ -1,0 +1,8 @@
+<h2>Отправка ATA-команд устройству в Windows</h2>
+<p>Date: 24.10.2017 8:54:34</p>
+<div>
+Пос&#1084;отрите в доку&#1084;ентации по <a href="http://www.t13.org/documents/uploadeddocuments/docs2006/d1699r3f-ata8-acs.pdf">
+АТА-ко&#1084;&#1084;анда&#1084;</a>. Нужно в&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">ioctl передать структуру&nbsp;</span><a href="https://msdn.microsoft.com/en-us/library/ff551323%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396">ATA_PASS_THROUGH_EX</a>
+ с установленны&#1084; кодо&#1084; ко&#1084;анды и с&#1084;ещение&#1084; буфера,&nbsp;и пото&#1084; буфер данных определенной структуры. Только аккуратно, начните с более простых ко&#1084;анд.<br/>
+<br/>
+</div>

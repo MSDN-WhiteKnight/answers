@@ -1,0 +1,58 @@
+<h2>Чтение таблиц в Microsoft Word</h2>
+<p>Date: 13.04.2018 5:41:42</p>
+<div>
+<p>&quot;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>К сожалению,не нашел нужного &#1084;етода преобразования значения ячейки в строку</em></span>&quot;</p>
+<pre class="prettyprint" style="">Word.Range range = tbl.Cell(i, 1).Range;
+Console.WriteLine(range.Text);</pre>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Как из&#1084;енить этот код, чтобы предупреждения не возникали?</em>&quot;</span><br/>
+</p>
+<pre class="prettyprint" style="">((Word._Document)doc).Close();
+((Word._Application)word).Quit();</pre>
+<p><br/>
+</p>
+<p></p>
+<p></p>
+<p><br/>
+</p>
+</div>
+<h2>Message 483</h2>
+<p>Date: 20.04.2018 3:17:08</p>
+<div>
+<p>А да, забыл про популярные грабли - текст в ячейках вордовской таблицы содержит управляющие си&#1084;волы, которые &#1084;огут испортить вывод в консоль (возврат каретки) и сравнение строк. Чтобы нор&#1084;ально работать со строка&#1084;и, нужно от них избавиться:</p>
+<pre class="prettyprint">            string find = &quot;example&quot;;
+            
+            for (int i = 1; i &lt;= numRows; i&#43;&#43;)
+            {
+                for (int j = 1; j &lt;= numCols; j&#43;&#43;)
+                {
+                    try
+                    {
+                        string text = tbl.Cell(i, j).Range.Text;
+                        text = text.Replace(&quot;\r&quot;, &quot;&quot;);
+                        text = text.Replace(&quot;\a&quot;, &quot;&quot;);
+                        Console.Write(&quot;(&quot; &#43; i.ToString() &#43; &quot;-&quot; &#43; j.ToString() &#43; &quot;): &quot; &#43; text);
+                        if (find == text) Console.Write(&quot; - Found&quot;);
+                        Console.WriteLine();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.ToString());
+                    }
+                } 
+            }</pre>
+<p></p>
+</div>
+<h2>Message 478</h2>
+<p>Date: 23.04.2018 18:51:00</p>
+<div>
+<p>Пере&#1084;ещаться просто - у таблицы есть свойство Rows, по которо&#1084;у &#1084;ожно пройти foreach. У Row соответственно, брать свойство Cells (ну или начинать с первой ячейки и дальше переходить, пользуясь свойство&#1084; Cell.Next).</p>
+<p>По второ&#1084;у, как ни странно, нор&#1084;ально способа нет. Читайте здесь, &#1084;ного понаписано на эту те&#1084;у:&nbsp;<a href="https://ru.stackoverflow.com/q/805934/240512">https://ru.stackoverflow.com/q/805934/240512</a></p>
+</div>
+<h2>Message 477</h2>
+<p>Date: 26.04.2018 3:02:17</p>
+<div>
+У Row есть свойство Cells, которое и позволяет получить все ячейки. С&#1084;отрите в
+<a href="https://msdn.microsoft.com/ru-ru/library/microsoft.office.interop.word.row_members.aspx">
+доку&#1084;ентации</a>
+</div>

@@ -1,0 +1,7 @@
+<h2>Отключение устройства с помощью WinAPI</h2>
+<p>Date: 18.11.2019 3:24:56</p>
+<div>
+Да, существует, функция Setup API&nbsp;<a href="https://docs.microsoft.com/en-us/windows/win32/api/setupapi/nf-setupapi-setupdicallclassinstaller">SetupDiCallClassInstaller</a>&nbsp;в сочетании с флаго&#1084;&nbsp;DICS_DISABLE в структуре&nbsp;<a href="https://docs.microsoft.com/ru-ru/windows/win32/api/setupapi/ns-setupapi-sp_propchange_params">SP_PROPCHANGE_PARAMS</a>.
+ При&#1084;ер использования &#1084;ожно пос&#1084;отреть напри&#1084;ер здесь:&nbsp;<a href="https://ru.stackoverflow.com/a/816732/240512">https://ru.stackoverflow.com/a/816732/240512</a> На практике, правда, если нужно просто програ&#1084;&#1084;но отключить
+ устройство, проще будет наверное вызвать из консоли какой-нибудь devcon, че&#1084; за&#1084;орачиваться напря&#1084;ую работать с API.&nbsp;&nbsp;
+</div>

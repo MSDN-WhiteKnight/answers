@@ -1,0 +1,28 @@
+<h2>Работа с реестром в UWP</h2>
+<p>Date: 15.12.2017 10:00:07</p>
+<div>
+Мы же не знае&#1084;, че&#1084; у вас оконное приложение отличается от консольного. Может вы просто в не&#1084; не включили &lt;windows.h&gt;. С ваши&#1084; кодо&#1084; пробле&#1084; нет, приведите чуть больше контекста, что за проект и т.п.
+</div>
+<h2>Message 591</h2>
+<p>Date: 15.12.2017 15:06:02</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&gt; Почти ниче&#1084; не отличается, вот весь код</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&gt; MainPage.xaml.cpp</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Please...&nbsp;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Это проект UWP? В проектах UWP функции работы с реестро&#1084; недоступны.</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+</div>
+<h2>Message 590</h2>
+<p>Date: 15.12.2017 19:29:30</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>как это обойти? Очень нужно</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Никак (кро&#1084;е создания отдельного веб-сервиса, который будет скар&#1084;ливать приложению эти данные). Приложению, которо&#1084;у
+ нужна инфор&#1084;ация о процессоре, в UWP явно делать нечего.&nbsp;</span></p>
+</div>
+<h2>Message 589</h2>
+<p>Date: 16.12.2017 10:02:39</p>
+<div>
+<p>В UWP есть класс&nbsp;<a href="https://docs.microsoft.com/en-us/uwp/api/windows.devices.enumeration.deviceinformation">DeviceInformation</a>, воз&#1084;ожно из него удастся что-то вытянуть. Судя по все&#1084;у, это урезанная обертка над Setup API.</p>
+<p>Если будете на C# писать (традиционное настольное приложение), инфор&#1084;ацию об оборудовании лучше брать через WMI (System.Management), а не напря&#1084;ую из реестра. Вообще, и на С&#43;&#43; нежелательно сильно зависеть от структуры реестра, так как
+ она &#1084;ожет из&#1084;ениться в новых версиях ОС. Лучше использовать, в зависи&#1084;ости от ситуации, либо Setup API, либо напря&#1084;ую
+<a href="https://ru.stackoverflow.com/a/753935/240512">данные таблицы SMBIOS</a> , либо тот же WMI.</p>
+</div>

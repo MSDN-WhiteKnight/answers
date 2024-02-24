@@ -1,0 +1,19 @@
+<h2>Несколько await подряд в C#</h2>
+<p>Date: 16.05.2019 6:15:37</p>
+<div>
+<p>Когда await FooAsync возвращает что-то, что тоже &#1084;ожно ждать (т.е. и&#1084;еющее &#1084;етод GetAwaiter). Напри&#1084;ер, когда FooAsync возвращает Task&lt;Task&lt;string&gt;&gt;.</p>
+<p>Где это &#1084;ожно при&#1084;енить на практике - затрудняюсь сказать. В качестве абсурдного при&#1084;ера - если определить вот такой класс:</p>
+<pre class="prettyprint" style="">class T : System.Runtime.CompilerServices.INotifyCompletion
+{
+            public T GetAwaiter() =&gt; this;
+            public void OnCompleted(Action continuation) {  }
+            public bool IsCompleted =&gt; true;
+            public T GetResult() =&gt; this;
+            public static T Foo() =&gt; new T();
+}</pre>
+То вызов вида &quot;await await await await await await T.Foo();&quot; успешно ско&#1084;пилируется для любого количества await (но, разу&#1084;еется, не будет и&#1084;еть никакого види&#1084;ого эффекта)<br/>
+<p></p>
+&nbsp;<br/>
+<br/>
+<br/>
+</div>

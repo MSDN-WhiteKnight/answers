@@ -1,0 +1,28 @@
+<h2>Сборка приложения .NET Core в EXE-файл</h2>
+<p>Date: 18.04.2019 9:41:33</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Я так полагаю что студия ду&#1084;ает будто я буду са&#1084;олично эту библиотеку вызывать через ко&#1084;андную строку чтобы
+ ей воспользоваться или что....</em> &quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Вы будете с&#1084;еяться, но ответ - &quot;<strong>Да</strong>&quot;... В .NET Core стандартный вариант - это распространение DLL, запускае&#1084;ого
+ через ко&#1084;анду &quot;dotnet&quot; ко&#1084;андной строки. Причина в то&#1084;, что&nbsp;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">.NET Core работает на &#1084;ногих ОС,
+ не все из которых используют фор&#1084;ат EXE (PE) для исполняе&#1084;ых файлов, а способ с ко&#1084;андной строкой универсален для всех ОС.
+</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Чтобы сгенерировать для приложения обычный EXE, необходи&#1084;о сконфигурировать проект определенны&#1084; образо&#1084;:&nbsp;</span><a href="https://blogs.msdn.microsoft.com/luisdem/2017/03/19/net-core-1-1-how-to-publish-a-self-contained-application/">https://blogs.msdn.microsoft.com/luisdem/2017/03/19/net-core-1-1-how-to-publish-a-self-contained-application/</a><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+<p></p>
+</div>
+<h2>Message 258</h2>
+<p>Date: 18.04.2019 18:58:57</p>
+<div>
+<p>Да, &quot;<span style="font-family:Consolas,Menlo,Monaco,'Lucida Console','Liberation Mono','DejaVu Sans Mono','Bitstream Vera Sans Mono','Courier New',monospace,sans-serif; font-size:12.8px; background-color:#fafafa">dotnet app.dll&quot;. Делать переход
+ в каталог вроде не нужно, так как он прописывается в PATH.</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>а люди, приду&#1084;авшие такой способ старта приложения не ду&#1084;али каково будет конечно&#1084;у пользователю</em>&quot;</span>&nbsp;</p>
+<p>Обычно создается инсталлятор, который создает ярлык на рабоче&#1084; столе или в систе&#1084;но&#1084; &#1084;еню. Пользователь просто нажи&#1084;ает на ярлык и не заду&#1084;ывается, какой и&#1084;енно тип файла запускается.&nbsp;</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>раз в студии изначально отсутсвует&nbsp; ко&#1084;пиляция в exe как таковая, значит либо &#1084;ир с у&#1084;а сходит либо я
+ чего то не недопони&#1084;аю</em>.&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Прочитайте вни&#1084;ательно статью, ссылку на которую я дал. В .NET Core &quot;ко&#1084;пиляция&quot; (точнее построение) - это процесс
+ получения DLL, не привязанной к конкретной ОС. Получение исполняе&#1084;ых файлов, заточенных под конкретную ОС, это отдельный процесс, называе&#1084;ый публикацией. Он отделен от построения, так как на этапе отладки без разницы, что и&#1084;енно запускать;
+ заточенные под конкретные ОС пакеты нужны только на этапе развертывания готового приложения.
+</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Вроде это не сильно отличается от Java, где ко&#1084;пилятор стандартно выдает кроссплатфор&#1084;енный JAR-файл, а для получения EXE нужны
+ дополнительные действия?</span></p>
+</div>

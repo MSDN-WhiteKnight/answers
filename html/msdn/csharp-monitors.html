@@ -1,0 +1,31 @@
+<h2>Получение информации о мониторах в C#</h2>
+<p>Date: 05.03.2018 11:10:41</p>
+<div>
+<p>Есть два WMI-класса,&nbsp;Win32_DesktopMonitor (в root\\CIMV2) и&nbsp;WmiMonitorID (root\\WMI). Один из них должен давать полный список физических &#1084;ониторов&nbsp;(<a href="https://stackoverflow.com/a/3491661/8674428">При&#1084;ер работы с WMI</a>)</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>не плохо было бы если у виндовс было бы какое нить сабытие которое сигнализировало что подключился какой нить &#1084;онитор</em>&quot;</span><br/>
+</p>
+<p>Оно есть (правда не для &#1084;ониторов конкретно, а для всех устройств): <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa363480(v=vs.85).aspx">
+Сообщение WM_DEVICECHANGE</a> с кодо&#1084; DBT_DEVNODES_CHANGED. Рассылается все&#1084; окна&#1084; верхнего уровня при любо&#1084; отключении или подключении устройства. В WinForms легко его обработать, переопределяя WndProc у фор&#1084;ы.<br/>
+</p>
+<p></p>
+<p></p>
+<br/>
+</div>
+<h2>Message 509</h2>
+<p>Date: 05.03.2018 11:56:24</p>
+<div>
+<p>Насколько я знаю, порядкового но&#1084;ера &#1084;онитора как отдельного пара&#1084;етра не существует. Панель управления их генерирует на лету, просто для наглядности, но в систе&#1084;е они нигде не прописаны. Соответственно нет и способа их получить програ&#1084;&#1084;но.</p>
+<p>Если нужно просто отличить один &#1084;онитор от другого, &#1084;ожно использовать DeviceID или серийный но&#1084;ер из данных WMI. На основе их уже построить свою таблицу с но&#1084;ера&#1084;и и их показывать пользователю.</p>
+</div>
+<h2>Message 508</h2>
+<p>Date: 06.03.2018 17:08:53</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>А еще какие нить&nbsp;Win инфор&#1084;ацию о &#1084;ониторах дают?</em>&quot;</span></p>
+<p>Да, целый &#1084;ешок.&nbsp;<a href="https://stackoverflow.com/q/18022612/8674428">Пос&#1084;отрите здесь.</a>&nbsp;Из перечисленных для вас будут явно бесполезны&nbsp;EnumDisplayMonitors (так как она дает то же са&#1084;ое, что&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Screen.AllScreens
+ в .NET) и&nbsp;</span>Setup API (он даст только то, что отображается в диспетчере устройств). Все остальное более-&#1084;енее заслуживает расс&#1084;отрения, хотя будет и трудновато задекларировать это все для C#.</p>
+<p><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px">&quot;<em>а то у&nbsp;</em></span><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><em>Win32_DesktopMonitor&nbsp;
+ и&nbsp;</em></span><span style="border:0px; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; margin:0px; outline:0px; padding:0px; color:#333333; font-size:14px"><em>WmiMonitorID&nbsp;&nbsp;</em></span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>InstanceName
+ и&nbsp;PNPDeviceID почти похожи но все равно разные, даже объединить нету по како&#1084;у либо пара&#1084;етру</em>.&quot;</span></p>
+<p>Ну, види&#1084;о, приходиться признать, что&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">InstanceName это&nbsp;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">PNPDeviceID
+ &#43; некоторая приписка, и так их сравнивать. Нигде больше это&nbsp;</span>&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">InstanceName не фигурирует.</span></p>
+</div>

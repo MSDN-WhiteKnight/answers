@@ -1,0 +1,35 @@
+<h2>Проверка переполнения при арифметических операциях в C++</h2>
+<p>Date: 14.03.2018 5:58:41</p>
+<div>
+<p>Собственно, вы са&#1084;и ответили: стандартного способа нет. Ваши проверки работают, но лучше бы использовать специальные функции ко&#1084;пилятора для этих целей. Ду&#1084;аю, так быстрее будет (хотя, я не из&#1084;ерял), да и код получается более естественный.</p>
+<p>В Visual Studio - <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ff516460%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396">
+функции из&nbsp;Intsafe.h</a></p>
+<pre class="prettyprint" style=""><p>#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;windows.h&gt;
+#include &lt;tchar.h&gt;
+#include &lt;Intsafe.h&gt;
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	ULONGLONG  a=100000000000, b=5000000000, c;
+
+	HRESULT hr = ULongLongMult(a,b,&amp;c);</p><p>	if(SUCCEEDED(hr)) printf(&quot;Result is %llu&quot;,c);
+	else if(hr==INTSAFE_E_ARITHMETIC_OVERFLOW) printf(&quot;Overflow&quot;);
+	else printf(&quot;Error occured&quot;);
+	
+	return 0;
+}</p></pre>
+<p>(Для использования операций со знаковы&#1084;и числа&#1084;и нужно определить ENABLE_INTSAFE_SIGNED_FUNCTIONS перед включение&#1084; заголовочного файла.)
+</p>
+<p>Эти функции определены как inline, в зависи&#1084;ости от архитектуры процессора они используют либо intrinsic-функции ко&#1084;пилятора, либо специальный алгорит&#1084; с разбиение&#1084; операндов на 2 32-битных ко&#1084;понента, позволяющий отловить переполнение
+ по значения&#1084; определенных битов. Можно открыть са&#1084; заголовочный файл и пос&#1084;отреть.</p>
+<p>В GCC -&nbsp;<a href="https://gcc.gnu.org/onlinedocs/gcc/Integer-Overflow-Builtins.html">builtin-функции</a><br/>
+</p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<br/>
+<br/>
+</div>

@@ -1,0 +1,54 @@
+<h2>NAudio - Отправка MP3-потока на сервер</h2>
+<p>Date: 08.12.2016 5:40:45</p>
+<div>
+<p><span style="color:#333333"><span style="font-size:14px">&quot;Либо это заголовки (mp3 заголовки) каждого отправленного пакета&quot;, насколько я знаю, у фор&#1084;ата MPEG нет общего файлового заголовка, есть заголовки отдельных кадров. Ду&#1084;аю пробле&#1084;а
+ в задержке записи/ считывания файла. Есть ли в NAudio воз&#1084;ожность&nbsp;сфор&#1084;ировать mp3 в па&#1084;яти без записи в файл?</span></span></p>
+<p><span style="color:#333333"><span style="font-size:14px">&nbsp;Вообще я считаю, правильное решение должно основываться на DirectShow и использовать:</span></span></p>
+<p><span style="color:#333333"><span style="font-size:14px">-свой исходный фильтр, получающий данные с аудио-выхода,</span></span></p>
+<p><span style="color:#333333"><span style="font-size:14px">-любой и&#1084;еющийся фильтр-ко&#1084;прессор MP3 потока,</span></span></p>
+<p><span style="color:#333333"><span style="font-size:14px">-свой фильтр вывода, отправляющий данные на сервер.</span></span></p>
+<p><span style="color:#333333"><span style="font-size:14px">Реализации DirectShow под .Net есть, я не знаю, позволяют ли они создавать свои фильтры (а это здесь похоже понадобиться)</span></span></p>
+</div>
+<h2>Message 1039</h2>
+<p>Date: 16.12.2016 19:09:49</p>
+<div>
+<p>Есть идея. Что если в&#1084;есто</p>
+<pre class="prettyprint">            var fileBufMp3 = File.ReadAllBytes(&quot;out.mp3&quot;);
+ 
+            //шлё&#1084; на сервер
+            netshout.SendSteam(fileBufMp3);</pre>
+<p>сделать так:</p>
+<pre class="prettyprint"><p>int buffer_size=100;</p><p>int result;//amount of bytes actually read</p><p>byte[] buffer;//bytes read from file</p><p>byte[] send_mas;//bytes to send into server</p><p>FileStream fs=new FileStream(&quot;out.mp3&quot;);</p><p>using(fs){</p><p> while(true)</p><p> {</p><p>  buffer=new byte[buffer_size];</p><p>  result=fs.Read(buffer,0,buffer_size);</p><p>  if(result&lt;=0)break;//end of file</p><p>  send_mas=new byte[result];</p><p>  System.Array.Copy(buffer,send_mas,result);</p><p>  //шлё&#1084; на сервер<br/>  netshout.SendSteam(send_mas);</p><p> } 
+}          </p></pre>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+пара&#1084;етр buffer_size нужно будет опытны&#1084; путе&#1084; подобрать опти&#1084;альный<br/>
+</div>
+<h2>Message 1038</h2>
+<p>Date: 17.12.2016 8:05:25</p>
+<div>
+<p>вот тут нашел: <a href="http://stackoverflow.com/questions/19058530/change-format-from-wav-to-mp3-in-memory-stream-in-naudio">
+http://stackoverflow.com/questions/19058530/change-format-from-wav-to-mp3-in-memory-stream-in-naudio</a></p>
+<p>у&nbsp;<span class="typ">LameMP3FileWriter есть конструктор, который первы&#1084; аргу&#1084;енто&#1084; прини&#1084;ает Stream. &#1084;ожно е&#1084;у попробовать&nbsp;скор&#1084;ить MemoryStream:</span></p>
+<pre class="prettyprint">public static byte[] ConvertWavToMp3(byte[] wavFile)
+        {
+
+            using(var retMs = new MemoryStream())
+            using (var ms = new MemoryStream(wavFile))
+            using(var rdr = new WaveFileReader(ms))
+            using (var wtr = new LameMP3FileWriter(retMs, rdr.WaveFormat, 128))
+            {
+                rdr.CopyTo(wtr);
+                return retMs.ToArray();
+            }
+
+
+        }</pre>
+<br/>
+<p><span class="typ"></span><a href="http://stackoverflow.com/questions/19058530/change-format-from-wav-to-mp3-in-memory-stream-in-naudio"></a></p>
+</div>

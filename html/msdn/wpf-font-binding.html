@@ -1,0 +1,106 @@
+<h2>WPF привязка шрифтов</h2>
+<p>Date: 13.05.2019 6:45:18</p>
+<div>
+<p>Использовать привязки для шрифта, конечно же, &#1084;ожно (не к &quot;функции&quot; только, а к свойству). Что до раз&#1084;еров эле&#1084;ентов, то подстраивать их в коде под раз&#1084;ер шрифта нет необходи&#1084;ости, так как WPF у&#1084;еет делать это
+ авто&#1084;атически. Ва&#1084; нужно спроектировать &#1084;акет окна без жесткого задавания раз&#1084;еров, и привязать свойство FontSize к ваше&#1084;у классу:</p>
+<pre class="prettyprint">&lt;Window
+        xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;
+        xmlns:x=&quot;http://schemas.microsoft.com/winfx/2006/xaml&quot;
+        xmlns:d=&quot;http://schemas.microsoft.com/expression/blend/2008&quot;
+        xmlns:mc=&quot;http://schemas.openxmlformats.org/markup-compatibility/2006&quot;        
+        mc:Ignorable=&quot;d&quot;
+        x:Class=&quot;WpfApp1.MainWindow&quot;
+        Title=&quot;MainWindow&quot; Height=&quot;400&quot; Width=&quot;600&quot; FontSize=&quot;{Binding Path=FontSize, Mode=TwoWay}&quot;&gt;
+
+    &lt;StackPanel HorizontalAlignment=&quot;Stretch&quot; VerticalAlignment=&quot;Stretch&quot;&gt;
+        &lt;Label Content=&quot;Hello, World&quot; HorizontalAlignment=&quot;Left&quot;  VerticalAlignment=&quot;Top&quot; Margin=&quot;10&quot;
+               Background=&quot;{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}&quot; FontFamily=&quot;Arial&quot; FontWeight=&quot;Bold&quot;  /&gt;
+        &lt;TextBlock HorizontalAlignment=&quot;Left&quot;   TextWrapping=&quot;Wrap&quot; Margin=&quot;10&quot;
+                   Text=&quot;Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua&quot; 
+                   VerticalAlignment=&quot;Top&quot; Width=&quot;289.076&quot; 
+                   Background=&quot;{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}&quot;/&gt;
+        &lt;Button Content=&quot;Increase font size&quot; HorizontalAlignment=&quot;Left&quot;  Margin=&quot;10&quot; 
+                VerticalAlignment=&quot;Top&quot;  Click=&quot;Button_Click&quot;/&gt;
+
+    &lt;/StackPanel&gt;
+&lt;/Window&gt;</pre>
+<br/>
+<pre class="prettyprint">using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.ComponentModel;
+
+namespace WpfApp1
+{
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.DataContext = Params.Instance;
+            
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Params.Instance.FontSize&#43;&#43;;
+        }
+    }
+
+    public class Params:INotifyPropertyChanged
+    {
+        int _FontSize=12;
+
+        public int FontSize
+        {
+            get
+            {
+                return _FontSize;
+            }
+            set
+            {
+                if (value != _FontSize)
+                {
+                    _FontSize = value;
+                    OnPropertyChanged(&quot;FontSize&quot;);
+                }
+            }
+        }
+
+        Params()
+        {
+            
+        }
+
+        static Params _instance;
+
+        void OnPropertyChanged(string prop)
+        {
+            PropertyChangedEventHandler h = PropertyChanged;
+            if (h != null)
+            {
+                h(this, new PropertyChangedEventArgs(prop));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public static Params Instance
+        {
+            get {
+                if (_instance == null) _instance = new Params();
+                return _instance;
+            }
+        }
+    }
+
+    
+}</pre>
+<br/>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+</div>

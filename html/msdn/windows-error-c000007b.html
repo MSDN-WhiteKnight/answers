@@ -1,0 +1,13 @@
+<h2>Windows - Ошибка NTSTATUS 0xc000007b</h2>
+<p>Date: 16.08.2018 10:32:37</p>
+<div>
+<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">0xc000007b =&nbsp;</span><span style="color:#2a2a2a; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:13px"><a href="https://msdn.microsoft.com/en-us/library/cc704588.aspx?f=255&MSPPError=-2147217396">STATUS_INVALID_IMAGE_FORMAT</a>.
+ Воз&#1084;ожно, вы используете DLL не той разрядности (напри&#1084;ер, 64-битную для 32-битного приложения, или наоборот) или поврежденную.</span><br/>
+</div>
+<h2>Message 396</h2>
+<p>Date: 16.08.2018 16:20:56</p>
+<div>
+Нет, путь к ntdll.dll правильный. Очевидно, пробле&#1084;а с другой dll - той, которой
+<strong>нет</strong> в списке, так ее загрузка упала с ошибкой. Пос&#1084;отрите те dll, от которых зависит програ&#1084;&#1084;а (кро&#1084;е систе&#1084;ных), у них должна быть 32-битная и 64-битная версии. Програ&#1084;&#1084;е нужно подложить правильную
+ версию (в ваше&#1084; случае, види&#1084;о, 32-битную).&nbsp;
+</div>

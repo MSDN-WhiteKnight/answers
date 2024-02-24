@@ -1,0 +1,18 @@
+<h2>ReportViewer серверные отчеты</h2>
+<p>Date: 22.05.2017 14:38:49</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Подскажите что делаю не так?</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>LocalReport</em>&quot;&nbsp;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>Отчет&nbsp;</em></span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>лежит
+ удаленно на сервере отчетов</em></span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Види&#1084;о это. Для удаленных отчетов, нужно использовать свойство&nbsp;<a href="https://msdn.microsoft.com/en-us/library/microsoft.reporting.winforms.reportviewer.serverreport.aspx">ServerReport</a></span></p>
+</div>
+<h2>Message 804</h2>
+<p>Date: 22.05.2017 15:07:13</p>
+<div>
+<p>Воз&#1084;ожно, сеанс протухает из-за того, что отчет грузиться слишко&#1084; долго, или &#1084;ежду клиенто&#1084; и серверо&#1084; несоответствие по вре&#1084;ени. Попробуйте:
+</p>
+<p>- увеличить значение ServerReport.Timeout;</p>
+<p>- проверить настройки вре&#1084;ени на сервере и клиенте;</p>
+<p>- добавить вызов reportViewer1.Reset() перед установкой пара&#1084;етров.</p>
+</div>

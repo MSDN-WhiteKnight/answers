@@ -1,0 +1,11 @@
+<h2>Взаимодействие Matlab и .NET</h2>
+<p>Date: 14.11.2016 10:05:55</p>
+<div>
+<p>как я пони&#1084;аю, Matlab Compiler ко&#1084;пилирует неуправляе&#1084;ые DLL. Про взаи&#1084;одействие с неуправляе&#1084;ы&#1084; кодо&#1084; написано здесь:&nbsp;<a href="https://msdn.microsoft.com/ru-ru/library/sd10k43k(v=vs.110).aspx">https://msdn.microsoft.com/ru-ru/library/sd10k43k(v=vs.110).aspx</a></p>
+<p>Если по просто&#1084;у - ва&#1084; нужно для каждой функции создать ее объявление такого вида:</p>
+[System.Runtime.InteropServices.DllImport(&quot;MatlabFilename.dll&quot;)]<br/>
+public static extern uint MyMatlabFunc(int param1);
+<p></p>
+<p>При это&#1084; типы аргу&#1084;ентов и возвращае&#1084;ого значения данных должны соответствовать неуправляе&#1084;ы&#1084; типа&#1084; (с&#1084;. таблицу здесь:
+<a href="https://msdn.microsoft.com/ru-ru/library/ac7ay120(v=vs.110).aspx">https://msdn.microsoft.com/ru-ru/library/ac7ay120(v=vs.110).aspx</a>)</p>
+</div>

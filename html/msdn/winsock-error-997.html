@@ -1,0 +1,23 @@
+<h2>Ошибка с кодом 997 в WinSock</h2>
+<p>Date: 19.06.2018 16:24:26</p>
+<div>
+<p>LOL, &quot;наложенное событие&quot;, надо ж было такое написать... На са&#1084;о&#1084; деле код 997 (<strong style="color:#2a2a2a; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">WSA_IO_PENDING</strong>) в WinSock
+ обозначает не ошибку, а то, что асинхронная (&quot;overlapped&quot;) операция не &#1084;ожет быть завершена сразу же, и требуется выполнить ожидание.
+</p>
+<p>Скорее всего, в &quot;загрузчике&quot; просто баг, если он обрабатывает такую ситуацию как ошибку. Что-то более определенное по приведенной инфор&#1084;ации сказать нельзя.&nbsp;</p>
+</div>
+<h2>Message 428</h2>
+<p>Date: 20.06.2018 6:49:32</p>
+<div>
+<p>&quot;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>Это не я пишу, это винда такую ошибку возвращает</em></span>&quot;</p>
+<p>Я знаю. Это не повод не с&#1084;еяться.</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>На тысячах &#1084;ашин работает нор&#1084;ально, нет та&#1084; багов.</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Это не аргу&#1084;ент. Вообще ни разу.</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Разработчики отвечают обратитесь к ад&#1084;инистратору рабочего &#1084;еста - у вас сетевые ошибки. Написал на&nbsp;Microsoft
+ Community - те отправили сюда.</em>&quot;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span></p>
+<p>Ну так скажите разработчика&#1084;, чтобы в&#1084;есто отправки к &quot;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">ад&#1084;инистратору рабочего &#1084;еста</span>&quot; они исправляли
+ свои баги. Еще раз, ошибка с кодо&#1084; 997 при нор&#1084;альных условиях не возникает из за сетевой ошибки. Даже если предположить, что реальный баг-первопричина не в програ&#1084;&#1084;е, а в ОС/драйвере/фаерволе, без участия разработчиков са&#1084;ой
+ програ&#1084;&#1084;ы ничего решить не получится.&nbsp;</p>
+<p>У вас эта ошибка&nbsp;<span style="color:#333333; font-family:'Segoe UI',SegoeUI,'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:15px">997 единственная в логе? Может до нее есть другие ошибки? Если да, то нужно обращать вни&#1084;ание и&#1084;енно
+ на них.</span></p>
+</div>

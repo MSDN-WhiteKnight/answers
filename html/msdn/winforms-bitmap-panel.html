@@ -1,0 +1,59 @@
+<h2>Получить изображение с полным содержимым панели в Windows Forms</h2>
+<p>Date: 29.07.2018 19:32:26</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Модератор &#1084;олодец ляпнул не разобравшись в сути вопроса теперь на него никто не обратит вни&#1084;ания</em>&quot;</span></p>
+<p>Не в то&#1084; дело. На фору&#1084;е активность и так околонулевая, а сейчас еще и лето, отпуска.&nbsp;</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Пробле&#1084;а: удается сделать сни&#1084;ок только види&#1084;ой области контрола&nbsp;</em></span><br style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>А нужна картинка всего содержи&#1084;ого для создания общей &#1084;иниатюры</em>&quot;</span></p>
+<p>Могу предложить такое решение. Перед те&#1084;, как делать скриншот, вре&#1084;енно увеличьте раз&#1084;еры панели, так чтобы все эле&#1084;енты попали в &quot;кадр&quot; (если панель прокручивается, позицию прокрутки нужно также сбросить в начало). После
+ создания скриншота, верните все назад. Как-то так:</p>
+<pre class="prettyprint">            //сохраняе&#1084; текущее положение полос прокрутки
+            int scrollx = -panel1.AutoScrollPosition.X;
+            int scrolly = -panel1.AutoScrollPosition.Y;
+
+            Size szCurrent = panel1.Size; //сохраняе&#1084; текущий раз&#1084;ер панели
+            int xmax = panel1.Size.Width, ymax = panel1.Size.Height;
+            
+            //сбрасывае&#1084; полосы прокрутки в начало
+            panel1.AutoScrollPosition = new Point(0, 0);           
+
+            try
+            {
+
+                //найде&#1084; крайние координаты для эле&#1084;ентов на панели
+                foreach (Control c in panel1.Controls)
+                {
+                    if (c.Right &gt; xmax) xmax = c.Right;
+                    if (c.Bottom &gt; ymax) ymax = c.Bottom;
+                }
+
+                //добави&#1084; запас на полосы прокрутки
+                xmax &#43;= SystemInformation.VerticalScrollBarWidth;
+                ymax &#43;= SystemInformation.HorizontalScrollBarHeight;
+
+                //вре&#1084;енно увеличи&#1084; раз&#1084;еры панели, так чтобы все эле&#1084;енты на ней у&#1084;естились
+                panel1.Size = new System.Drawing.Size(xmax, ymax);                
+
+                //создади&#1084; полный скришот панели 
+                Bitmap memoryImage;
+                Rectangle rect = new Rectangle();
+                rect.Height = ymax;
+                rect.Width = xmax;
+                rect.X = 0;
+                rect.Y = 0;
+                memoryImage = new Bitmap(xmax, ymax);
+                panel1.DrawToBitmap(memoryImage, rect);
+                pictureBox1.Image = memoryImage;
+            }
+            finally
+            {
+                //возвращае&#1084; старый раз&#1084;ер
+                panel1.Size = szCurrent;
+
+                //возвращае&#1084; старые позиции прокрутки
+                panel1.AutoScrollPosition = new Point(scrollx, scrolly);                
+                
+            }</pre>
+<br/>
+<p></p>
+</div>

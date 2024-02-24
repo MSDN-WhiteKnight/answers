@@ -1,0 +1,17 @@
+<h2>Отправка большого файла по HTTP</h2>
+<p>Date: 27.12.2017 5:33:56</p>
+<div>
+Нехватка па&#1084;яти =/= утечка па&#1084;яти. Скорее всего, систе&#1084;а просто не &#1084;ожет выделить непрерывный блок па&#1084;яти необходи&#1084;ой длины (даже если в су&#1084;&#1084;е свободной па&#1084;яти достаточно). В&#1084;есто считывания всего
+ &#1084;ассива из&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">formDataStream целико&#1084;, нужно считывать данные отдельны&#1084;и порция&#1084;и, и соответственно в RequestStream
+ тоже писать отдельны&#1084;и порция&#1084;и.</span>
+</div>
+<h2>Message 577</h2>
+<p>Date: 27.12.2017 7:00:00</p>
+<div>
+<p>Ой, не увидел, что&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">formDataStream это MemoryStream. От него надо будет избавится и работать напря&#1084;ую с FileStream. Что-то вроде&nbsp;</span></p>
+<pre class="prettyprint">fileStream.CopyTo(RequestStream);</pre>
+<p>Пос&#1084;отрите,&nbsp;<a href="https://stackoverflow.com/q/1131425/8674428">здесь</a>&nbsp;вроде что-то есть.</p>
+<p>Пробле&#1084; не будет, так как в Http все и так отправляется пакета&#1084;и.</p>
+<p><br/>
+</p>
+</div>

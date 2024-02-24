@@ -1,0 +1,34 @@
+<h2>Работа с XPS в .NET</h2>
+<p>Date: 20.08.2017 7:53:38</p>
+<div>
+Причин &#1084;ожет быть &#1084;ного. Напри&#1084;ер, в начале файла находится UTF8 Byte Order Mark, а парсер ожидает текст без нее. Воз&#1084;ите текстовый редактор с функцией выбора кодировки (типа Notepad&#43;&#43;) и сохраните в &quot;UTF8 без Byte
+ Order Mark&quot;.
+</div>
+<h2>Message 698</h2>
+<p>Date: 20.08.2017 14:28:33</p>
+<div>
+Скиньте файл на файлооб&#1084;енник, пос&#1084;отрю. Не знаю, из-за чего еще &#1084;ожет быть такая ошибка.
+</div>
+<h2>Message 695</h2>
+<p>Date: 21.08.2017 5:51:48</p>
+<div>
+Нужен XPS файл, а не проект. У &#1084;еня нор&#1084;ально работает, если ваш XPS с первого сообщения скопировать в файл. У вас види&#1084;о с файло&#1084; что-то не так.
+</div>
+<h2>Message 693</h2>
+<p>Date: 22.08.2017 8:13:57</p>
+<div>
+XPS файл - са&#1084; по себе не XML. Он как доку&#1084;енты Office 2007&#43;, ZIP-архив, состоящий из XML-файлов. Ва&#1084; нужно его распаковать и взять файл 1.fpage (переи&#1084;енуйте&nbsp;XPS в ZIP, са&#1084;и все пой&#1084;ете).
+</div>
+<h2>Message 692</h2>
+<p>Date: 23.08.2017 8:16:17</p>
+<div>
+<p>С&#1084;отря под какую версию NET Framework вы планируете ко&#1084;пилировать. Если 4.5 или более новые, то используйте класс&nbsp;<span style="font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:13px"><a href="https://msdn.microsoft.com/ru-ru/library/system.io.compression.ziparchive(v=vs.110).aspx">System.IO.Compression.</a></span><a href="https://msdn.microsoft.com/ru-ru/library/system.io.compression.ziparchive(v=vs.110).aspx">ZipArchive</a>.
+ Через GetEntry получаете файл, пото&#1084; Open и работаете с потоко&#1084;.&nbsp;</p>
+<p>Если под более старые версии, то либо сторонние библиотеки, либо COM-объект Shell (переи&#1084;еновать в расширение *.zip и работать с архиво&#1084; как с папкой).</p>
+</div>
+<h2>Message 691</h2>
+<p>Date: 23.08.2017 9:54:13</p>
+<div>
+<p>С&#1084;. спецификацию фор&#1084;ата:&nbsp;<a href="https://www.ecma-international.org/activities/XML%20Paper%20Specification/XPS%20Standard.pdf">https://www.ecma-international.org/activities/XML%20Paper%20Specification/XPS%20Standard.pdf</a></p>
+<p>Пара&#1084;етр RenderTransform задает &#1084;атрицу преобразования, в которо&#1084; последние два пара&#1084;етра это координаты для операции переноса OffsetX, OffsetY.</p>
+</div>

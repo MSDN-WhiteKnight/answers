@@ -1,0 +1,63 @@
+<h2>Windows Forms - Перетаскивание строк в DataGridView</h2>
+<p>Date: 02.01.2019 8:03:14</p>
+<div>
+Для начала, у вас DataGridView привязана к источнику данных или нет?
+</div>
+<h2>Message 317</h2>
+<p>Date: 02.01.2019 11:20:51</p>
+<div>
+<p>Вот &#1084;ини&#1084;альный при&#1084;ер перетаскивания строк:</p>
+<pre class="prettyprint">using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Text;
+using System.Windows.Forms;
+using System.Drawing;
+
+namespace WindowsFormsApplication1
+{
+    public partial class Form1 : Form
+    {
+        
+        public Form1()
+        {
+            InitializeComponent();
+            dataGridView1.AllowDrop = true;               
+        }
+
+        private void dataGridView1_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.Move;
+        }
+
+        private void dataGridView1_DragDrop(object sender, DragEventArgs e)
+        {
+            Point p = dataGridView1.PointToClient(new Point(e.X, e.Y));            
+            int TargetRow = dataGridView1.HitTest(p.X, p.Y).RowIndex;
+            int DraggedRow = (int)e.Data.GetData(typeof(int));
+
+            if (TargetRow &lt; 0 || DraggedRow &lt; 0 || TargetRow &gt;= dataGridView1.Rows.Count-1 || 
+                DraggedRow &gt;= dataGridView1.Rows.Count-1 || TargetRow == DraggedRow) return;
+
+            var row = dataGridView1.Rows[DraggedRow];
+            dataGridView1.Rows.RemoveAt(DraggedRow);
+            dataGridView1.Rows.Insert(TargetRow, row);            
+        }
+
+        private void dataGridView1_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.Button.HasFlag(MouseButtons.Left))
+            {
+                int DraggedRow = e.RowIndex;
+                DragDropEffects dropEffect = dataGridView1.DoDragDrop((object)DraggedRow,DragDropEffects.Move); 
+            }
+        }   
+        
+    }
+    
+}
+</pre>
+<br/>
+<p>Источник:&nbsp;<a href="https://social.msdn.microsoft.com/Forums/windows/en-US/16b0a44e-35a0-4bc8-9ccd-ec2c62c95a55/select-and-drag-a-datagridview-row-with-a-single-click?forum=winforms">https://social.msdn.microsoft.com/Forums/windows/en-US/16b0a44e-35a0-4bc8-9ccd-ec2c62c95a55/select-and-drag-a-datagridview-row-with-a-single-click?forum=winforms</a></p>
+<p></p>
+</div>

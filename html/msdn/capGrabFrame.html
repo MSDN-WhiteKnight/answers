@@ -1,0 +1,11 @@
+<h2>Использование функции capGrabFrame</h2>
+<p>Date: 04.12.2017 8:49:17</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Наверное, пробле&#1084;а в то&#1084;, что capGrabFrame посылает сообщение с по&#1084;ощью функции SendMessage, которая синхронно ожидает
+ завершения обработки сообщения, блокируя текущий поток (и, соответственно, делая &#1084;ногопоточность бесполезной). Попробуйте посылать сообщение&nbsp;</span>WM_CAP_GRAB_FRAME с использование&#1084; функции&nbsp;<span style="color:#454545; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&nbsp;</span><a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms644951(v=vs.85).aspx" style="font-family:'Segoe UI Semibold','Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:1.429em; color:#00188f"><strong>SendMessageCallback</strong></a>
+ или <strong style="font-family:'Segoe UI Semibold','Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:1.429em; color:#00188f">
+<a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ms644944(v=vs.85).aspx" style="font-family:'Segoe UI Semibold','Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:1.429em; color:#00188f">PostMessage</a>.</strong></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>OpenCV, которая тоже использует vfw32</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Строго говоря, это не так. OpenCV &#1084;ожет использовать разные &#1084;еханиз&#1084;ы для захвата, VFW не единственный вариант (и далеко
+ не са&#1084;ый лучший, т.к. этот интерфейс уже не поддерживается).&nbsp;</span><strong style="font-family:'Segoe UI Semibold','Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px; line-height:1.429em; color:#00188f"></strong></p>
+</div>

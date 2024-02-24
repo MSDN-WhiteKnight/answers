@@ -1,0 +1,32 @@
+<h2>Использование Microsoft.Expression.Encoder</h2>
+<p>Date: 10.01.2017 6:03:07</p>
+<div>
+<p>приведите вывод Exception.ToString()</p>
+<p>по&#1084;и&#1084;о отсуствия сборки, это &#1084;ожет быть отсутствие определенного ключа в реестре</p>
+<p>должен ли SDK <span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+програ&#1084;&#1084;ы</span>&nbsp;вообще работать без этой програ&#1084;&#1084;ы? те&#1084; более учитывая что часть ее функций доступна только в платной версии</p>
+<p>--- Добавлено ---</p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>Получается нет воз&#1084;ожности без дополнительной установки sdk использовать &#1084;ою програ&#1084;&#1084;у?</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Можно попробовать отследить какие и&#1084;енно ключи реестра требуются для запуска нужных ва&#1084; функций, и подсадить их на целевую
+ систе&#1084;у. Вопрос только, как на это с&#1084;отрит лицензионное соглашение</span></p>
+<br/>
+</div>
+<h2>Message 1007</h2>
+<p>Date: 10.01.2017 9:32:25</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>А вот есть ли с&#1084;ысл подробно расс&#1084;атривать Exception.ToString()</em>&quot;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Есть.&nbsp;</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">1.&nbsp;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">System.TypeInitializationException
+ происходит при необработанно&#1084; исключении в конструкторе типа, и в InnerException находиться первоначальное исключение. Соответственно, в его тексте &#1084;ожет быть полезная инфор&#1084;ация.</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">2. Трассировка стека по&#1084;ожет понять, на како&#1084; и&#1084;енно &#1084;етоде падает програ&#1084;&#1084;а, что тоже &#1084;ожет
+ быть полезны&#1084;.</span></p>
+</div>
+<h2>Message 1005</h2>
+<p>Date: 11.01.2017 3:14:11</p>
+<div>
+<p>в качестве последней попытки, запихните&nbsp;<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Microsoft.Expression.Encoder.resources.dll в подкаталог en каталога с&nbsp;</span><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Microsoft.Expression.Encoder.dll</span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">------</span></p>
+<p><a href="http://uprightbassics.blogspot.ru/2014/01/how-to-deploy-expression-encoder-4-sdk.html">http://uprightbassics.blogspot.ru/2014/01/how-to-deploy-expression-encoder-4-sdk.html</a>&nbsp;- вот статья по те&#1084;е, рассказывается как достать нужный файл
+ из дистрибутива<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"></span><br/>
+</p>
+</div>

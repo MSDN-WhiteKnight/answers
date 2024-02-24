@@ -1,0 +1,24 @@
+<h2>Диагностика BSOD</h2>
+<p>Date: 19.09.2017 5:43:58</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">&quot;<em>что делать</em>&quot;</span></p>
+<p><a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/crash-dump-files">анализ да&#1084;пов через WinDbg</a>. Выявлять какой &#1084;одуль в каждо&#1084; случае падает и с какой ошибкой. &nbsp;</p>
+</div>
+<h2>Message 666</h2>
+<p>Date: 19.09.2017 9:01:28</p>
+<div>
+<p>Данная ошибка означает, что процессор завис при выполнении прерывания с уровне&#1084; выше Clock Timer (13 в x64), т.е.:</p>
+<p><span style="color:#333333; font-family:'Segoe UI',Tahoma,Arial,'Helvetica Neue',Helvetica,sans-serif; font-size:14px">Interprocessor interrupt,
+</span>Power failure<span style="color:#333333; font-family:'Segoe UI',Tahoma,Arial,'Helvetica Neue',Helvetica,sans-serif; font-size:14px">, или&nbsp;</span>High level interrupt</p>
+<p>Соответственно это &#1084;ожет быть как аппаратная, так и програ&#1084;&#1084;ная пробле&#1084;а. С&#1084;. напри&#1084;ер
+<a href="https://blogs.msdn.microsoft.com/ntdebugging/2011/10/26/debugging-a-clock_watchdog_timeout-bugcheck/">
+эту статью</a> о &#1084;етодах исследования (если бы вы с&#1084;огли повторить что-то из этого, было бы кстати). Для начала хотя бы получить несколько да&#1084;пов и пос&#1084;отреть, что &#1084;ежду ни&#1084;и общего.&nbsp;</p>
+<p><span style="color:#333333; font-family:'Segoe UI',Tahoma,Arial,'Helvetica Neue',Helvetica,sans-serif; font-size:14px"></span></p>
+</div>
+<h2>Message 665</h2>
+<p>Date: 19.09.2017 9:35:02</p>
+<div>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px"><em>&quot;Насчет повторить - хорошая шутка&quot;</em></span></p>
+<p><span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">Не все (понятно что на 10 ядрах задолбаетесь), хотя бы в части выполнения ко&#1084;анды !thread на пробле&#1084;ный процессор - 10-й в
+ ваше&#1084; случае, чтобы узнать какой поток он выполнял в &#1084;о&#1084;ент зависания.&nbsp;</span></p>
+</div>

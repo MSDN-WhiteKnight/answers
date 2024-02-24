@@ -1,0 +1,18 @@
+<h2>Не отображаются эмодзи в WPF</h2>
+<p>Date: 07.05.2020 5:57:40</p>
+<div>
+<p>Прикол в то&#1084;, что таблица си&#1084;волов похоже не переваривает коды больше FFFF, поэто&#1084;у
+<span style="color:#333333; font-family:'Segoe UI','Lucida Grande',Verdana,Arial,Helvetica,sans-serif; font-size:14px">
+U&#43;1F844</span> вы не увидите, даже если он есть в шрифте. В Courier New его конечно же нету. В WPF для диапазона 1F800-1F8FF в файле C:\Windows\Microsoft.NET\Framework\...\WPF\Fonts\GlobalUserInterface.CompositeFont заданы такие привязки:</p>
+<pre class="prettyprint" style="">&lt;!-- Segoe UI Symbol covers all on Win8; Cambria Math covers 2900-2AFF; MS Gothic has little coverage --&gt;
+&lt;!-- Segoe UI Emoji supports only emoji characters in these ranges; not adding to avoid uneven display --&gt;
+&lt;FontFamilyMap
+                Unicode     = &quot;27C0-2BFF, 1F800-1F8FF&quot;
+                Target      = &quot;Segoe UI Symbol, Cambria Math, MS Gothic&quot;
+                Scale       = &quot;1.0&quot; /&gt;</pre>
+Так что стрелка в одно&#1084; из этих трех шрифтов.&nbsp;<br/>
+<p></p>
+<p></p>
+<p></p>
+&nbsp;&nbsp;<br/>
+</div>
