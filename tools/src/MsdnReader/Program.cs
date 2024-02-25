@@ -19,14 +19,20 @@ namespace MsdnReader
 
     class Program
     {
+        const string AuthorName = "VadimTagil";
+        const string AuthorHomepage = "https://smallsoft2.blogspot.com";
+
         static void CreateIndex(string dir)
         {
             string[] files = Directory.GetFiles(dir, "*.html");
             List<WebPage> pages = new List<WebPage>(files.Length);
+            string outdir = Path.Combine(dir, "Output");
+            Directory.CreateDirectory(outdir);
 
-            // Read page headings
+            // Read input files
             for (int i = 0; i < files.Length; i++)
             {
+                // Read page name and title
                 string name = Path.GetFileName(files[i]);
                 string content = File.ReadAllText(files[i]);
                 string title = Path.GetFileNameWithoutExtension(files[i]);
@@ -44,14 +50,33 @@ namespace MsdnReader
                 WebPage page = new WebPage();
                 page.Title = title;
                 page.Name = name;
-                
-                if (name != "index.html") pages.Add(page);
+
+                if (name == "index.html") continue;
+
+                pages.Add(page);
+
+                // Copy resulting file into output directory
+                StringBuilder sb = new StringBuilder((int)(content.Length * 1.5));
+                sb.Append("<html><head><title>");
+                sb.Append(title);
+                sb.AppendLine("</title></head><body>");
+                sb.AppendLine("<p><a href=\"index.html\">Ответы с форумов MSDN</a></p>");
+                sb.AppendLine(content);
+                sb.Append("<hr/>");
+                sb.AppendLine("<p>Автор: <a href=\"" + AuthorHomepage + "\">" + AuthorName + "</a></p>");
+                sb.Append("<p><a href=\"https://msdn-whiteknight.github.io/answers/html/\">Главная страница</a> - ");
+                sb.Append("<a href=\"index.html\">Список тем</a> - ");
+                sb.AppendLine("<a href=\"https://github.com/MSDN-WhiteKnight/answers\">Репозиторий на GitHub</a></p>");
+                sb.AppendLine("</body></html>");
+
+                string targetName = Path.Combine(outdir, name);
+                File.WriteAllText(targetName, sb.ToString());
             }
 
             // Build index
             Console.WriteLine("Pages: " + pages.Count);
             pages.Sort();
-            string indexPath = Path.Combine(dir, "index.html");
+            string indexPath = Path.Combine(outdir, "index.html");
             StreamWriter wr = new StreamWriter(indexPath);
             
             using (wr)
@@ -72,7 +97,7 @@ namespace MsdnReader
                 }
 
                 wr.WriteLine("</div><hr/>");
-                wr.WriteLine("<p>Автор: <a href=\"https://smallsoft2.blogspot.com\">VadimTagil</a></p>");
+                wr.WriteLine("<p>Автор: <a href=\"" + AuthorHomepage + "\">" + AuthorName + "</a></p>");
                 wr.WriteLine("<p><a href=\"https://msdn-whiteknight.github.io/answers/html/\">Главная страница</a> - ");
                 wr.WriteLine("<a href=\"https://github.com/MSDN-WhiteKnight/answers\">Репозиторий на GitHub</a></p>");
                 wr.WriteLine("</body></html>");
@@ -84,7 +109,7 @@ namespace MsdnReader
         /// <summary>
         /// Reads JSON dump of MSDN forum messages and writes content to HTML files
         /// </summary>
-        static void Main(string[] args)
+        static void ExtractMessages()
         {
             string input = @"..\..\..\..\..\..\MSDN\forum.json";
             string outputDir = @"..\..\..\..\..\..\MSDN\";
@@ -140,6 +165,11 @@ namespace MsdnReader
             }
 
             Console.WriteLine("Files processed: " + n.ToString());
+        }
+        
+        static void Main()
+        {
+            ExtractMessages();
             Console.ReadLine();
         }
     }
