@@ -92,7 +92,7 @@ namespace MsdnReader
 
                 for (int i = 0; i < pages.Count; i++)
                 {
-                    wr.WriteLine("<a href=\"" + pages[i].Name + "\">" + pages[i].Title);
+                    wr.Write("<a href=\"" + pages[i].Name + "\">" + pages[i].Title);
                     wr.WriteLine("</a><br/>");
                 }
 
