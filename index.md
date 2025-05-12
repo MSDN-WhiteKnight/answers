@@ -13,4 +13,4 @@
 ## См. также
 
 - [CIL Tools](https://github.com/MSDN-WhiteKnight/CilTools/)
-- [SmallSoft - бесплатные программы](https://smallsoft2.blogspot.com/)
+- [SmallSoft - бесплатные программы](https://smallsoftru.wordpress.com)
