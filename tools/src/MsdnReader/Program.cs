@@ -20,7 +20,7 @@ namespace MsdnReader
     class Program
     {
         const string AuthorName = "VadimTagil";
-        const string AuthorHomepage = "https://smallsoft2.blogspot.com";
+        const string AuthorHomepage = "https://smallsoftru.wordpress.com";
 
         static void CreateIndex(string dir)
         {
